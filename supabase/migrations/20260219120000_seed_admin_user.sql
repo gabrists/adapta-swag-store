@@ -50,14 +50,16 @@ BEGIN
       user_id,
       identity_data,
       provider,
+      provider_id,
       last_sign_in_at,
       created_at,
       updated_at
     ) VALUES (
-      new_user_id::text,
+      gen_random_uuid(),
       new_user_id,
       json_build_object('sub', new_user_id, 'email', 'admin@adapta.org'),
       'email',
+      new_user_id::text,
       now(),
       now(),
       now()
