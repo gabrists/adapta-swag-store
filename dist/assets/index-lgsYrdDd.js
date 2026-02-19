@@ -24125,8 +24125,9 @@ function Layout() {
 				className: "hidden md:block bg-white border-b border-slate-200 sticky top-0 z-40",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "max-w-7xl mx-auto px-6 h-16 flex items-center justify-between",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "flex items-center gap-2.5",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Link, {
+						to: "/",
+						className: "flex items-center gap-2.5 hover:opacity-80 transition-opacity",
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 							className: "w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Package2, { className: "w-5 h-5" })
@@ -39105,4 +39106,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-Bm0gwq-a.js.map
+//# sourceMappingURL=index-lgsYrdDd.js.map
