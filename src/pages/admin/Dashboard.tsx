@@ -1,11 +1,5 @@
 import { useState, useMemo } from 'react'
-import {
-  Package,
-  DollarSign,
-  AlertTriangle,
-  Users,
-  TrendingUp,
-} from 'lucide-react'
+import { Package, AlertTriangle, Users, TrendingUp } from 'lucide-react'
 import {
   startOfMonth,
   startOfQuarter,
@@ -86,27 +80,13 @@ export default function Dashboard() {
     [filteredHistory],
   )
 
-  // 2. Delivered Value
-  const deliveredValue = useMemo(() => {
-    return filteredHistory.reduce((acc, entry) => {
-      let entryValue = 0
-      entry.items.forEach((item) => {
-        const product = products.find((p) => p.id === item.productId)
-        if (product) {
-          entryValue += (product.price || 0) * item.quantity
-        }
-      })
-      return acc + entryValue
-    }, 0)
-  }, [filteredHistory, products])
-
-  // 3. Critical Stock
+  // 2. Critical Stock
   const criticalStockCount = useMemo(
     () => products.filter((p) => p.stock < 5).length,
     [products],
   )
 
-  // 4. Top Consuming Area
+  // 3. Top Consuming Area
   const topConsumingArea = useMemo(() => {
     const departmentCounts: Record<string, number> = {}
 
@@ -230,7 +210,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card className="shadow-sm border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">
@@ -244,26 +224,6 @@ export default function Dashboard() {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Itens retirados no período
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm border-slate-100 bg-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
-              Valor Entregue
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#0E9C8B]">
-              R${' '}
-              {deliveredValue.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-              })}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Valor estimado entregue
             </p>
           </CardContent>
         </Card>
