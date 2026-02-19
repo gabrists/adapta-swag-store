@@ -2,6 +2,7 @@ import { Outlet, NavLink, Link, useLocation } from 'react-router-dom'
 import { Store, History, Package2, PackagePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
+import { UserProfile } from '@/components/UserProfile'
 
 export default function Layout() {
   const location = useLocation()
@@ -29,45 +30,66 @@ export default function Layout() {
       {/* Desktop Header */}
       <header className="hidden md:block bg-white border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
-          >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20">
+          <div className="flex items-center gap-8">
+            <Link
+              to="/"
+              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <Package2 className="w-5 h-5" />
+              </div>
+              <span className="font-display font-bold text-xl tracking-tight text-slate-900">
+                Adapta <span className="text-primary">Swag</span>
+              </span>
+            </Link>
+
+            <nav className="flex items-center gap-1">
+              {navItems.map((item) => {
+                const isPrimaryAction = item.path === '/gerenciar'
+
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={({ isActive }) =>
+                      cn(
+                        isPrimaryAction
+                          ? buttonVariants({ variant: 'default', size: 'sm' })
+                          : 'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2',
+                        !isPrimaryAction &&
+                          (isActive
+                            ? 'bg-slate-100 text-primary'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'),
+                        isPrimaryAction && 'ml-2 gap-2 shadow-sm',
+                      )
+                    }
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </NavLink>
+                )
+              })}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <UserProfile />
+          </div>
+        </div>
+      </header>
+
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div className="px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
               <Package2 className="w-5 h-5" />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight text-slate-900">
+            <span className="font-display font-bold text-lg tracking-tight text-slate-900">
               Adapta <span className="text-primary">Swag</span>
             </span>
           </Link>
-
-          <nav className="flex items-center gap-1">
-            {navItems.map((item) => {
-              const isPrimaryAction = item.path === '/gerenciar'
-
-              return (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  className={({ isActive }) =>
-                    cn(
-                      isPrimaryAction
-                        ? buttonVariants({ variant: 'default', size: 'sm' })
-                        : 'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2',
-                      !isPrimaryAction &&
-                        (isActive
-                          ? 'bg-slate-100 text-primary'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'),
-                      isPrimaryAction && 'ml-2 gap-2 shadow-sm',
-                    )
-                  }
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </NavLink>
-              )
-            })}
-          </nav>
+          <UserProfile align="end" showName={false} />
         </div>
       </header>
 
