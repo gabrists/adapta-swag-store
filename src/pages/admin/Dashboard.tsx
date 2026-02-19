@@ -1,11 +1,21 @@
 import { useState, useMemo } from 'react'
-import { Package, AlertTriangle, Users, TrendingUp } from 'lucide-react'
+import {
+  Package,
+  AlertTriangle,
+  Users,
+  TrendingUp,
+  DollarSign,
+  ExternalLink,
+} from 'lucide-react'
 import {
   startOfQuarter,
   startOfYear,
   isAfter,
   subDays,
   isValid,
+  startOfMonth,
+  endOfMonth,
+  isWithinInterval,
 } from 'date-fns'
 import {
   BarChart,
@@ -39,6 +49,7 @@ import {
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   ChartContainer,
   ChartTooltip,
@@ -72,7 +83,6 @@ export default function Dashboard() {
     return history.filter((entry) => {
       if (!entry.date) return false
       const entryDate = new Date(entry.date)
-      // Robust date validation to prevent invalid date comparisons
       if (!isValid(entryDate)) return false
       return isAfter(entryDate, startDate)
     })
@@ -80,7 +90,7 @@ export default function Dashboard() {
 
   // --- KPI Calculations ---
 
-  // 1. Total Outputs - Validated to ensure numeric result
+  // 1. Total Outputs
   const totalOutputs = useMemo(
     () =>
       filteredHistory.reduce((acc, entry) => {
@@ -90,7 +100,7 @@ export default function Dashboard() {
     [filteredHistory],
   )
 
-  // 2. Critical Stock - Validated filter
+  // 2. Critical Stock
   const criticalStockCount = useMemo(
     () =>
       products.filter((p) => {
@@ -100,7 +110,7 @@ export default function Dashboard() {
     [products],
   )
 
-  // 3. Top Consuming Area - Validated accumulation
+  // 3. Top Consuming Area
   const topConsumingArea = useMemo(() => {
     const departmentCounts: Record<string, number> = {}
 
@@ -119,9 +129,36 @@ export default function Dashboard() {
     return sortedDepts.length > 0 ? sortedDepts[0][0] : 'N/A'
   }, [filteredHistory, team])
 
+  // 4. Monthly Total Cost (Current Calendar Month)
+  const monthlyTotalCost = useMemo(() => {
+    const now = new Date()
+    const start = startOfMonth(now)
+    const end = endOfMonth(now)
+
+    // Filter history for current month only, regardless of dashboard filter
+    const currentMonthHistory = history.filter((entry) => {
+      if (!entry.date) return false
+      const entryDate = new Date(entry.date)
+      return isValid(entryDate) && isWithinInterval(entryDate, { start, end })
+    })
+
+    let totalCost = 0
+    currentMonthHistory.forEach((entry) => {
+      if (Array.isArray(entry.items)) {
+        entry.items.forEach((item) => {
+          const product = products.find((p) => p.id === item.productId)
+          const qty = Number(item.quantity) || 0
+          const unitCost = Number(product?.unitCost) || 0
+          totalCost += qty * unitCost
+        })
+      }
+    })
+    return totalCost
+  }, [history, products])
+
   // --- Chart Data Preparation ---
 
-  // Top 5 Popular Items - Validated quantities
+  // Top 5 Popular Items
   const popularItemsData = useMemo(() => {
     const itemCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
@@ -141,7 +178,7 @@ export default function Dashboard() {
       .slice(0, 5)
   }, [filteredHistory])
 
-  // Department Distribution - Validated values
+  // Department Distribution (Quantity)
   const departmentData = useMemo(() => {
     const deptCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
@@ -157,7 +194,33 @@ export default function Dashboard() {
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory, team])
 
-  // Replenishment List - Validated stock
+  // Department Cost Data (Cost)
+  const departmentCostData = useMemo(() => {
+    const deptCosts: Record<string, number> = {}
+
+    filteredHistory.forEach((entry) => {
+      const collaborator = team.find((c) => c.name === entry.user)
+      const dept = collaborator?.department || 'Outros'
+
+      let entryCost = 0
+      if (Array.isArray(entry.items)) {
+        entry.items.forEach((item) => {
+          const product = products.find((p) => p.id === item.productId)
+          const qty = Number(item.quantity) || 0
+          const unitCost = Number(product?.unitCost) || 0
+          entryCost += qty * unitCost
+        })
+      }
+
+      deptCosts[dept] = (deptCosts[dept] || 0) + entryCost
+    })
+
+    return Object.entries(deptCosts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+  }, [filteredHistory, team, products])
+
+  // Replenishment List (Critical Stock)
   const lowStockProducts = useMemo(
     () =>
       products
@@ -165,11 +228,11 @@ export default function Dashboard() {
           const stock = Number(p.stock)
           return !isNaN(stock) && stock < 5
         })
-        .slice(0, 5),
+        .slice(0, 8), // Show slightly more if space allows
     [products],
   )
 
-  // Recent Transactions - Safe mapping
+  // Recent Transactions
   const recentTransactions = useMemo(() => {
     return filteredHistory.slice(0, 10).map((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
@@ -193,6 +256,13 @@ export default function Dashboard() {
     quantity: {
       label: 'Quantidade',
       color: '#0E9C8B',
+    },
+  } satisfies ChartConfig
+
+  const costBarChartConfig = {
+    value: {
+      label: 'Custo (R$)',
+      color: '#6366F1',
     },
   } satisfies ChartConfig
 
@@ -244,7 +314,7 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-sm border-slate-100 bg-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">
@@ -258,6 +328,26 @@ export default function Dashboard() {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Itens retirados no período
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border-slate-100 bg-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-600">
+              Custo Total Mensal
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-slate-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-slate-900">
+              {new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }).format(monthlyTotalCost)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Gasto no mês atual
             </p>
           </CardContent>
         </Card>
@@ -317,52 +407,37 @@ export default function Dashboard() {
         <Card className="shadow-sm border-slate-100 bg-white">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-slate-800">
-              Top 5 Itens Mais Populares
+              Custo por Departamento (R$)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer
-              config={barChartConfig}
+              config={costBarChartConfig}
               className="h-[300px] w-full min-w-0"
             >
               <BarChart
                 accessibilityLayer
-                data={popularItemsData}
-                layout="vertical"
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                data={departmentCostData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid
-                  horizontal={false}
-                  strokeDasharray="3 3"
-                  stroke="#f0f0f0"
-                />
-                <YAxis
+                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <XAxis
                   dataKey="name"
-                  type="category"
                   tickLine={false}
+                  tickMargin={10}
                   axisLine={false}
-                  width={140}
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tickFormatter={(value) => value.slice(0, 10)}
                 />
-                <XAxis type="number" hide />
                 <ChartTooltip
-                  cursor={{ fill: 'transparent' }}
-                  content={<ChartTooltipContent indicator="line" />}
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dashed" />}
                 />
                 <Bar
-                  dataKey="quantity"
-                  layout="vertical"
-                  fill="var(--color-quantity)"
-                  radius={[0, 4, 4, 0]}
-                  barSize={20}
-                >
-                  <LabelList
-                    dataKey="quantity"
-                    position="right"
-                    offset={8}
-                    className="fill-slate-600 text-xs font-bold"
-                  />
-                </Bar>
+                  dataKey="value"
+                  fill="var(--color-value)"
+                  radius={4}
+                  barSize={40}
+                />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -371,7 +446,7 @@ export default function Dashboard() {
         <Card className="shadow-sm border-slate-100 bg-white">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-slate-800">
-              Distribuição por Departamento
+              Distribuição por Departamento (Qtd)
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -514,48 +589,63 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Replenishment Alerts Widget - Takes 1 col */}
-        <Card className="shadow-sm border-slate-100 bg-white h-full">
+        {/* Replenishment Alerts Widget (Atenção List) */}
+        <Card className="shadow-sm border-slate-100 bg-white h-full flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Alertas de Reposição
+              Atenção: Reposição
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 overflow-y-auto max-h-[400px]">
             {lowStockProducts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500">
+              <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500 h-full">
                 <Package className="h-10 w-10 text-emerald-100 mb-2" />
                 <p className="text-sm">Estoque saudável!</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {lowStockProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-red-50 border border-red-100"
+                    className="flex flex-col gap-2 p-3 rounded-lg bg-red-50 border border-red-100"
                   >
-                    <div className="mt-0.5">
-                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-red-900 line-clamp-1">
+                          {product.name}
+                        </h4>
+                        <p className="text-xs text-red-700 font-medium mt-0.5">
+                          Restam apenas {Number(product.stock) || 0} unidades
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-red-900 line-clamp-1">
-                        {product.name}
-                      </h4>
-                      <p className="text-xs text-red-700 font-medium mt-0.5">
-                        Restam apenas {Number(product.stock) || 0} unidades
-                      </p>
-                    </div>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full text-xs h-7 bg-white hover:bg-red-100 border-red-200 text-red-700 gap-1"
+                      disabled={!product.supplierUrl}
+                      onClick={() => {
+                        if (product.supplierUrl) {
+                          window.open(product.supplierUrl, '_blank')
+                        }
+                      }}
+                    >
+                      {product.supplierUrl ? (
+                        <>
+                          Repor Estoque
+                          <ExternalLink className="h-3 w-3" />
+                        </>
+                      ) : (
+                        'Sem URL do Fornecedor'
+                      )}
+                    </Button>
                   </div>
                 ))}
-                {products.filter((p) => (Number(p.stock) || 0) < 5).length >
-                  5 && (
-                  <p className="text-xs text-center text-slate-400 mt-2">
-                    Exibindo 5 de{' '}
-                    {products.filter((p) => (Number(p.stock) || 0) < 5).length}{' '}
-                    itens críticos
-                  </p>
-                )}
               </div>
             )}
           </CardContent>

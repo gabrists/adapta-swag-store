@@ -19,6 +19,8 @@ export interface Product {
   hasGrid: boolean
   grid?: ProductSizeGrid
   price: number // Added for Dashboard KPI
+  unitCost: number // Added for Financial KPI
+  supplierUrl?: string // Added for Restock
 }
 
 export interface CartItem {

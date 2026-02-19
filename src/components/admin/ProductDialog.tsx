@@ -2,14 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import {
-  Loader2,
-  Save,
-  Upload,
-  X,
-  Image as ImageIcon,
-  CloudUpload,
-} from 'lucide-react'
+import { Loader2, Save, X, Image as ImageIcon, CloudUpload } from 'lucide-react'
 
 import { Product } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -28,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -48,6 +42,8 @@ const formSchema = z.object({
   category: z.string().min(1, 'Selecione uma categoria'),
   description: z.string().min(5, 'Descrição é obrigatória'),
   imageQuery: z.string().min(2, 'Informe um termo ou faça upload'),
+  unitCost: z.coerce.number().min(0, 'Custo não pode ser negativo'),
+  supplierUrl: z.string().url('URL inválida').optional().or(z.literal('')),
   hasGrid: z.boolean(),
   stock: z.coerce.number().min(0).optional(),
   gridPP: z.coerce.number().min(0).optional(),
@@ -82,6 +78,8 @@ export function ProductDialog({
       category: 'Institucional',
       description: '',
       imageQuery: '',
+      unitCost: 0,
+      supplierUrl: '',
       hasGrid: false,
       stock: 0,
       gridPP: 0,
@@ -102,6 +100,8 @@ export function ProductDialog({
           category: product.category,
           description: product.description || '',
           imageQuery: product.imageQuery,
+          unitCost: product.unitCost || 0,
+          supplierUrl: product.supplierUrl || '',
           hasGrid: product.hasGrid,
           stock: product.stock,
           gridPP: product.grid?.PP || 0,
@@ -127,6 +127,8 @@ export function ProductDialog({
           category: 'Institucional',
           description: '',
           imageQuery: '',
+          unitCost: 0,
+          supplierUrl: '',
           hasGrid: false,
           stock: 0,
           gridPP: 0,
@@ -146,21 +148,19 @@ export function ProductDialog({
     if (file) {
       try {
         setIsUploading(true)
-        // Optimistic preview
         const reader = new FileReader()
         reader.onloadend = () => {
           setImagePreview(reader.result as string)
         }
         reader.readAsDataURL(file)
 
-        // Actual upload
         const url = await uploadToR2(file)
         form.setValue('imageQuery', url, { shouldValidate: true })
-        setImagePreview(url) // Update with "remote" URL (simulated)
+        setImagePreview(url)
 
         toast({
           title: 'Upload concluído',
-          description: 'Imagem enviada para Cloudflare R2 com sucesso.',
+          description: 'Imagem enviada com sucesso.',
           className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
         })
       } catch (error) {
@@ -172,7 +172,6 @@ export function ProductDialog({
               : 'Não foi possível enviar a imagem.',
           variant: 'destructive',
         })
-        // Reset preview on error
         if (form.getValues('imageQuery')) {
           setImagePreview(form.getValues('imageQuery'))
         } else {
@@ -201,6 +200,8 @@ export function ProductDialog({
       category: values.category,
       description: values.description,
       imageQuery: values.imageQuery,
+      unitCost: values.unitCost,
+      supplierUrl: values.supplierUrl,
       hasGrid: values.hasGrid,
       stock: values.hasGrid ? 0 : values.stock,
       grid: values.hasGrid
@@ -224,7 +225,7 @@ export function ProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] rounded-xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] rounded-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Editar Item' : 'Novo Item'}</DialogTitle>
           <DialogDescription>
@@ -236,25 +237,25 @@ export function ProductDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome do Produto</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Ex: Mochila Executiva"
-                      className="rounded-lg"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome do Produto</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Ex: Mochila Executiva"
+                        className="rounded-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="category"
@@ -288,15 +289,64 @@ export function ProductDialog({
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="unitCost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Custo Unitário (R$)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="rounded-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Visível apenas para admins
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="supplierUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL do Fornecedor</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://..."
+                        className="rounded-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border p-3 shadow-sm bg-slate-50">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Controle de Grade</FormLabel>
+                <FormDescription>
+                  Este produto possui variação de tamanhos?
+                </FormDescription>
+              </div>
               <FormField
                 control={form.control}
                 name="hasGrid"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel>Tem tamanhos?</FormLabel>
-                    </div>
+                  <FormItem>
                     <FormControl>
                       <Switch
                         checked={field.value}
@@ -309,104 +359,31 @@ export function ProductDialog({
             </div>
 
             {hasGrid ? (
-              <div className="space-y-2 border rounded-lg p-3 bg-slate-50">
+              <div className="space-y-2 border rounded-lg p-3 bg-white">
                 <FormLabel>Grade de Estoque</FormLabel>
                 <div className="grid grid-cols-5 gap-2">
-                  <FormField
-                    control={form.control}
-                    name="gridPP"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-center block">
-                          PP
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            className="text-center px-1 rounded-md"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gridP"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-center block">
-                          P
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            className="text-center px-1 rounded-md"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gridM"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-center block">
-                          M
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            className="text-center px-1 rounded-md"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gridG"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-center block">
-                          G
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            className="text-center px-1 rounded-md"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="gridGG"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-xs text-center block">
-                          GG
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min="0"
-                            className="text-center px-1 rounded-md"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+                  {['PP', 'P', 'M', 'G', 'GG'].map((size) => (
+                    <FormField
+                      key={size}
+                      control={form.control}
+                      name={`grid${size}` as any}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-xs text-center block">
+                            {size}
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              className="text-center px-1 rounded-md"
+                              {...field}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  ))}
                 </div>
               </div>
             ) : (
@@ -432,7 +409,6 @@ export function ProductDialog({
 
             <div className="space-y-4">
               <FormLabel>Imagem do Produto</FormLabel>
-
               <div className="flex flex-col gap-4">
                 {imagePreview ? (
                   <div className="relative w-full h-40 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 group">
@@ -475,7 +451,7 @@ export function ProductDialog({
                       <div className="flex flex-col items-center gap-2">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                         <span className="text-sm text-slate-500">
-                          Enviando para Cloudflare R2...
+                          Enviando...
                         </span>
                       </div>
                     ) : (
@@ -484,14 +460,10 @@ export function ProductDialog({
                         <span className="text-sm text-slate-500">
                           Clique para fazer upload
                         </span>
-                        <span className="text-xs text-slate-400 mt-1">
-                          armazenamento seguro via R2
-                        </span>
                       </>
                     )}
                   </div>
                 )}
-
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -500,15 +472,6 @@ export function ProductDialog({
                   className="hidden"
                   disabled={isUploading}
                 />
-
-                <div className="flex items-center gap-2">
-                  <div className="h-px bg-slate-200 flex-1"></div>
-                  <span className="text-xs text-slate-400 uppercase">
-                    Ou use um termo
-                  </span>
-                  <div className="h-px bg-slate-200 flex-1"></div>
-                </div>
-
                 <FormField
                   control={form.control}
                   name="imageQuery"

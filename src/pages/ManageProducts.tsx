@@ -40,6 +40,8 @@ const formSchema = z.object({
   name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   stock: z.coerce.number().min(0, 'Quantidade não pode ser negativa'),
   price: z.coerce.number().min(0, 'O valor não pode ser negativo'),
+  unitCost: z.coerce.number().min(0, 'O custo não pode ser negativo'),
+  supplierUrl: z.string().url('URL inválida').optional().or(z.literal('')),
   description: z
     .string()
     .min(10, 'Descrição deve ter pelo menos 10 caracteres'),
@@ -65,6 +67,8 @@ export default function ManageProducts() {
       name: '',
       stock: 0,
       price: 0,
+      unitCost: 0,
+      supplierUrl: '',
       description: '',
       category: '',
       imageQuery: '',
@@ -103,14 +107,12 @@ export default function ManageProducts() {
       try {
         setIsUploading(true)
 
-        // Optimistic preview
         const reader = new FileReader()
         reader.onloadend = () => {
           setImagePreview(reader.result as string)
         }
         reader.readAsDataURL(file)
 
-        // Upload to R2 (Mock)
         const url = await uploadToR2(file)
         form.setValue('imageQuery', url, { shouldValidate: true })
         setImagePreview(url)
@@ -157,6 +159,8 @@ export default function ManageProducts() {
         name: values.name,
         stock: values.stock,
         price: values.price,
+        unitCost: values.unitCost,
+        supplierUrl: values.supplierUrl,
         description: values.description,
         category: values.category,
         imageQuery: values.imageQuery,
@@ -253,13 +257,13 @@ export default function ManageProducts() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   control={form.control}
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Quantidade em Estoque</FormLabel>
+                      <FormLabel>Estoque Inicial</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -268,9 +272,6 @@ export default function ManageProducts() {
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Número inicial de itens disponíveis.
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -281,7 +282,7 @@ export default function ManageProducts() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor Unitário (R$)</FormLabel>
+                      <FormLabel>Valor (R$)</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -291,14 +292,50 @@ export default function ManageProducts() {
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Valor estimado para relatórios.
-                      </FormDescription>
+                      <FormDescription>Valor de venda</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="unitCost"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Custo Unitário (R$)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>Custo para a empresa</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="supplierUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL do Fornecedor</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="https://fornecedor.com.br/produto"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="space-y-4">
                 <FormLabel>Imagem do Produto</FormLabel>

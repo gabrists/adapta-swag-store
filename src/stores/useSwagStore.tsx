@@ -12,7 +12,6 @@ import {
   ProductSizeGrid,
   Collaborator,
   CartItem,
-  HistoryItemEntry,
 } from '@/types'
 import { triggerConfetti } from '@/lib/confetti'
 import { supabase } from '@/lib/supabase/client'
@@ -116,17 +115,17 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         imageQuery: item.image_url || '',
         stock: item.current_stock,
         hasGrid: item.has_grid,
-        grid: item.grid as unknown as ProductSizeGrid, // Trusting the DB JSON structure
+        grid: item.grid as unknown as ProductSizeGrid,
         description: item.description || '',
         price: Number(item.price) || 0,
+        unitCost: Number(item.unit_cost) || 0,
+        supplierUrl: item.supplier_url || '',
       })) || []
 
     setProducts(mappedProducts)
   }
 
   const fetchEmployees = async () => {
-    // We need to join with departments, but for now we fetch separately or use join syntax if preferred
-    // Supabase allows: select('*, departments(name)')
     const { data, error } = await supabase
       .from('employees')
       .select('*, departments(name)')
@@ -162,13 +161,12 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
     if (error) throw error
 
-    // Group by group_id to reconstruct transactions
     const groups: Record<string, HistoryEntry> = {}
 
     data?.forEach((row: any) => {
       if (!groups[row.group_id]) {
         groups[row.group_id] = {
-          id: row.group_id, // Using group_id as transaction ID
+          id: row.group_id,
           items: [],
           user: row.employees?.name || 'Desconhecido',
           destination: row.destination || '',
@@ -197,7 +195,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         (item) => item.productId === product.id && item.size === size,
       )
 
-      // Calculate max stock available
       let maxStock = product.stock
       if (product.hasGrid && size && product.grid) {
         maxStock = product.grid[size]
@@ -269,14 +266,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
     try {
       const employee = team.find((c) => c.name === userName)
-      // If employee not found (should not happen with select), we proceed with null id or handle error
-      // Ideally we should use ID from the start, but UI passes name.
       const employeeId = employee?.id
 
       const groupId = crypto.randomUUID()
       const movements = []
 
-      // Prepare movements
       for (const item of cart) {
         movements.push({
           group_id: groupId,
@@ -289,17 +283,13 @@ export function SwagProvider({ children }: { children: ReactNode }) {
           created_at: date.toISOString(),
         })
 
-        // For grid items, we must update the specific JSON key in DB
-        // The trigger only updates 'current_stock' total.
         const product = products.find((p) => p.id === item.productId)
         if (product && product.hasGrid && item.size && product.grid) {
           const newGrid = {
             ...product.grid,
             [item.size]: Math.max(0, product.grid[item.size] - item.quantity),
           }
-          // Optimistic update locally
           updateProductState(item.productId, { grid: newGrid })
-          // DB update for grid
           await supabase
             .from('items')
             .update({ grid: newGrid })
@@ -307,7 +297,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Insert movements (This triggers stock decrement in DB)
       const { error } = await supabase
         .from('inventory_movements')
         .insert(movements)
@@ -317,7 +306,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       setCart([])
       triggerConfetti()
 
-      // Refresh data to ensure sync
       await fetchItems()
       await fetchHistory()
     } catch (error) {
@@ -330,13 +318,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Helper for optimistic updates
   const updateProductState = (id: string, updates: Partial<Product>) => {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id !== id) return p
         const updated = { ...p, ...updates }
-        // Re-calculate stock if grid changed
         if (updated.hasGrid && updated.grid) {
           updated.stock = Object.values(updated.grid).reduce((a, b) => a + b, 0)
         }
@@ -367,17 +353,15 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       image_url: productData.imageQuery,
       category: productData.category,
       price: productData.price,
+      unit_cost: productData.unitCost,
+      supplier_url: productData.supplierUrl,
       has_grid: productData.hasGrid,
       grid: productData.grid ? JSON.stringify(productData.grid) : null,
       current_stock: finalStock,
       critical_level: 5,
     }
 
-    // Use explicit any to bypass strict type check for now or cast properly
-    const { error, data } = await supabase
-      .from('items')
-      .insert(newItem as any)
-      .select()
+    const { error } = await supabase.from('items').insert(newItem as any)
 
     if (error) {
       console.error(error)
@@ -402,8 +386,10 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       image_url: updatedProduct.imageQuery,
       category: updatedProduct.category,
       price: updatedProduct.price,
+      unit_cost: updatedProduct.unitCost,
+      supplier_url: updatedProduct.supplierUrl,
       has_grid: updatedProduct.hasGrid,
-      grid: updatedProduct.grid ? updatedProduct.grid : null, // supabase handles json conversion
+      grid: updatedProduct.grid ? updatedProduct.grid : null,
       current_stock: finalStock,
     }
 
@@ -441,14 +427,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     size?: string,
   ) => {
     try {
-      // Create a movement record to track adjustment (using IN or OUT)
-      // If amount > 0, it's IN (Restock)
-      // If amount < 0, it's OUT (Adjustment/Loss)
       const type = amount > 0 ? 'IN' : 'OUT'
       const absAmount = Math.abs(amount)
 
       const { error } = await supabase.from('inventory_movements').insert({
-        group_id: crypto.randomUUID(), // Individual adjustment
+        group_id: crypto.randomUUID(),
         item_id: productId,
         type: type,
         quantity: absAmount,
@@ -458,7 +441,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error
 
-      // If grid, update grid JSON manually as well
       if (size) {
         const product = products.find((p) => p.id === productId)
         if (product && product.grid) {
@@ -481,18 +463,12 @@ export function SwagProvider({ children }: { children: ReactNode }) {
   }
 
   const addCollaborator = async (data: Omit<Collaborator, 'id'>) => {
-    // We need to resolve department name to ID
-    // If department exists in our local map 'departments' (id->name), we need to reverse lookup
-    // Or just query/insert departments on the fly.
-    // For simplicity, we assume departments are seeded and fixed, we search by name.
-
     let deptId = Object.keys(departments).find(
       (key) => departments[key] === data.department,
     )
 
     if (!deptId) {
-      // Fallback: try to fetch or create department
-      const { data: deptData, error } = await supabase
+      const { data: deptData } = await supabase
         .from('departments')
         .select('id')
         .eq('name', data.department)
@@ -501,7 +477,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       if (deptData) {
         deptId = deptData.id
       } else {
-        // Create if not exists (optional, based on requirement)
         const { data: newDept } = await supabase
           .from('departments')
           .insert({ name: data.department })
@@ -531,7 +506,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     let deptId = Object.keys(departments).find(
       (key) => departments[key] === data.department,
     )
-    // Fallback lookup if local map isn't sufficient (though it should be if fetched correctly)
     if (!deptId) {
       const { data: deptData } = await supabase
         .from('departments')
