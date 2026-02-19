@@ -9,13 +9,13 @@ import {
   Store,
   History,
   Package2,
-  PackagePlus,
   LayoutDashboard,
   Package,
   Settings,
   LogOut,
   User as UserIcon,
   ChevronsUpDown,
+  Plus,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -42,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import useAuthStore from '@/stores/useAuthStore'
 
 export default function Layout() {
@@ -64,11 +65,6 @@ export default function Layout() {
       title: 'Histórico',
       url: '/historico',
       icon: History,
-    },
-    {
-      title: 'Cadastrar Brinde',
-      url: '/gerenciar',
-      icon: PackagePlus,
     },
   ]
 
@@ -236,14 +232,39 @@ export default function Layout() {
 
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-white px-4">
-          <SidebarTrigger className="-ml-1" />
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <div className="w-px h-4 bg-border mx-2" />
-            <span className="font-medium text-foreground">
-              {location.pathname.startsWith('/admin')
-                ? 'Administração'
-                : 'Adapta Swag Store'}
-            </span>
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-px h-4 bg-border mx-2" />
+              <span className="font-medium text-foreground">
+                {location.pathname.startsWith('/admin')
+                  ? 'Administração'
+                  : 'Adapta Swag Store'}
+              </span>
+            </div>
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <Button
+              asChild
+              size="sm"
+              className="hidden sm:flex bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+            >
+              <Link to="/gerenciar">
+                <Plus className="mr-2 h-4 w-4" />
+                Cadastrar Brinde
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="icon"
+              className="flex sm:hidden bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-8 w-8"
+            >
+              <Link to="/gerenciar">
+                <Plus className="h-4 w-4" />
+                <span className="sr-only">Cadastrar Brinde</span>
+              </Link>
+            </Button>
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8 pt-6 w-full max-w-7xl mx-auto animate-fade-in h-full">
