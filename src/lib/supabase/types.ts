@@ -133,6 +133,7 @@ export type Database = {
           has_grid: boolean | null
           id: string
           image_url: string | null
+          is_single_quota: boolean
           name: string
           price: number | null
           supplier_url: string | null
@@ -148,6 +149,7 @@ export type Database = {
           has_grid?: boolean | null
           id?: string
           image_url?: string | null
+          is_single_quota?: boolean
           name: string
           price?: number | null
           supplier_url?: string | null
@@ -163,6 +165,7 @@ export type Database = {
           has_grid?: boolean | null
           id?: string
           image_url?: string | null
+          is_single_quota?: boolean
           name?: string
           price?: number | null
           supplier_url?: string | null
