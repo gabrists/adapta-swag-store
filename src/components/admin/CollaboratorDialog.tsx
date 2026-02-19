@@ -1,0 +1,250 @@
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Loader2, Save, X, User } from 'lucide-react'
+
+import { Collaborator } from '@/types'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
+const formSchema = z.object({
+  name: z.string().min(2, 'Nome é obrigatório'),
+  email: z.string().email('E-mail inválido'),
+  department: z.string().min(1, 'Selecione um departamento'),
+  role: z.string().min(2, 'Cargo é obrigatório'),
+  avatarUrl: z.string().optional(),
+})
+
+interface CollaboratorDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  collaborator?: Collaborator | null
+  onSave: (values: any) => Promise<void>
+}
+
+export function CollaboratorDialog({
+  open,
+  onOpenChange,
+  collaborator,
+  onSave,
+}: CollaboratorDialogProps) {
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      department: '',
+      role: '',
+      avatarUrl: '',
+    },
+  })
+
+  useEffect(() => {
+    if (open) {
+      if (collaborator) {
+        form.reset({
+          name: collaborator.name,
+          email: collaborator.email,
+          department: collaborator.department,
+          role: collaborator.role,
+          avatarUrl: collaborator.avatarUrl || '',
+        })
+        setAvatarPreview(collaborator.avatarUrl || null)
+      } else {
+        form.reset({
+          name: '',
+          email: '',
+          department: '',
+          role: '',
+          avatarUrl: '',
+        })
+        setAvatarPreview(null)
+      }
+    }
+  }, [open, collaborator, form])
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    await onSave(values)
+    form.reset()
+    onOpenChange(false)
+  }
+
+  const isEditing = !!collaborator
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px] rounded-xl">
+        <DialogHeader>
+          <DialogTitle>
+            {isEditing ? 'Editar Colaborador' : 'Novo Colaborador'}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? 'Atualize as informações do membro da equipe.'
+              : 'Adicione um novo membro ao time para liberar acesso ao Swag.'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            <div className="flex justify-center mb-2">
+              <div className="relative group">
+                <Avatar className="h-20 w-20 border-2 border-slate-100 shadow-sm">
+                  <AvatarImage src={avatarPreview || undefined} />
+                  <AvatarFallback className="text-xl bg-slate-100 text-slate-400">
+                    <User className="h-8 w-8" />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            </div>
+
+            <FormField
+              control={form.control}
+              name="avatarUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Foto (URL)</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://..."
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e)
+                        setAvatarPreview(e.target.value)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome Completo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ex: João da Silva" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail Corporativo</FormLabel>
+                  <FormControl>
+                    <Input placeholder="nome@adapta.com.br" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="department"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Área/Time</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Marketing">Marketing</SelectItem>
+                        <SelectItem value="B2B">B2B</SelectItem>
+                        <SelectItem value="B2C">B2C</SelectItem>
+                        <SelectItem value="Produto">Produto</SelectItem>
+                        <SelectItem value="Engenharia">Engenharia</SelectItem>
+                        <SelectItem value="RH">RH</SelectItem>
+                        <SelectItem value="Financeiro">Financeiro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Cargo</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Desenvolvedor" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <DialogFooter className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}
+                {isEditing ? 'Salvar' : 'Adicionar'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
+}

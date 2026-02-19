@@ -15,6 +15,7 @@ import NotFound from '@/pages/NotFound'
 import Dashboard from '@/pages/admin/Dashboard'
 import Inventory from '@/pages/admin/Inventory'
 import Settings from '@/pages/admin/Settings'
+import Collaborators from '@/pages/admin/Collaborators'
 
 const App = () => (
   <BrowserRouter
@@ -40,6 +41,7 @@ const App = () => (
                 <Route path="/admin">
                   <Route index element={<Dashboard />} />
                   <Route path="inventory" element={<Inventory />} />
+                  <Route path="collaborators" element={<Collaborators />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
               </Route>

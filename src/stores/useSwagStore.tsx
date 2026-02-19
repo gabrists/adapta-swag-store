@@ -3,15 +3,17 @@ import {
   useContext,
   useEffect,
   useState,
+  useMemo,
   ReactNode,
 } from 'react'
-import { Product, HistoryEntry, ProductSizeGrid } from '@/types'
+import { Product, HistoryEntry, ProductSizeGrid, Collaborator } from '@/types'
 import { triggerConfetti } from '@/lib/confetti'
 
 interface SwagContextType {
   products: Product[]
   history: HistoryEntry[]
-  collaborators: string[]
+  team: Collaborator[]
+  collaborators: string[] // Derived names for backward compatibility
   withdrawItem: (
     productId: string,
     user: string,
@@ -29,6 +31,9 @@ interface SwagContextType {
   updateProduct: (product: Product) => void
   deleteProduct: (productId: string) => void
   adjustStock: (productId: string, amount: number, size?: string) => void
+  addCollaborator: (collaborator: Omit<Collaborator, 'id'>) => void
+  updateCollaborator: (collaborator: Collaborator) => void
+  deleteCollaborator: (id: string) => void
   isLoading: boolean
 }
 
@@ -75,7 +80,7 @@ const INITIAL_PRODUCTS: Product[] = [
   },
 ]
 
-const INITIAL_COLLABORATORS = [
+const INITIAL_COLLABORATOR_NAMES = [
   'Allan Baptista',
   'Angelo Nuncio Pinheiro',
   'Arthur da Fonte Guerra',
@@ -172,21 +177,39 @@ const INITIAL_COLLABORATORS = [
   'Yuri',
 ]
 
+const generateInitialTeam = (): Collaborator[] => {
+  const departments = [
+    'Engenharia',
+    'Produto',
+    'Vendas',
+    'Marketing',
+    'RH',
+    'Financeiro',
+  ]
+  return INITIAL_COLLABORATOR_NAMES.map((name, i) => ({
+    id: `c-${i}`,
+    name,
+    email: `${name.toLowerCase().split(' ')[0]}@adapta.com.br`,
+    department: departments[i % departments.length],
+    role: 'Colaborador',
+    avatarUrl: `https://img.usecurling.com/ppl/thumbnail?gender=${i % 2 === 0 ? 'male' : 'female'}&seed=${i}`,
+  }))
+}
+
 export function SwagProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([])
   const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [collaborators, setCollaborators] = useState<string[]>([])
+  const [team, setTeam] = useState<Collaborator[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  const collaborators = useMemo(() => team.map((c) => c.name).sort(), [team])
+
   useEffect(() => {
-    // Load from local storage
     const loadData = () => {
       try {
-        const storedProducts = localStorage.getItem('adapta-swag-products-v2') // Changed key to force new seed data
+        const storedProducts = localStorage.getItem('adapta-swag-products-v2')
         const storedHistory = localStorage.getItem('adapta-swag-history')
-        const storedCollaborators = localStorage.getItem(
-          'adapta-swag-collaborators',
-        )
+        const storedTeam = localStorage.getItem('adapta-swag-team')
 
         if (storedProducts) {
           setProducts(JSON.parse(storedProducts))
@@ -198,15 +221,15 @@ export function SwagProvider({ children }: { children: ReactNode }) {
           setHistory(JSON.parse(storedHistory))
         }
 
-        if (storedCollaborators) {
-          setCollaborators(JSON.parse(storedCollaborators))
+        if (storedTeam) {
+          setTeam(JSON.parse(storedTeam))
         } else {
-          setCollaborators(INITIAL_COLLABORATORS)
+          setTeam(generateInitialTeam())
         }
       } catch (error) {
         console.error('Failed to load data from local storage', error)
         setProducts(INITIAL_PRODUCTS)
-        setCollaborators(INITIAL_COLLABORATORS)
+        setTeam(generateInitialTeam())
       } finally {
         setIsLoading(false)
       }
@@ -219,17 +242,9 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     if (!isLoading) {
       localStorage.setItem('adapta-swag-products-v2', JSON.stringify(products))
       localStorage.setItem('adapta-swag-history', JSON.stringify(history))
-      localStorage.setItem(
-        'adapta-swag-collaborators',
-        JSON.stringify(collaborators),
-      )
+      localStorage.setItem('adapta-swag-team', JSON.stringify(team))
     }
-  }, [products, history, collaborators, isLoading])
-
-  const calculateTotalStock = (product: Product): number => {
-    if (!product.hasGrid || !product.grid) return product.stock
-    return Object.values(product.grid).reduce((acc, curr) => acc + curr, 0)
-  }
+  }, [products, history, team, isLoading])
 
   const withdrawItem = (
     productId: string,
@@ -302,7 +317,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
   }
 
   const updateProduct = (updatedProduct: Product) => {
-    // Recalculate total stock just in case
     let finalStock = updatedProduct.stock
     if (updatedProduct.hasGrid && updatedProduct.grid) {
       finalStock = Object.values(updatedProduct.grid).reduce(
@@ -310,9 +324,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         0,
       )
     }
-
     const finalProduct = { ...updatedProduct, stock: finalStock }
-
     setProducts((prev) =>
       prev.map((p) => (p.id === finalProduct.id ? finalProduct : p)),
     )
@@ -326,7 +338,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     setProducts((prev) =>
       prev.map((p) => {
         if (p.id !== productId) return p
-
         if (p.hasGrid && size && p.grid) {
           const newGrid = {
             ...p.grid,
@@ -344,17 +355,34 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     )
   }
 
+  const addCollaborator = (data: Omit<Collaborator, 'id'>) => {
+    const newCollaborator = { ...data, id: crypto.randomUUID() }
+    setTeam((prev) => [newCollaborator, ...prev])
+  }
+
+  const updateCollaborator = (data: Collaborator) => {
+    setTeam((prev) => prev.map((c) => (c.id === data.id ? data : c)))
+  }
+
+  const deleteCollaborator = (id: string) => {
+    setTeam((prev) => prev.filter((c) => c.id !== id))
+  }
+
   return (
     <SwagContext.Provider
       value={{
         products,
         history,
+        team,
         collaborators,
         withdrawItem,
         addProduct,
         updateProduct,
         deleteProduct,
         adjustStock,
+        addCollaborator,
+        updateCollaborator,
+        deleteCollaborator,
         isLoading,
       }}
     >

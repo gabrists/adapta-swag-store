@@ -32,6 +32,15 @@ export interface HistoryEntry {
   quantity: number
 }
 
+export interface Collaborator {
+  id: string
+  name: string
+  email: string
+  department: string
+  role: string
+  avatarUrl?: string
+}
+
 export type Category =
   | 'Todos'
   | 'Vendas'

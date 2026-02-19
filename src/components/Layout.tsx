@@ -16,6 +16,7 @@ import {
   User as UserIcon,
   ChevronsUpDown,
   Plus,
+  Users,
 } from 'lucide-react'
 import {
   Sidebar,
@@ -79,6 +80,11 @@ export default function Layout() {
       title: 'Inventário',
       url: '/admin/inventory',
       icon: Package,
+    },
+    {
+      title: 'Time',
+      url: '/admin/collaborators',
+      icon: Users,
     },
     {
       title: 'Configurações',
