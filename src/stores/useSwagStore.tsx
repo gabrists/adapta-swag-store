@@ -189,7 +189,7 @@ const generateInitialTeam = (): Collaborator[] => {
   return INITIAL_COLLABORATOR_NAMES.map((name, i) => ({
     id: `c-${i}`,
     name,
-    email: `${name.toLowerCase().split(' ')[0]}@adapta.com.br`,
+    email: `${name.toLowerCase().split(' ')[0]}@adapta.org`,
     department: departments[i % departments.length],
     role: 'Colaborador',
     avatarUrl: `https://img.usecurling.com/ppl/thumbnail?gender=${i % 2 === 0 ? 'male' : 'female'}&seed=${i}`,

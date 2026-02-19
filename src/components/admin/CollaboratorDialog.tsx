@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Loader2, Save, X, User } from 'lucide-react'
+import { Loader2, Save, User, Camera, Upload } from 'lucide-react'
 
 import { Collaborator } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -21,6 +21,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
@@ -34,7 +35,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const formSchema = z.object({
   name: z.string().min(2, 'Nome é obrigatório'),
-  email: z.string().email('E-mail inválido'),
+  email: z
+    .string()
+    .email('E-mail inválido')
+    .refine((val) => val.endsWith('@adapta.org'), {
+      message: 'O e-mail deve pertencer ao domínio @adapta.org',
+    }),
   department: z.string().min(1, 'Selecione um departamento'),
   role: z.string().min(2, 'Cargo é obrigatório'),
   avatarUrl: z.string().optional(),
@@ -54,6 +60,7 @@ export function CollaboratorDialog({
   onSave,
 }: CollaboratorDialogProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -96,6 +103,23 @@ export function CollaboratorDialog({
     onOpenChange(false)
   }
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        setAvatarPreview(result)
+        form.setValue('avatarUrl', result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click()
+  }
+
   const isEditing = !!collaborator
 
   return (
@@ -114,37 +138,44 @@ export function CollaboratorDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <div className="flex justify-center mb-2">
-              <div className="relative group">
-                <Avatar className="h-20 w-20 border-2 border-slate-100 shadow-sm">
-                  <AvatarImage src={avatarPreview || undefined} />
-                  <AvatarFallback className="text-xl bg-slate-100 text-slate-400">
-                    <User className="h-8 w-8" />
+            <div className="flex flex-col items-center justify-center mb-2 gap-3">
+              <div
+                className="relative group cursor-pointer"
+                onClick={triggerFileInput}
+              >
+                <Avatar className="h-24 w-24 border-4 border-slate-50 shadow-md transition-all group-hover:opacity-90">
+                  <AvatarImage
+                    src={avatarPreview || undefined}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="text-2xl bg-slate-100 text-slate-400">
+                    <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="h-8 w-8 text-white drop-shadow-md" />
+                </div>
               </div>
-            </div>
 
-            <FormField
-              control={form.control}
-              name="avatarUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Foto (URL)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://..."
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e)
-                        setAvatarPreview(e.target.value)
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={triggerFileInput}
+                className="text-xs h-8 border-dashed"
+              >
+                <Upload className="mr-2 h-3 w-3" />
+                Carregar foto
+              </Button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -167,8 +198,23 @@ export function CollaboratorDialog({
                 <FormItem>
                   <FormLabel>E-mail Corporativo</FormLabel>
                   <FormControl>
-                    <Input placeholder="nome@adapta.com.br" {...field} />
+                    <Input
+                      placeholder="nome@adapta.org"
+                      {...field}
+                      onBlur={(e) => {
+                        field.onBlur()
+                        const value = e.target.value
+                        if (value && !value.includes('@')) {
+                          form.setValue('email', `${value}@adapta.org`, {
+                            shouldValidate: true,
+                          })
+                        }
+                      }}
+                    />
                   </FormControl>
+                  <FormDescription className="text-xs">
+                    O domínio @adapta.org é adicionado automaticamente.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -232,7 +278,7 @@ export function CollaboratorDialog({
               <Button
                 type="submit"
                 disabled={form.formState.isSubmitting}
-                className="bg-primary hover:bg-primary/90"
+                className="bg-[#0E9C8B] hover:bg-[#0E9C8B]/90 text-white"
               >
                 {form.formState.isSubmitting ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
