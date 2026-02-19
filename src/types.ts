@@ -20,16 +20,30 @@ export interface Product {
   grid?: ProductSizeGrid
 }
 
-export interface HistoryEntry {
-  id: string
+export interface CartItem {
   productId: string
   productName: string
   productImageQuery: string
+  size?: string
+  quantity: number
+  maxStock: number
+}
+
+export interface HistoryItemEntry {
+  productId: string
+  productName: string
+  productImageQuery: string
+  size?: string
+  quantity: number
+}
+
+export interface HistoryEntry {
+  id: string
+  items: HistoryItemEntry[]
   user: string
   destination: string
   date: string // ISO string
-  size?: string
-  quantity: number
+  totalQuantity: number
 }
 
 export interface Collaborator {

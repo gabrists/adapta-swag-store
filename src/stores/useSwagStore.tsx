@@ -6,22 +6,31 @@ import {
   useMemo,
   ReactNode,
 } from 'react'
-import { Product, HistoryEntry, ProductSizeGrid, Collaborator } from '@/types'
+import {
+  Product,
+  HistoryEntry,
+  ProductSizeGrid,
+  Collaborator,
+  CartItem,
+  HistoryItemEntry,
+} from '@/types'
 import { triggerConfetti } from '@/lib/confetti'
 
 interface SwagContextType {
   products: Product[]
+  cart: CartItem[]
   history: HistoryEntry[]
   team: Collaborator[]
-  collaborators: string[] // Derived names for backward compatibility
-  withdrawItem: (
+  collaborators: string[]
+  addToCart: (product: Product, quantity: number, size?: string) => void
+  removeFromCart: (productId: string, size?: string) => void
+  updateCartItemQuantity: (
     productId: string,
-    user: string,
-    destination: string,
-    date: Date,
-    amount: number,
+    quantity: number,
     size?: string,
   ) => void
+  clearCart: () => void
+  checkoutCart: (user: string, destination: string, date: Date) => void
   addProduct: (
     product: Omit<Product, 'id' | 'stock'> & {
       stock?: number
@@ -198,6 +207,7 @@ const generateInitialTeam = (): Collaborator[] => {
 
 export function SwagProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([])
+  const [cart, setCart] = useState<CartItem[]>([])
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [team, setTeam] = useState<Collaborator[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -218,7 +228,28 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         }
 
         if (storedHistory) {
-          setHistory(JSON.parse(storedHistory))
+          const parsedHistory = JSON.parse(storedHistory)
+          // Migration logic for old history format
+          const migratedHistory = parsedHistory.map((entry: any) => {
+            if (entry.items) return entry
+            return {
+              id: entry.id,
+              user: entry.user,
+              destination: entry.destination,
+              date: entry.date,
+              totalQuantity: entry.quantity,
+              items: [
+                {
+                  productId: entry.productId,
+                  productName: entry.productName,
+                  productImageQuery: entry.productImageQuery,
+                  size: entry.size,
+                  quantity: entry.quantity,
+                },
+              ],
+            }
+          })
+          setHistory(migratedHistory)
         }
 
         if (storedTeam) {
@@ -246,50 +277,141 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     }
   }, [products, history, team, isLoading])
 
-  const withdrawItem = (
+  const addToCart = (product: Product, quantity: number, size?: string) => {
+    setCart((prev) => {
+      const existingItemIndex = prev.findIndex(
+        (item) => item.productId === product.id && item.size === size,
+      )
+
+      // Calculate max stock available
+      let maxStock = product.stock
+      if (product.hasGrid && size && product.grid) {
+        maxStock = product.grid[size]
+      }
+
+      if (existingItemIndex >= 0) {
+        const newCart = [...prev]
+        const newQuantity = Math.min(
+          newCart[existingItemIndex].quantity + quantity,
+          maxStock,
+        )
+        newCart[existingItemIndex] = {
+          ...newCart[existingItemIndex],
+          quantity: newQuantity,
+        }
+        return newCart
+      } else {
+        return [
+          ...prev,
+          {
+            productId: product.id,
+            productName: product.name,
+            productImageQuery: product.imageQuery,
+            size,
+            quantity: Math.min(quantity, maxStock),
+            maxStock,
+          },
+        ]
+      }
+    })
+  }
+
+  const removeFromCart = (productId: string, size?: string) => {
+    setCart((prev) =>
+      prev.filter(
+        (item) => !(item.productId === productId && item.size === size),
+      ),
+    )
+  }
+
+  const updateCartItemQuantity = (
     productId: string,
-    user: string,
-    destination: string,
-    date: Date,
-    amount: number,
+    quantity: number,
     size?: string,
   ) => {
-    setProducts((prev) =>
-      prev.map((p) => {
-        if (p.id !== productId) return p
-
-        if (p.hasGrid && size && p.grid) {
-          const newGrid = {
-            ...p.grid,
-            [size]: Math.max(0, p.grid[size] - amount),
+    setCart((prev) =>
+      prev.map((item) => {
+        if (item.productId === productId && item.size === size) {
+          return {
+            ...item,
+            quantity: Math.min(Math.max(1, quantity), item.maxStock),
           }
-          const newStock = Object.values(newGrid).reduce(
-            (acc, curr) => acc + curr,
-            0,
-          )
-          return { ...p, grid: newGrid, stock: newStock }
-        } else {
-          return { ...p, stock: Math.max(0, p.stock - amount) }
         }
+        return item
       }),
     )
+  }
 
-    const product = products.find((p) => p.id === productId)
-    if (product) {
-      const newEntry: HistoryEntry = {
-        id: crypto.randomUUID(),
-        productId,
-        productName: product.name,
-        productImageQuery: product.imageQuery,
-        user,
-        destination,
-        date: date.toISOString(),
-        size,
-        quantity: amount,
-      }
-      setHistory((prev) => [newEntry, ...prev])
-      triggerConfetti()
+  const clearCart = () => {
+    setCart([])
+  }
+
+  const checkoutCart = (user: string, destination: string, date: Date) => {
+    if (cart.length === 0) return
+
+    // Update products stock
+    setProducts((prevProducts) => {
+      return prevProducts.map((p) => {
+        const cartItemsForProduct = cart.filter(
+          (item) => item.productId === p.id,
+        )
+
+        if (cartItemsForProduct.length === 0) return p
+
+        let newProduct = { ...p }
+
+        cartItemsForProduct.forEach((item) => {
+          if (newProduct.hasGrid && item.size && newProduct.grid) {
+            const newGrid = {
+              ...newProduct.grid,
+              [item.size]: Math.max(
+                0,
+                newProduct.grid[item.size] - item.quantity,
+              ),
+            }
+            const newStock = Object.values(newGrid).reduce(
+              (acc, curr) => acc + curr,
+              0,
+            )
+            newProduct = { ...newProduct, grid: newGrid, stock: newStock }
+          } else {
+            newProduct = {
+              ...newProduct,
+              stock: Math.max(0, newProduct.stock - item.quantity),
+            }
+          }
+        })
+
+        return newProduct
+      })
+    })
+
+    // Create history entry
+    const historyItems: HistoryItemEntry[] = cart.map((item) => ({
+      productId: item.productId,
+      productName: item.productName,
+      productImageQuery: item.productImageQuery,
+      size: item.size,
+      quantity: item.quantity,
+    }))
+
+    const totalQuantity = historyItems.reduce(
+      (acc, item) => acc + item.quantity,
+      0,
+    )
+
+    const newEntry: HistoryEntry = {
+      id: crypto.randomUUID(),
+      items: historyItems,
+      user,
+      destination,
+      date: date.toISOString(),
+      totalQuantity,
     }
+
+    setHistory((prev) => [newEntry, ...prev])
+    setCart([])
+    triggerConfetti()
   }
 
   const addProduct = (
@@ -372,10 +494,15 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     <SwagContext.Provider
       value={{
         products,
+        cart,
         history,
         team,
         collaborators,
-        withdrawItem,
+        addToCart,
+        removeFromCart,
+        updateCartItemQuantity,
+        clearCart,
+        checkoutCart,
         addProduct,
         updateProduct,
         deleteProduct,

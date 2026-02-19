@@ -4,13 +4,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { ShoppingCart } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
-  onSelect: (product: Product, size?: string) => void
+  onAddToCart: (product: Product, size?: string) => void
 }
 
-export function ProductCard({ product, onSelect }: ProductCardProps) {
+export function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
 
   const isOutOfStock = product.stock === 0
@@ -134,14 +135,19 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
       <CardFooter className="p-4 pt-0 mt-auto">
         <Button
           className="w-full bg-primary hover:bg-primary/90 text-white font-medium active:scale-95 transition-all rounded-lg"
-          onClick={() => onSelect(product, selectedSize || undefined)}
+          onClick={() => onAddToCart(product, selectedSize || undefined)}
           disabled={product.hasGrid ? !selectedSize : isOutOfStock}
         >
-          {isOutOfStock
-            ? 'Indisponível'
-            : product.hasGrid && !selectedSize
-              ? 'Selecione Tamanho'
-              : 'Solicitar'}
+          {isOutOfStock ? (
+            'Indisponível'
+          ) : product.hasGrid && !selectedSize ? (
+            'Selecione Tamanho'
+          ) : (
+            <>
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              Adicionar
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>

@@ -45,6 +45,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import useAuthStore from '@/stores/useAuthStore'
+import { CartSheet } from '@/components/CartSheet'
 
 export default function Layout() {
   const { user, logout } = useAuthStore()
@@ -251,10 +252,12 @@ export default function Layout() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            <CartSheet />
+
             <Button
               asChild
               size="sm"
-              className="hidden sm:flex bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+              className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
             >
               <Link to="/gerenciar">
                 <Plus className="mr-2 h-4 w-4" />
@@ -264,7 +267,7 @@ export default function Layout() {
             <Button
               asChild
               size="icon"
-              className="flex sm:hidden bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm h-8 w-8"
+              className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
             >
               <Link to="/gerenciar">
                 <Plus className="h-4 w-4" />

@@ -5,20 +5,14 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import useSwagStore from '@/stores/useSwagStore'
 import { ProductCard } from '@/components/ProductCard'
-import { CheckoutDialog } from '@/components/CheckoutDialog'
 import { Product } from '@/types'
 import { useToast } from '@/hooks/use-toast'
 
 export default function Index() {
-  const { products, isLoading, withdrawItem } = useSwagStore()
+  const { products, isLoading, addToCart } = useSwagStore()
   const { toast } = useToast()
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null)
-  const [checkoutSize, setCheckoutSize] = useState<string | undefined>(
-    undefined,
-  )
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -29,30 +23,14 @@ export default function Index() {
     })
   }, [products, searchQuery])
 
-  const handleSelectProduct = (product: Product, size?: string) => {
-    setCheckoutProduct(product)
-    setCheckoutSize(size)
-    setIsCheckoutOpen(true)
-  }
-
-  const handleConfirmCheckout = (values: any) => {
-    if (checkoutProduct) {
-      withdrawItem(
-        checkoutProduct.id,
-        values.user,
-        values.destination,
-        values.date,
-        values.quantity,
-        values.size,
-      )
-
-      toast({
-        title: 'Retirada confirmada!',
-        description: `Você resgatou ${values.quantity} unidades de ${checkoutProduct.name}`,
-        duration: 3000,
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-      })
-    }
+  const handleAddToCart = (product: Product, size?: string) => {
+    addToCart(product, 1, size)
+    toast({
+      title: 'Adicionado ao carrinho',
+      description: `${product.name} ${size ? `(${size})` : ''} foi adicionado.`,
+      duration: 2000,
+      className: 'bg-slate-900 text-white border-none',
+    })
   }
 
   if (isLoading) {
@@ -103,7 +81,7 @@ export default function Index() {
               <ProductCard
                 key={product.id}
                 product={product}
-                onSelect={handleSelectProduct}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </div>
@@ -121,14 +99,6 @@ export default function Index() {
           </div>
         )}
       </section>
-
-      <CheckoutDialog
-        open={isCheckoutOpen}
-        onOpenChange={setIsCheckoutOpen}
-        product={checkoutProduct}
-        size={checkoutSize}
-        onConfirm={handleConfirmCheckout}
-      />
     </div>
   )
 }
