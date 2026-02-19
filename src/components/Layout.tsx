@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { Store, History, Package2, PackagePlus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button'
 
 export default function Layout() {
   const location = useLocation()
@@ -18,7 +19,7 @@ export default function Layout() {
     },
     {
       path: '/gerenciar',
-      label: 'Gerenciar',
+      label: 'Cadastrar Brinde',
       icon: PackagePlus,
     },
   ]
@@ -38,23 +39,31 @@ export default function Layout() {
           </div>
 
           <nav className="flex items-center gap-1">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  cn(
-                    'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2',
-                    isActive
-                      ? 'bg-slate-100 text-primary'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50',
-                  )
-                }
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </NavLink>
-            ))}
+            {navItems.map((item) => {
+              const isPrimaryAction = item.path === '/gerenciar'
+
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    cn(
+                      isPrimaryAction
+                        ? buttonVariants({ variant: 'default', size: 'sm' })
+                        : 'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2',
+                      !isPrimaryAction &&
+                        (isActive
+                          ? 'bg-slate-100 text-primary'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'),
+                      isPrimaryAction && 'ml-2 gap-2 shadow-sm',
+                    )
+                  }
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </NavLink>
+              )
+            })}
           </nav>
         </div>
       </header>
@@ -86,7 +95,9 @@ export default function Layout() {
                   location.pathname === item.path && 'fill-current/10',
                 )}
               />
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span className="text-[10px] font-medium leading-tight text-center px-1">
+                {item.label}
+              </span>
             </NavLink>
           ))}
         </div>

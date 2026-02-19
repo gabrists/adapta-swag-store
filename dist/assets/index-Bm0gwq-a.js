@@ -23973,6 +23973,132 @@ function useSwagStore() {
 	if (context === void 0) throw new Error("useSwagStore must be used within a SwagProvider");
 	return context;
 }
+var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+var use = import_react[" use ".trim().toString()];
+function isPromiseLike(value) {
+	return typeof value === "object" && value !== null && "then" in value;
+}
+function isLazyComponent(element) {
+	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
+}
+/* @__NO_SIDE_EFFECTS__ */
+function createSlot$1(ownerName) {
+	const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		const childrenArray = import_react.Children.toArray(children);
+		const slottable = childrenArray.find(isSlottable);
+		if (slottable) {
+			const newElement = slottable.props.children;
+			const newChildren = childrenArray.map((child) => {
+				if (child === slottable) {
+					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
+					return import_react.isValidElement(newElement) ? newElement.props.children : null;
+				} else return child;
+			});
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+				...slotProps,
+				ref: forwardedRef,
+				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
+			});
+		}
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+			...slotProps,
+			ref: forwardedRef,
+			children
+		});
+	});
+	Slot2.displayName = `${ownerName}.Slot`;
+	return Slot2;
+}
+var Slot$2 = /* @__PURE__ */ createSlot$1("Slot");
+/* @__NO_SIDE_EFFECTS__ */
+function createSlotClone(ownerName) {
+	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		if (import_react.isValidElement(children)) {
+			const childrenRef = getElementRef(children);
+			const props2 = mergeProps(slotProps, children.props);
+			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs$1(forwardedRef, childrenRef) : childrenRef;
+			return import_react.cloneElement(children, props2);
+		}
+		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
+	});
+	SlotClone.displayName = `${ownerName}.SlotClone`;
+	return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+	const overrideProps = { ...childProps };
+	for (const propName in childProps) {
+		const slotPropValue = slotProps[propName];
+		const childPropValue = childProps[propName];
+		if (/^on[A-Z]/.test(propName)) {
+			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
+				const result = childPropValue(...args);
+				slotPropValue(...args);
+				return result;
+			};
+			else if (slotPropValue) overrideProps[propName] = slotPropValue;
+		} else if (propName === "style") overrideProps[propName] = {
+			...slotPropValue,
+			...childPropValue
+		};
+		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+	}
+	return {
+		...slotProps,
+		...overrideProps
+	};
+}
+function getElementRef(element) {
+	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
+	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.ref;
+	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
+	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.props.ref;
+	return element.props.ref || element.ref;
+}
+var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
+	variants: {
+		variant: {
+			default: "bg-primary text-primary-foreground hover:bg-primary/90",
+			destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+			outline: "border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
+			secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+			ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+			link: "text-foreground underline-offset-4 hover:underline"
+		},
+		size: {
+			default: "h-10 px-4 py-2",
+			sm: "h-9 rounded-md px-3",
+			lg: "h-11 rounded-md px-8",
+			icon: "h-10 w-10"
+		}
+	},
+	defaultVariants: {
+		variant: "default",
+		size: "default"
+	}
+});
+var Button = import_react.forwardRef(({ className, variant, size: size$3, asChild = false, ...props }, ref) => {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot$2 : "button", {
+		className: cn(buttonVariants({
+			variant,
+			size: size$3,
+			className
+		})),
+		ref,
+		...props
+	});
+});
+Button.displayName = "Button";
 function Layout() {
 	const location = useLocation();
 	const navItems = [
@@ -23988,7 +24114,7 @@ function Layout() {
 		},
 		{
 			path: "/gerenciar",
-			label: "Gerenciar",
+			label: "Cadastrar Brinde",
 			icon: PackagePlus
 		}
 	];
@@ -24013,11 +24139,17 @@ function Layout() {
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
 						className: "flex items-center gap-1",
-						children: navItems.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NavLink, {
-							to: item.path,
-							className: ({ isActive }) => cn("px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2", isActive ? "bg-slate-100 text-primary" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(item.icon, { className: "w-4 h-4" }), item.label]
-						}, item.path))
+						children: navItems.map((item) => {
+							const isPrimaryAction = item.path === "/gerenciar";
+							return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(NavLink, {
+								to: item.path,
+								className: ({ isActive }) => cn(isPrimaryAction ? buttonVariants({
+									variant: "default",
+									size: "sm"
+								}) : "px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2", !isPrimaryAction && (isActive ? "bg-slate-100 text-primary" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"), isPrimaryAction && "ml-2 gap-2 shadow-sm"),
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(item.icon, { className: "w-4 h-4" }), item.label]
+							}, item.path);
+						})
 					})]
 				})
 			}),
@@ -24033,7 +24165,7 @@ function Layout() {
 						to: item.path,
 						className: ({ isActive }) => cn("flex flex-col items-center justify-center w-full h-full gap-1 active:scale-95 transition-transform", isActive ? "text-primary" : "text-slate-400 hover:text-slate-600"),
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(item.icon, { className: cn("w-6 h-6", location.pathname === item.path && "fill-current/10") }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "text-[10px] font-medium",
+							className: "text-[10px] font-medium leading-tight text-center px-1",
 							children: item.label
 						})]
 					}, item.path))
@@ -24736,132 +24868,6 @@ var ScrollBar = import_react.forwardRef(({ className, orientation = "vertical", 
 	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ScrollAreaThumb, { className: "relative flex-1 rounded-full bg-border" })
 }));
 ScrollBar.displayName = ScrollAreaScrollbar.displayName;
-var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-var use = import_react[" use ".trim().toString()];
-function isPromiseLike(value) {
-	return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
-/* @__NO_SIDE_EFFECTS__ */
-function createSlot$1(ownerName) {
-	const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
-	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		const childrenArray = import_react.Children.toArray(children);
-		const slottable = childrenArray.find(isSlottable);
-		if (slottable) {
-			const newElement = slottable.props.children;
-			const newChildren = childrenArray.map((child) => {
-				if (child === slottable) {
-					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
-					return import_react.isValidElement(newElement) ? newElement.props.children : null;
-				} else return child;
-			});
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-				...slotProps,
-				ref: forwardedRef,
-				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
-			});
-		}
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-			...slotProps,
-			ref: forwardedRef,
-			children
-		});
-	});
-	Slot2.displayName = `${ownerName}.Slot`;
-	return Slot2;
-}
-var Slot$2 = /* @__PURE__ */ createSlot$1("Slot");
-/* @__NO_SIDE_EFFECTS__ */
-function createSlotClone(ownerName) {
-	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		if (import_react.isValidElement(children)) {
-			const childrenRef = getElementRef(children);
-			const props2 = mergeProps(slotProps, children.props);
-			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs$1(forwardedRef, childrenRef) : childrenRef;
-			return import_react.cloneElement(children, props2);
-		}
-		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
-	});
-	SlotClone.displayName = `${ownerName}.SlotClone`;
-	return SlotClone;
-}
-var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
-function isSlottable(child) {
-	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
-}
-function mergeProps(slotProps, childProps) {
-	const overrideProps = { ...childProps };
-	for (const propName in childProps) {
-		const slotPropValue = slotProps[propName];
-		const childPropValue = childProps[propName];
-		if (/^on[A-Z]/.test(propName)) {
-			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
-				const result = childPropValue(...args);
-				slotPropValue(...args);
-				return result;
-			};
-			else if (slotPropValue) overrideProps[propName] = slotPropValue;
-		} else if (propName === "style") overrideProps[propName] = {
-			...slotPropValue,
-			...childPropValue
-		};
-		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
-	}
-	return {
-		...slotProps,
-		...overrideProps
-	};
-}
-function getElementRef(element) {
-	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
-	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.ref;
-	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
-	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.props.ref;
-	return element.props.ref || element.ref;
-}
-var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
-	variants: {
-		variant: {
-			default: "bg-primary text-primary-foreground hover:bg-primary/90",
-			destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-			outline: "border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
-			secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-			ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
-			link: "text-foreground underline-offset-4 hover:underline"
-		},
-		size: {
-			default: "h-10 px-4 py-2",
-			sm: "h-9 rounded-md px-3",
-			lg: "h-11 rounded-md px-8",
-			icon: "h-10 w-10"
-		}
-	},
-	defaultVariants: {
-		variant: "default",
-		size: "default"
-	}
-});
-var Button = import_react.forwardRef(({ className, variant, size: size$3, asChild = false, ...props }, ref) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot$2 : "button", {
-		className: cn(buttonVariants({
-			variant,
-			size: size$3,
-			className
-		})),
-		ref,
-		...props
-	});
-});
-Button.displayName = "Button";
 var badgeVariants = cva("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", {
 	variants: { variant: {
 		default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
@@ -39099,4 +39105,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 var App_default = App;
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App_default, {}));
 
-//# sourceMappingURL=index-DFFoiPT7.js.map
+//# sourceMappingURL=index-Bm0gwq-a.js.map
