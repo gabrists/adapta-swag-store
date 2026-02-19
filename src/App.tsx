@@ -37,11 +37,11 @@ const App = () => (
                 {/* Storefront Routes */}
                 <Route path="/" element={<Index />} />
                 <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/historico" element={<HistoryPage />} />
                 <Route path="/profile" element={<Profile />} />
 
                 {/* Admin Routes - Protected by RequireAdmin */}
                 <Route element={<RequireAdmin />}>
+                  <Route path="/historico" element={<HistoryPage />} />
                   <Route path="/gerenciar" element={<ManageProducts />} />
                   <Route path="/admin">
                     <Route index element={<Dashboard />} />

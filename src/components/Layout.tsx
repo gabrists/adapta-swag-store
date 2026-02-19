@@ -77,11 +77,6 @@ export default function Layout() {
       url: '/orders',
       icon: Clock,
     },
-    {
-      title: 'Histórico',
-      url: '/historico',
-      icon: History,
-    },
   ]
 
   const adminItems = [
@@ -106,6 +101,11 @@ export default function Layout() {
       title: 'Time',
       url: '/admin/collaborators',
       icon: Users,
+    },
+    {
+      title: 'Histórico',
+      url: '/historico',
+      icon: History,
     },
     {
       title: 'Configurações',
