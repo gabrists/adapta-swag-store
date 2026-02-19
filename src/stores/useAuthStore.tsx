@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (email: string, password?: string) => Promise<void>
   logout: () => void
   isLoading: boolean
+  updateProfile: (data: { name: string; avatar?: string }) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -76,9 +77,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('adapta-swag-auth-user')
   }
 
+  const updateProfile = (data: { name: string; avatar?: string }) => {
+    if (!user) return
+
+    const updatedUser = {
+      ...user,
+      name: data.name,
+      avatar: data.avatar || user.avatar,
+    }
+
+    setUser(updatedUser)
+    localStorage.setItem('adapta-swag-auth-user', JSON.stringify(updatedUser))
+  }
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, logout, isLoading }}
+      value={{ isAuthenticated, user, login, logout, isLoading, updateProfile }}
     >
       {children}
     </AuthContext.Provider>

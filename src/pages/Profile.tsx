@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Loader2, Save, User as UserIcon, Mail } from 'lucide-react'
+import { Loader2, Save, User as UserIcon, Mail, Camera } from 'lucide-react'
 
 import useAuthStore from '@/stores/useAuthStore'
 import { useToast } from '@/hooks/use-toast'
@@ -32,9 +32,11 @@ const formSchema = z.object({
 })
 
 export default function Profile() {
-  const { user } = useAuthStore()
+  const { user, updateProfile } = useAuthStore()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,13 +46,50 @@ export default function Profile() {
     },
   })
 
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user.name,
+        email: user.email,
+      })
+    }
+  }, [user, form])
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // 5MB Limit
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'Arquivo muito grande',
+          description: 'A imagem deve ter no máximo 5MB.',
+          variant: 'destructive',
+        })
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click()
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
 
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
-    // In a real app, we would update the store here
+    updateProfile({
+      name: values.name,
+      avatar: avatarPreview || undefined,
+    })
 
     toast({
       title: 'Perfil atualizado!',
@@ -74,18 +113,44 @@ export default function Profile() {
 
       <Card className="border-slate-200 shadow-sm">
         <CardHeader>
-          <div className="flex items-center gap-4">
-            <Avatar className="h-16 w-16 border-2 border-primary/20">
-              <AvatarImage src={user?.avatar} />
-              <AvatarFallback>
-                {user?.name?.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <CardTitle>{user?.name}</CardTitle>
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div
+              className="relative group cursor-pointer"
+              onClick={handleAvatarClick}
+            >
+              <Avatar className="h-24 w-24 border-4 border-white shadow-md group-hover:opacity-90 transition-opacity">
+                <AvatarImage
+                  src={avatarPreview || user?.avatar}
+                  className="object-cover"
+                />
+                <AvatarFallback className="text-2xl">
+                  {user?.name?.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-8 h-8 text-white" />
+              </div>
+              <div className="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full shadow-lg border-2 border-white">
+                <Camera className="w-4 h-4" />
+              </div>
+            </div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+
+            <div className="text-center md:text-left space-y-1">
+              <CardTitle className="text-xl">{user?.name}</CardTitle>
               <CardDescription>
                 {user?.role === 'admin' ? 'Administrador' : 'Colaborador'}
               </CardDescription>
+              <p className="text-xs text-muted-foreground pt-1">
+                Clique na foto para alterar
+              </p>
             </div>
           </div>
         </CardHeader>
