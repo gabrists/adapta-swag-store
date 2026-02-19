@@ -1,6 +1,12 @@
 import { useState, useMemo } from 'react'
 import { Package, AlertTriangle, Users, TrendingUp } from 'lucide-react'
-import { startOfQuarter, startOfYear, isAfter, subDays } from 'date-fns'
+import {
+  startOfQuarter,
+  startOfYear,
+  isAfter,
+  subDays,
+  isValid,
+} from 'date-fns'
 import {
   BarChart,
   Bar,
@@ -63,32 +69,48 @@ export default function Dashboard() {
         break
     }
 
-    return history.filter((entry) => isAfter(new Date(entry.date), startDate))
+    return history.filter((entry) => {
+      if (!entry.date) return false
+      const entryDate = new Date(entry.date)
+      // Robust date validation to prevent invalid date comparisons
+      if (!isValid(entryDate)) return false
+      return isAfter(entryDate, startDate)
+    })
   }, [history, dateRange])
 
   // --- KPI Calculations ---
 
-  // 1. Total Outputs
+  // 1. Total Outputs - Validated to ensure numeric result
   const totalOutputs = useMemo(
-    () => filteredHistory.reduce((acc, entry) => acc + entry.totalQuantity, 0),
+    () =>
+      filteredHistory.reduce((acc, entry) => {
+        const qty = Number(entry.totalQuantity)
+        return acc + (isNaN(qty) ? 0 : qty)
+      }, 0),
     [filteredHistory],
   )
 
-  // 2. Critical Stock
+  // 2. Critical Stock - Validated filter
   const criticalStockCount = useMemo(
-    () => products.filter((p) => p.stock < 5).length,
+    () =>
+      products.filter((p) => {
+        const stock = Number(p.stock)
+        return !isNaN(stock) && stock < 5
+      }).length,
     [products],
   )
 
-  // 3. Top Consuming Area
+  // 3. Top Consuming Area - Validated accumulation
   const topConsumingArea = useMemo(() => {
     const departmentCounts: Record<string, number> = {}
 
     filteredHistory.forEach((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
       const dept = collaborator?.department || 'Outros'
-      departmentCounts[dept] =
-        (departmentCounts[dept] || 0) + entry.totalQuantity
+      const qty = Number(entry.totalQuantity)
+      const safeQty = isNaN(qty) ? 0 : qty
+
+      departmentCounts[dept] = (departmentCounts[dept] || 0) + safeQty
     })
 
     const sortedDepts = Object.entries(departmentCounts).sort(
@@ -99,14 +121,18 @@ export default function Dashboard() {
 
   // --- Chart Data Preparation ---
 
-  // Top 5 Popular Items
+  // Top 5 Popular Items - Validated quantities
   const popularItemsData = useMemo(() => {
     const itemCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
-      entry.items.forEach((item) => {
-        itemCounts[item.productName] =
-          (itemCounts[item.productName] || 0) + item.quantity
-      })
+      if (Array.isArray(entry.items)) {
+        entry.items.forEach((item) => {
+          const qty = Number(item.quantity)
+          const safeQty = isNaN(qty) ? 0 : qty
+          const name = item.productName || 'Item Desconhecido'
+          itemCounts[name] = (itemCounts[name] || 0) + safeQty
+        })
+      }
     })
 
     return Object.entries(itemCounts)
@@ -115,13 +141,15 @@ export default function Dashboard() {
       .slice(0, 5)
   }, [filteredHistory])
 
-  // Department Distribution
+  // Department Distribution - Validated values
   const departmentData = useMemo(() => {
     const deptCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
       const dept = collaborator?.department || 'Outros'
-      deptCounts[dept] = (deptCounts[dept] || 0) + entry.totalQuantity
+      const qty = Number(entry.totalQuantity)
+      const safeQty = isNaN(qty) ? 0 : qty
+      deptCounts[dept] = (deptCounts[dept] || 0) + safeQty
     })
 
     return Object.entries(deptCounts)
@@ -129,21 +157,33 @@ export default function Dashboard() {
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory, team])
 
-  // Replenishment List
+  // Replenishment List - Validated stock
   const lowStockProducts = useMemo(
-    () => products.filter((p) => p.stock < 5).slice(0, 5),
+    () =>
+      products
+        .filter((p) => {
+          const stock = Number(p.stock)
+          return !isNaN(stock) && stock < 5
+        })
+        .slice(0, 5),
     [products],
   )
 
-  // Recent Transactions
+  // Recent Transactions - Safe mapping
   const recentTransactions = useMemo(() => {
     return filteredHistory.slice(0, 10).map((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
+      const items = Array.isArray(entry.items) ? entry.items : []
+      const mainItemName = items[0]?.productName || 'Item Removido'
+      const moreItemsCount = Math.max(0, items.length - 1)
+      const qty = Number(entry.totalQuantity)
+
       return {
         ...entry,
+        totalQuantity: isNaN(qty) ? 0 : qty,
         collaborator,
-        mainItemName: entry.items[0]?.productName,
-        moreItemsCount: entry.items.length - 1,
+        mainItemName,
+        moreItemsCount,
       }
     })
   }, [filteredHistory, team])
@@ -503,14 +543,16 @@ export default function Dashboard() {
                         {product.name}
                       </h4>
                       <p className="text-xs text-red-700 font-medium mt-0.5">
-                        Restam apenas {product.stock} unidades
+                        Restam apenas {Number(product.stock) || 0} unidades
                       </p>
                     </div>
                   </div>
                 ))}
-                {products.filter((p) => p.stock < 5).length > 5 && (
+                {products.filter((p) => (Number(p.stock) || 0) < 5).length >
+                  5 && (
                   <p className="text-xs text-center text-slate-400 mt-2">
-                    Exibindo 5 de {products.filter((p) => p.stock < 5).length}{' '}
+                    Exibindo 5 de{' '}
+                    {products.filter((p) => (Number(p.stock) || 0) < 5).length}{' '}
                     itens críticos
                   </p>
                 )}
