@@ -76,8 +76,8 @@ export default function ApprovalsPage() {
   if (isLoading) {
     return (
       <div className="w-full max-w-7xl mx-auto space-y-6">
-        <div className="h-10 w-48 bg-white/5 rounded-lg animate-pulse" />
-        <div className="h-32 w-full bg-white/5 rounded-2xl animate-pulse" />
+        <div className="h-10 w-48 bg-gray-200 dark:bg-white/5 rounded-lg animate-pulse" />
+        <div className="h-32 w-full bg-gray-100 dark:bg-white/5 rounded-2xl animate-pulse" />
       </div>
     )
   }
@@ -86,18 +86,18 @@ export default function ApprovalsPage() {
     <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in-up pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Fila de Pedidos
           </h1>
-          <p className="text-base text-[#ADADAD]">
+          <p className="text-base text-gray-600 dark:text-[#ADADAD]">
             Gerencie as solicitações de brindes pendentes de aprovação.
           </p>
         </div>
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 dark:text-[#ADADAD]" />
           <Input
             placeholder="Buscar por nome ou item..."
-            className="pl-11 h-12"
+            className="pl-11 h-12 text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/40"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -106,18 +106,23 @@ export default function ApprovalsPage() {
 
       {pendingOrders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center glass-panel rounded-2xl border-dashed">
-          <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-inner">
+          <div className="w-20 h-20 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-inner">
             <CheckCircle className="w-10 h-10 text-primary" />
           </div>
-          <h3 className="text-xl font-semibold text-white">Fila vazia!</h3>
-          <p className="text-[#ADADAD] text-sm mt-2">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
+            Fila vazia!
+          </h3>
+          <p className="text-gray-500 dark:text-[#ADADAD] text-sm mt-2">
             Não há solicitações pendentes no momento.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5">
           {pendingOrders.map((order) => (
-            <Card key={order.id} className="overflow-hidden group">
+            <Card
+              key={order.id}
+              className="overflow-hidden group border-gray-200 dark:border-white/10"
+            >
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row md:items-center">
                   <div className="w-full md:w-2 h-2 md:h-auto md:self-stretch bg-sky-400" />
@@ -125,7 +130,7 @@ export default function ApprovalsPage() {
                   <div className="flex-1 p-5 md:p-6 flex flex-col sm:flex-row gap-6 md:items-center">
                     {/* User Info */}
                     <div className="flex items-center gap-4 min-w-[220px]">
-                      <Avatar className="h-12 w-12 border border-white/10 shrink-0">
+                      <Avatar className="h-12 w-12 border border-gray-200 dark:border-white/10 shrink-0">
                         <AvatarImage
                           src={order.employeeAvatar}
                           alt={order.employeeName}
@@ -135,10 +140,10 @@ export default function ApprovalsPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-semibold text-white text-base">
+                        <div className="font-semibold text-slate-900 dark:text-white text-base">
                           {order.employeeName}
                         </div>
-                        <div className="text-xs text-[#ADADAD] flex items-center gap-1.5 mt-0.5">
+                        <div className="text-xs text-gray-500 dark:text-[#ADADAD] flex items-center gap-1.5 mt-0.5">
                           <Clock className="w-3.5 h-3.5" />
                           {format(parseISO(order.createdAt), 'd MMM, HH:mm', {
                             locale: ptBR,
@@ -148,8 +153,8 @@ export default function ApprovalsPage() {
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex items-center gap-4 flex-1 bg-black/20 p-3 rounded-xl border border-white/5">
-                      <div className="h-14 w-14 rounded-lg bg-black/40 border border-white/10 overflow-hidden shrink-0">
+                    <div className="flex items-center gap-4 flex-1 bg-gray-50 dark:bg-black/20 p-3 rounded-xl border border-gray-200 dark:border-white/5">
+                      <div className="h-14 w-14 rounded-lg bg-gray-100 dark:bg-black/40 border border-gray-200 dark:border-white/10 overflow-hidden shrink-0">
                         <img
                           src={
                             order.productImage?.startsWith('http') ||
@@ -162,20 +167,20 @@ export default function ApprovalsPage() {
                         />
                       </div>
                       <div>
-                        <div className="font-semibold text-white text-sm">
+                        <div className="font-semibold text-slate-900 dark:text-white text-sm">
                           {order.productName}
                         </div>
                         <div className="flex items-center gap-2 mt-1.5">
                           <Badge
                             variant="secondary"
-                            className="text-[10px] h-5 px-2 font-medium bg-white/10 text-[#ADADAD] border-white/5"
+                            className="text-[10px] h-5 px-2 font-medium bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-[#ADADAD] hover:bg-gray-300 dark:hover:bg-white/20 border-transparent dark:border-white/5"
                           >
                             Qtd: {order.quantity}
                           </Badge>
                           {order.size && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-5 px-2 font-medium border-white/20 text-[#ADADAD]"
+                              className="text-[10px] h-5 px-2 font-medium border-gray-300 dark:border-white/20 text-gray-600 dark:text-[#ADADAD]"
                             >
                               Tam: {order.size}
                             </Badge>
@@ -188,7 +193,7 @@ export default function ApprovalsPage() {
                     <div className="flex items-center gap-3 mt-4 sm:mt-0">
                       <Button
                         variant="outline"
-                        className="btn-secondary-outline h-10 px-4 text-[#ADADAD] border-white/10 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all duration-300"
+                        className="btn-secondary-outline h-10 px-4 text-gray-600 dark:text-[#ADADAD] border-gray-200 dark:border-white/10 hover:text-red-600 dark:hover:text-red-500 hover:border-red-600 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-300"
                         onClick={() => handleRejectClick(order)}
                       >
                         <X className="w-4 h-4 mr-2" />
@@ -216,8 +221,10 @@ export default function ApprovalsPage() {
       >
         <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
-            <DialogTitle>Rejeitar Solicitação</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-slate-900 dark:text-white">
+              Rejeitar Solicitação
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 dark:text-[#ADADAD]">
               Informe o motivo da rejeição para que o colaborador saiba o que
               aconteceu.
             </DialogDescription>
@@ -232,7 +239,7 @@ export default function ApprovalsPage() {
                   reason: e.target.value,
                 }))
               }
-              className="min-h-[120px]"
+              className="min-h-[120px] text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/40"
             />
           </div>
           <DialogFooter>
@@ -241,14 +248,14 @@ export default function ApprovalsPage() {
               onClick={() =>
                 setRejectDialog({ open: false, order: null, reason: '' })
               }
-              className="btn-secondary-outline border-white/10"
+              className="btn-secondary-outline border-gray-200 dark:border-white/10 text-slate-900 dark:text-white"
             >
               Cancelar
             </Button>
             <Button
               onClick={confirmReject}
               disabled={!rejectDialog.reason.trim()}
-              className="bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
+              className="bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               Confirmar Rejeição
             </Button>
