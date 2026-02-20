@@ -83,7 +83,7 @@ export default function Index() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 dark:text-white" />
           <Input
             placeholder="O que você procura hoje?"
-            className="pl-11 h-12 text-lg rounded-xl bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 focus-visible:border-[#0E9C8B] dark:focus-visible:border-primary/50 focus-visible:ring-[#0E9C8B]/50 dark:focus-visible:ring-primary/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
+            className="pl-11 h-12 text-lg rounded-xl bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 focus-visible:border-[#00CA7E] dark:focus-visible:border-primary/50 focus-visible:ring-[#00CA7E]/50 dark:focus-visible:ring-primary/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -99,7 +99,7 @@ export default function Index() {
             className={cn(
               'px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 border',
               selectedCategory === category
-                ? 'bg-[#0E9C8B] text-white border-[#0E9C8B] dark:btn-primary-glow shadow-md'
+                ? 'bg-[#00CA7E] text-white border-[#00CA7E] dark:btn-primary-glow shadow-md'
                 : 'bg-white dark:bg-white/5 text-slate-700 dark:text-white border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white',
             )}
           >

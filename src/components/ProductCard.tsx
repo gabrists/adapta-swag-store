@@ -95,7 +95,7 @@ export function ProductCard({
         </div>
         {product.isSingleQuota && (
           <div className="absolute top-3 right-3">
-            <Badge className="bg-[#0E9C8B]/90 dark:bg-primary/90 text-white backdrop-blur-md shadow-[0_0_10px_rgba(14,156,139,0.3)] dark:shadow-[0_0_10px_rgba(20,240,214,0.3)] font-medium border-none">
+            <Badge className="bg-[#00CA7E]/90 dark:bg-primary/90 text-white backdrop-blur-md shadow-[0_0_10px_rgba(0,202,126,0.3)] dark:shadow-[0_0_10px_rgba(0,202,126,0.3)] font-medium border-none">
               Cota Única
             </Badge>
           </div>
@@ -124,9 +124,9 @@ export function ProductCard({
                   className={cn(
                     'w-9 h-9 rounded-full text-xs font-bold transition-all border flex items-center justify-center',
                     isSelected
-                      ? 'bg-[#0E9C8B]/10 dark:bg-primary/20 text-[#0E9C8B] dark:text-primary border-[#0E9C8B] dark:border-primary shadow-[0_0_10px_rgba(14,156,139,0.2)] dark:shadow-[0_0_10px_rgba(20,240,214,0.3)]'
+                      ? 'bg-[#00CA7E]/10 dark:bg-primary/20 text-[#00CA7E] dark:text-primary border-[#00CA7E] dark:border-primary shadow-[0_0_10px_rgba(0,202,126,0.2)] dark:shadow-[0_0_10px_rgba(0,202,126,0.3)]'
                       : hasStock
-                        ? 'bg-white dark:bg-black/20 text-slate-700 dark:text-white border-slate-200 dark:border-white/10 hover:border-[#0E9C8B]/50 hover:text-[#0E9C8B] dark:hover:border-primary/50 dark:hover:text-primary hover:bg-[#0E9C8B]/5 dark:hover:bg-primary/10'
+                        ? 'bg-white dark:bg-black/20 text-slate-700 dark:text-white border-slate-200 dark:border-white/10 hover:border-[#00CA7E]/50 hover:text-[#00CA7E] dark:hover:border-primary/50 dark:hover:text-primary hover:bg-[#00CA7E]/5 dark:hover:bg-primary/10'
                         : 'bg-slate-50 dark:bg-black/10 text-slate-400 dark:text-white border-slate-200 dark:border-white/5 cursor-not-allowed line-through opacity-50',
                   )}
                 >
@@ -161,7 +161,7 @@ export function ProductCard({
               ) : (
                 <Badge
                   variant="outline"
-                  className="bg-[#0E9C8B]/10 dark:bg-primary/10 text-[#0E9C8B] dark:text-primary border-[#0E9C8B]/20 dark:border-primary/20"
+                  className="bg-[#00CA7E]/10 dark:bg-primary/10 text-[#00CA7E] dark:text-primary border-[#00CA7E]/20 dark:border-primary/20"
                 >
                   {selectedSize && (
                     <span className="mr-1 font-bold">{selectedSize}:</span>
@@ -254,7 +254,7 @@ export function ProductCard({
                   ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none border-transparent'
                   : product.hasGrid && !selectedSize
                     ? 'text-slate-600 dark:text-slate-300 shadow-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-100 cursor-default'
-                    : 'bg-[#0E9C8B] text-white hover:bg-[#0E9C8B] shadow-[0_0_15px_rgba(14,156,139,0.2)] hover:shadow-[0_0_25px_rgba(14,156,139,0.4)] dark:btn-primary-glow border-transparent disabled:opacity-50',
+                    : 'bg-[#00CA7E] text-white hover:bg-[#00CA7E] shadow-[0_0_15px_rgba(0,202,126,0.2)] hover:shadow-[0_0_25px_rgba(0,202,126,0.4)] dark:btn-primary-glow border-transparent disabled:opacity-50',
             )}
             onClick={handleAddToCartClick}
             disabled={isDisabled}
