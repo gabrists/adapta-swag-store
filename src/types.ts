@@ -15,15 +15,15 @@ export interface Product {
   category: string
   imageQuery: string
   description?: string
-  stock: number // Total stock
+  stock: number
   hasGrid: boolean
   grid?: ProductSizeGrid
-  price: number // Added for Dashboard KPI
-  unitCost: number // Added for Financial KPI
-  supplierUrl?: string // Added for Restock
-  isSingleQuota: boolean // Added for Single Quota Feature
-  isActive: boolean // Added for Active/Inactive status
-  criticalLevel?: number // Added for Stock Alert
+  price: number
+  unitCost: number
+  supplierUrl?: string
+  isSingleQuota: boolean
+  isActive: boolean
+  criticalLevel?: number
 }
 
 export interface CartItem {
@@ -48,9 +48,9 @@ export interface HistoryEntry {
   id: string
   items: HistoryItemEntry[]
   user: string
-  userAvatar?: string // Added for Avatar support
+  userAvatar?: string
   destination: string
-  date: string // ISO string
+  date: string
   totalQuantity: number
   totalValue: number
 }
@@ -84,6 +84,7 @@ export interface Collaborator {
 export interface SlackSettings {
   id: string
   webhookUrl: string
+  botToken?: string
   isEnabled: boolean
 }
 

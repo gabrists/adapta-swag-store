@@ -69,7 +69,8 @@ interface SwagContextType {
   ) => Promise<void>
   saveSlackSettings: (settings: Partial<SlackSettings>) => Promise<void>
   testSlackConnection: () => Promise<void>
-  sendSlackNotification: (text: string, throwError?: boolean) => Promise<void>
+  notifySlackChannel: (text: string) => Promise<void>
+  notifySlackDM: (email: string, text: string) => Promise<void>
   fetchCampaigns: () => Promise<void>
   fetchCampaignResponses: () => Promise<void>
   createCampaign: (
@@ -298,12 +299,13 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       setSlackSettings({
         id: data.id,
         webhookUrl: data.webhook_url,
+        botToken: (data as any).bot_token,
         isEnabled: data.is_enabled,
       })
     } else {
       const { data: newData, error: newError } = await supabase
         .from('slack_settings')
-        .insert({ webhook_url: '', is_enabled: false })
+        .insert({ webhook_url: '', is_enabled: false } as any)
         .select()
         .single()
 
@@ -311,6 +313,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         setSlackSettings({
           id: newData.id,
           webhookUrl: newData.webhook_url,
+          botToken: (newData as any).bot_token,
           isEnabled: newData.is_enabled,
         })
       }
@@ -435,19 +438,26 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     await fetchCampaignResponses()
   }
 
-  const sendSlackNotification = async (text: string, throwError = false) => {
-    if (!slackSettings?.webhookUrl) {
-      if (throwError) throw new Error('Webhook não configurado')
+  const notifySlackChannel = async (text: string) => {
+    const payloadInfo = { type: 'webhook', text }
+    console.log('Sending Slack Channel Notification:', payloadInfo)
+
+    toast({
+      title: 'Slack Notificação',
+      description: 'Notificação enviada no canal do RH',
+    })
+
+    if (!slackSettings?.webhookUrl || !slackSettings?.isEnabled) {
+      console.log('Slack Webhook Missing or Disabled. Payload:', payloadInfo)
       return
     }
-
-    if (!slackSettings.isEnabled && !throwError) return
 
     try {
       const { data, error } = await supabase.functions.invoke(
         'send-slack-notification',
         {
           body: {
+            type: 'webhook',
             webhook_url: slackSettings.webhookUrl,
             payload: { text },
           },
@@ -457,8 +467,45 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       if (error) throw new Error(error.message)
       if (data?.error) throw new Error(data.error)
     } catch (error) {
-      console.error('Failed to send Slack notification:', error)
-      if (throwError) throw error
+      console.error(
+        'Failed to send Slack channel notification:',
+        error,
+        payloadInfo,
+      )
+    }
+  }
+
+  const notifySlackDM = async (email: string, text: string) => {
+    const payloadInfo = { type: 'dm', email, text }
+    console.log('Sending Slack DM:', payloadInfo)
+
+    toast({
+      title: 'Slack DM',
+      description: 'DM enviada para o Slack do colaborador',
+    })
+
+    if (!slackSettings?.botToken || !slackSettings?.isEnabled) {
+      console.log('Slack Bot Token Missing or Disabled. Payload:', payloadInfo)
+      return
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        'send-slack-notification',
+        {
+          body: {
+            type: 'dm',
+            bot_token: slackSettings.botToken,
+            email,
+            payload: { text },
+          },
+        },
+      )
+
+      if (error) throw new Error(error.message)
+      if (data?.error) throw new Error(data.error)
+    } catch (error) {
+      console.error('Failed to send Slack DM:', error, payloadInfo)
     }
   }
 
@@ -481,13 +528,14 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
     const updates = {
       webhook_url: settings.webhookUrl,
+      bot_token: settings.botToken,
       is_enabled: settings.isEnabled,
       updated_at: new Date().toISOString(),
     }
 
     const { error } = await supabase
       .from('slack_settings')
-      .update(updates)
+      .update(updates as any)
       .eq('id', slackSettings.id)
 
     if (error) throw error
@@ -497,10 +545,15 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
   const testSlackConnection = async () => {
     if (!checkAdminPermission()) return
-    await sendSlackNotification(
+    await notifySlackChannel(
       '🔔 *Teste de Conexão:* O sistema Adapta Swag Store está conectado ao Slack com sucesso!',
-      true,
     )
+    if (user?.email) {
+      await notifySlackDM(
+        user.email,
+        '🔔 *Teste de Conexão (DM):* O sistema Adapta Swag Store está conectado ao Slack com sucesso!',
+      )
+    }
   }
 
   const addToCart = (product: Product, quantity: number, size?: string) => {
@@ -633,8 +686,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       if (error) throw error
 
       for (const item of cart) {
-        const message = `🚨 *Novo Pedido de Swag:* ${user.name} solicitou ${item.quantity}x ${item.productName}${item.size ? ` (Tam: ${item.size})` : ''}. Motivo: ${destination}. <${window.location.origin}/admin/approvals|Clique para aprovar>`
-        sendSlackNotification(message)
+        const channelMessage = `🚨 *Novo Pedido de Swag:* ${user.name} (${user.email}) solicitou ${item.quantity}x ${item.productName}. Acesse o painel para aprovar ou rejeitar: ${window.location.origin}/admin/approvals`
+        notifySlackChannel(channelMessage)
+
+        const dmMessage = `⏳ *Recebemos seu pedido!* Sua solicitação para ${item.productName} foi enviada ao RH. Avisaremos aqui quando houver atualização.`
+        notifySlackDM(user.email, dmMessage)
       }
 
       setCart([])
@@ -687,8 +743,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       await updateLocalStock(order.itemId, order.quantity, order.size)
 
-      const approvalMsg = `✅ *Pedido Aprovado:* Seu pedido de ${order.productName} foi separado e está pronto para retirada com o RH!`
-      sendSlackNotification(approvalMsg)
+      const approvalMsg = `✅ *Boas notícias!* Seu pedido do ${order.productName} foi aprovado. Você já pode retirá-lo com o time de Facilities/RH.`
+      notifySlackDM(order.employeeEmail || '', approvalMsg)
 
       toast({
         title: 'Pedido Aprovado',
@@ -810,7 +866,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
     if (newStockLevel < 5 && productName) {
       const stockMsg = `⚠️ *Alerta de Estoque:* O item ${productName} está acabando! Restam apenas ${newStockLevel} unidades. ${productSupplierUrl ? `<${productSupplierUrl}|Link para fornecedor>` : '(Sem link do fornecedor)'}`
-      sendSlackNotification(stockMsg)
+      notifySlackChannel(stockMsg)
     }
 
     await fetchItems()
@@ -833,8 +889,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       const order = orders.find((o) => o.id === orderId)
       const productName = order?.productName || 'Item'
 
-      const rejectionMsg = `❌ *Pedido Rejeitado:* Seu pedido de ${productName} não pôde ser atendido.${reason ? ` Motivo: ${reason}` : ''}`
-      sendSlackNotification(rejectionMsg)
+      const rejectionMsg = `❌ *Atualização do pedido:* Infelizmente seu pedido do ${productName} não pôde ser aprovado agora. Motivo: ${reason}`
+      notifySlackDM(order?.employeeEmail || '', rejectionMsg)
 
       toast({
         title: 'Pedido Rejeitado',
@@ -1133,7 +1189,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         registerManualDelivery,
         saveSlackSettings,
         testSlackConnection,
-        sendSlackNotification,
+        notifySlackChannel,
+        notifySlackDM,
         fetchCampaigns,
         fetchCampaignResponses,
         createCampaign,
