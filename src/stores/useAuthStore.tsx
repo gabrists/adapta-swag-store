@@ -77,12 +77,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sbUser: SupabaseUser,
   ): Promise<User> => {
     try {
-      // Fetch employee data from Supabase to get the real role
-      const { data: employee, error } = await supabase
+      // First try to find by ID to ensure consistency if email changed
+      let { data: employee, error } = await supabase
         .from('employees')
         .select('*')
-        .eq('email', sbUser.email)
+        .eq('id', sbUser.id)
         .single()
+
+      // Fallback to email if not found by ID
+      if (!employee) {
+        const { data: employeeByEmail } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('email', sbUser.email)
+          .single()
+
+        employee = employeeByEmail
+      }
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching employee data:', error)
@@ -112,9 +123,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         `https://img.usecurling.com/ppl/medium?gender=male&seed=${sbUser.email}`
 
       return {
-        id: sbUser.id,
+        id: employee?.id || sbUser.id,
         name: name.charAt(0).toUpperCase() + name.slice(1),
-        email: sbUser.email || '',
+        email: employee?.email || sbUser.email || '',
         avatar,
         role,
       }

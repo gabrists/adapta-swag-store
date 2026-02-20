@@ -70,7 +70,7 @@ interface SwagContextType {
   saveSlackSettings: (settings: Partial<SlackSettings>) => Promise<void>
   testSlackConnection: () => Promise<void>
   notifySlackChannel: (text: string) => Promise<void>
-  notifySlackDM: (email: string, text: string) => Promise<void>
+  notifySlackDM: (employeeId: string, text: string) => Promise<void>
   fetchCampaigns: () => Promise<void>
   fetchCampaignResponses: () => Promise<void>
   createCampaign: (
@@ -475,7 +475,23 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const notifySlackDM = async (email: string, text: string) => {
+  const notifySlackDM = async (employeeId: string, text: string) => {
+    // 1. Ensure we always use the latest email from the employees table to avoid stale session data errors
+    const { data: employee } = await supabase
+      .from('employees')
+      .select('email')
+      .eq('id', employeeId)
+      .single()
+
+    const email = employee?.email
+
+    if (!email) {
+      console.log(
+        `Slack DM skipped: Could not find up-to-date email for employee ID: ${employeeId}`,
+      )
+      return
+    }
+
     const payloadInfo = { type: 'dm', email, text }
     console.log('Sending Slack DM:', payloadInfo)
 
@@ -548,9 +564,9 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     await notifySlackChannel(
       '🔔 *Teste de Conexão:* O sistema Adapta Swag Store está conectado ao Slack com sucesso!',
     )
-    if (user?.email) {
+    if (user?.id) {
       await notifySlackDM(
-        user.email,
+        user.id,
         '🔔 *Teste de Conexão (DM):* O sistema Adapta Swag Store está conectado ao Slack com sucesso!',
       )
     }
@@ -685,12 +701,21 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error
 
+      // Get latest employee email to ensure no stale data in channel message
+      const { data: currentEmp } = await supabase
+        .from('employees')
+        .select('email')
+        .eq('id', user.id)
+        .single()
+
+      const currentEmail = currentEmp?.email || user.email
+
       for (const item of cart) {
-        const channelMessage = `🚨 *Novo Pedido de Swag:* ${user.name} (${user.email}) solicitou ${item.quantity}x ${item.productName}. Acesse o painel para aprovar ou rejeitar: ${window.location.origin}/admin/approvals`
+        const channelMessage = `🚨 *Novo Pedido de Swag:* ${user.name} (${currentEmail}) solicitou ${item.quantity}x ${item.productName}. Acesse o painel para aprovar ou rejeitar: ${window.location.origin}/admin/approvals`
         notifySlackChannel(channelMessage)
 
         const dmMessage = `⏳ *Recebemos seu pedido!* Sua solicitação para ${item.productName} foi enviada ao RH. Avisaremos aqui quando houver atualização.`
-        notifySlackDM(user.email, dmMessage)
+        notifySlackDM(user.id, dmMessage)
       }
 
       setCart([])
@@ -744,7 +769,9 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       await updateLocalStock(order.itemId, order.quantity, order.size)
 
       const approvalMsg = `✅ *Boas notícias!* Seu pedido do ${order.productName} foi aprovado. Você já pode retirá-lo com o time de Facilities/RH.`
-      notifySlackDM(order.employeeEmail || '', approvalMsg)
+      if (order.employeeId) {
+        notifySlackDM(order.employeeId, approvalMsg)
+      }
 
       toast({
         title: 'Pedido Aprovado',
@@ -890,7 +917,9 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       const productName = order?.productName || 'Item'
 
       const rejectionMsg = `❌ *Atualização do pedido:* Infelizmente seu pedido do ${productName} não pôde ser aprovado agora. Motivo: ${reason}`
-      notifySlackDM(order?.employeeEmail || '', rejectionMsg)
+      if (order?.employeeId) {
+        notifySlackDM(order.employeeId, rejectionMsg)
+      }
 
       toast({
         title: 'Pedido Rejeitado',
