@@ -204,21 +204,21 @@ export default function Dashboard() {
   const getDepartmentBadgeStyles = (dept: string | undefined) => {
     switch (dept) {
       case 'Vendas B2B':
-        return 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30'
       case 'Engenharia':
-        return 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/30'
       case 'Marketing':
-        return 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
+        return 'bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/30'
       case 'RH':
-        return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
       default:
-        return 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+        return 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-500/20 dark:text-slate-300 dark:border-slate-500/30'
     }
   }
 
   const departmentColors: Record<string, string> = {
     'Vendas B2B': '#3b82f6',
-    Engenharia: '#06b6d4',
+    Engenharia: '#a855f7',
     Marketing: '#0ea5e9',
     RH: '#10b981',
     Outros: '#94a3b8',
@@ -237,11 +237,11 @@ export default function Dashboard() {
   } satisfies ChartConfig
 
   const monochromePalette = [
-    '#14F0D6',
-    '#0E9C8B',
-    '#0A7064',
-    '#06b6d4',
-    '#0ea5e9',
+    '#77d4cb', // Lightest Teal
+    '#30c2b2', // Light Teal
+    '#0E9C8B', // Base Teal
+    '#09695d', // Dark Teal
+    '#053d36', // Darkest Teal
   ]
 
   const pieChartConfig = {
@@ -264,13 +264,15 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Dashboard Analítico
           </h1>
-          <p className="text-white mt-1">Visão geral da Adapta Swag Store.</p>
+          <p className="text-slate-600 dark:text-slate-300 mt-1">
+            Visão geral da Adapta Swag Store.
+          </p>
         </div>
         <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[200px] bg-black/20 border-white/10 h-12 text-white">
+          <SelectTrigger className="w-[200px] bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 h-12 text-slate-900 dark:text-white">
             <SelectValue placeholder="Selecione o período" />
           </SelectTrigger>
           <SelectContent>
@@ -283,52 +285,58 @@ export default function Dashboard() {
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:border-primary/30 transition-colors">
+        <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
               Total de Saídas
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">{totalOutputs}</div>
-            <p className="text-xs text-white mt-2">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+              {totalOutputs}
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               Itens retirados no período
             </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:border-primary/30 transition-colors">
+        <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
               Custo Total Mensal
             </CardTitle>
             <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
               {formatCurrency(monthlyTotalCost)}
             </div>
-            <p className="text-xs text-white mt-2">Gasto no mês atual</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              Gasto no mês atual
+            </p>
           </CardContent>
         </Card>
 
         <Card
           className={cn(
-            'transition-colors',
+            'transition-colors bg-white dark:bg-[#081a17]/80 shadow-sm dark:shadow-none',
             criticalStockCount > 0
-              ? 'border-sky-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-              : 'hover:border-primary/30',
+              ? 'border-sky-500/50 dark:shadow-[0_0_15px_rgba(6,182,212,0.15)] shadow-[0_0_15px_rgba(6,182,212,0.1)]'
+              : 'border-slate-200 dark:border-white/10 hover:border-primary/30',
           )}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
               Estoque Crítico
             </CardTitle>
             <AlertTriangle
               className={cn(
                 'h-4 w-4',
-                criticalStockCount > 0 ? 'text-sky-400' : 'text-white',
+                criticalStockCount > 0
+                  ? 'text-sky-500 dark:text-sky-400'
+                  : 'text-slate-900 dark:text-white',
               )}
             />
           </CardHeader>
@@ -336,27 +344,31 @@ export default function Dashboard() {
             <div
               className={cn(
                 'text-3xl font-bold',
-                criticalStockCount > 0 ? 'text-sky-400' : 'text-white',
+                criticalStockCount > 0
+                  ? 'text-sky-600 dark:text-sky-400'
+                  : 'text-slate-900 dark:text-white',
               )}
             >
               {criticalStockCount}
             </div>
-            <p className="text-xs text-white mt-2">Itens com &lt; 5 unidades</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              Itens com &lt; 5 unidades
+            </p>
           </CardContent>
         </Card>
 
-        <Card className="hover:border-primary/30 transition-colors">
+        <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
               Área que mais Consome
             </CardTitle>
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white truncate min-h-[36px] flex items-center">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white truncate min-h-[36px] flex items-center">
               {topConsumingArea}
             </div>
-            <p className="text-xs text-white mt-2">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               Departamento com mais retiradas
             </p>
           </CardContent>
@@ -365,9 +377,9 @@ export default function Dashboard() {
 
       {/* Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Custo por Departamento (R$)
             </CardTitle>
           </CardHeader>
@@ -384,7 +396,7 @@ export default function Dashboard() {
                 <CartesianGrid
                   vertical={false}
                   strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.05)"
+                  className="stroke-slate-200 dark:stroke-white/5"
                 />
                 <XAxis
                   dataKey="name"
@@ -392,33 +404,21 @@ export default function Dashboard() {
                   tickMargin={10}
                   axisLine={false}
                   tickFormatter={(value) => value.slice(0, 10)}
-                  stroke="rgba(255,255,255,0.4)"
+                  className="fill-slate-600 dark:fill-slate-400 text-xs"
                 />
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) =>
-                    new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                      notation: 'compact',
-                      maximumFractionDigits: 1,
-                    }).format(value)
-                  }
-                  stroke="rgba(255,255,255,0.4)"
+                  tickFormatter={(value) => formatCurrency(value)}
+                  className="fill-slate-600 dark:fill-slate-400 text-xs"
                 />
                 <ChartTooltip
-                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  cursor={{ fill: 'rgba(148,163,184,0.1)' }}
                   content={
                     <ChartTooltipContent
                       indicator="dashed"
-                      formatter={(value) =>
-                        new Intl.NumberFormat('pt-BR', {
-                          style: 'currency',
-                          currency: 'BRL',
-                        }).format(Number(value))
-                      }
-                      className="bg-[#081a17]/90 border-white/10 text-white backdrop-blur-md shadow-xl"
+                      formatter={(value) => formatCurrency(Number(value))}
+                      className="bg-white/90 dark:bg-[#081a17]/90 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white backdrop-blur-md shadow-xl"
                     />
                   }
                 />
@@ -437,9 +437,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Distribuição por Departamento (Qtd)
             </CardTitle>
           </CardHeader>
@@ -477,7 +477,7 @@ export default function Dashboard() {
                     <ChartTooltipContent
                       nameKey="name"
                       hideLabel
-                      className="bg-[#081a17]/90 border-white/10 text-white backdrop-blur-md"
+                      className="bg-white/90 dark:bg-[#081a17]/90 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white backdrop-blur-md shadow-xl"
                     />
                   }
                 />
@@ -485,7 +485,7 @@ export default function Dashboard() {
                   verticalAlign="bottom"
                   height={40}
                   content={({ payload }) => (
-                    <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-white">
+                    <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-slate-900 dark:text-white">
                       {payload?.map((entry: any, index: number) => (
                         <div
                           key={`legend-${index}`}
@@ -512,9 +512,9 @@ export default function Dashboard() {
       {/* Bottom Section: Transactions & Alerts */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Transactions Table */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
               Transações Recentes
             </CardTitle>
           </CardHeader>
@@ -522,13 +522,23 @@ export default function Dashboard() {
             <div className="overflow-x-auto rounded-b-2xl">
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent border-white/10 bg-black/20">
-                    <TableHead className="pl-6 text-white">Data</TableHead>
-                    <TableHead className="text-white">Colaborador</TableHead>
-                    <TableHead className="text-white">Item Retirado</TableHead>
-                    <TableHead className="text-white">Qtd</TableHead>
-                    <TableHead className="text-white">Depto</TableHead>
-                    <TableHead className="text-right pr-6 text-white">
+                  <TableRow className="hover:bg-transparent border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20">
+                    <TableHead className="pl-6 text-slate-600 dark:text-slate-300">
+                      Data
+                    </TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">
+                      Colaborador
+                    </TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">
+                      Item Retirado
+                    </TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">
+                      Qtd
+                    </TableHead>
+                    <TableHead className="text-slate-600 dark:text-slate-300">
+                      Depto
+                    </TableHead>
+                    <TableHead className="text-right pr-6 text-slate-600 dark:text-slate-300">
                       Valor Total
                     </TableHead>
                   </TableRow>
@@ -538,7 +548,7 @@ export default function Dashboard() {
                     <TableRow>
                       <TableCell
                         colSpan={6}
-                        className="h-32 text-center text-white"
+                        className="h-32 text-center text-slate-500 dark:text-slate-400"
                       >
                         Nenhuma transação encontrada no período.
                       </TableCell>
@@ -547,29 +557,29 @@ export default function Dashboard() {
                     recentTransactions.map((tx) => (
                       <TableRow
                         key={tx.id}
-                        className="hover:bg-white/5 border-white/5 transition-colors"
+                        className="hover:bg-slate-50 dark:hover:bg-white/5 border-slate-100 dark:border-white/5 transition-colors"
                       >
-                        <TableCell className="pl-6 font-medium text-white text-xs whitespace-nowrap">
+                        <TableCell className="pl-6 font-medium text-slate-900 dark:text-white text-xs whitespace-nowrap">
                           {new Date(tx.date).toLocaleDateString('pt-BR')}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 border border-white/10">
+                            <Avatar className="h-8 w-8 border border-slate-200 dark:border-white/10">
                               <AvatarImage
                                 src={tx.collaborator?.avatarUrl}
                                 alt={tx.user}
                               />
-                              <AvatarFallback className="text-xs bg-white/5 text-white">
+                              <AvatarFallback className="text-xs bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white">
                                 {tx.user.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-white font-medium truncate max-w-[120px]">
+                            <span className="text-sm text-slate-900 dark:text-white font-medium truncate max-w-[120px]">
                               {tx.user}
                             </span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm text-white truncate block max-w-[180px]">
+                          <span className="text-sm text-slate-900 dark:text-white truncate block max-w-[180px]">
                             {tx.mainItemName}
                             {tx.moreItemsCount > 0 && (
                               <span className="text-xs text-primary ml-2 bg-primary/10 px-1.5 py-0.5 rounded">
@@ -578,7 +588,7 @@ export default function Dashboard() {
                             )}
                           </span>
                         </TableCell>
-                        <TableCell className="text-sm text-white">
+                        <TableCell className="text-sm text-slate-900 dark:text-white">
                           {tx.totalQuantity}
                         </TableCell>
                         <TableCell>
@@ -607,16 +617,16 @@ export default function Dashboard() {
         </Card>
 
         {/* Replenishment Alerts Widget */}
-        <Card className="h-full flex flex-col">
+        <Card className="h-full flex flex-col bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-sky-400" />
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-sky-500 dark:text-sky-400" />
               Atenção: Reposição
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 overflow-y-auto max-h-[420px] pr-2">
             {lowStockProducts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center text-white h-full bg-black/20 rounded-xl border border-white/5">
+              <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 dark:text-white h-full bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5">
                 <Package className="h-12 w-12 text-primary/40 mb-3" />
                 <p className="text-sm">Estoque saudável!</p>
               </div>
@@ -625,17 +635,17 @@ export default function Dashboard() {
                 {lowStockProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex flex-col gap-3 p-4 rounded-xl bg-sky-500/5 border border-sky-500/20 shadow-sm"
+                    className="flex flex-col gap-3 p-4 rounded-xl bg-sky-50 dark:bg-sky-500/5 border border-sky-100 dark:border-sky-500/20 shadow-sm"
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">
-                        <AlertTriangle className="h-5 w-5 text-sky-400" />
+                        <AlertTriangle className="h-5 w-5 text-sky-500 dark:text-sky-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-white line-clamp-1">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white line-clamp-1">
                           {product.name}
                         </h4>
-                        <p className="text-xs text-sky-300 mt-1">
+                        <p className="text-xs text-sky-600 dark:text-sky-300 mt-1">
                           Restam apenas{' '}
                           <span className="font-bold">
                             {Number(product.stock) || 0}
@@ -648,7 +658,7 @@ export default function Dashboard() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full text-xs h-8 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/30 text-sky-300 gap-2 mt-1"
+                      className="w-full text-xs h-8 bg-sky-100 dark:bg-sky-500/10 hover:bg-sky-200 dark:hover:bg-sky-500/20 border-sky-200 dark:border-sky-500/30 text-sky-700 dark:text-sky-300 gap-2 mt-1"
                       disabled={!product.supplierUrl}
                       onClick={() => {
                         if (product.supplierUrl) {

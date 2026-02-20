@@ -48,6 +48,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import useAuthStore from '@/stores/useAuthStore'
 import { CartSheet } from '@/components/CartSheet'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import useSwagStore from '@/stores/useSwagStore'
 import { cn } from '@/lib/utils'
 
@@ -121,7 +122,7 @@ export default function Layout() {
     <SidebarProvider>
       <Sidebar
         collapsible="icon"
-        className="border-r border-white/10 bg-[#061412]"
+        className="border-r border-gray-200 dark:border-white/10 bg-white dark:bg-[#061412]"
       >
         <SidebarHeader>
           <SidebarMenu>
@@ -131,7 +132,7 @@ export default function Layout() {
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[0_0_10px_rgba(20,240,214,0.3)]">
                     <Package2 className="size-4" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight text-white">
+                  <div className="grid flex-1 text-left text-sm leading-tight text-slate-900 dark:text-white">
                     <span className="truncate font-bold text-[15px]">
                       Adapta Swag
                     </span>
@@ -147,7 +148,7 @@ export default function Layout() {
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel className="text-white/50">
+            <SidebarGroupLabel className="text-gray-500 dark:text-white/50">
               Loja
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -159,9 +160,9 @@ export default function Layout() {
                       isActive={location.pathname === item.url}
                       tooltip={item.title}
                       className={cn(
-                        'text-[#ADADAD] hover:text-white hover:bg-white/5',
+                        'text-gray-500 dark:text-[#ADADAD] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5',
                         location.pathname === item.url &&
-                          'bg-white/10 text-white font-medium',
+                          'bg-gray-200 dark:bg-white/10 text-slate-900 dark:text-white font-medium',
                       )}
                     >
                       <NavLink to={item.url}>
@@ -170,7 +171,7 @@ export default function Layout() {
                             'w-4 h-4',
                             location.pathname === item.url
                               ? 'text-primary'
-                              : 'text-[#ADADAD]',
+                              : 'text-gray-500 dark:text-[#ADADAD]',
                           )}
                         />
                         <span>{item.title}</span>
@@ -184,9 +185,9 @@ export default function Layout() {
 
           {isAdmin && (
             <>
-              <SidebarSeparator className="bg-white/5" />
+              <SidebarSeparator className="bg-gray-200 dark:bg-white/5" />
               <SidebarGroup>
-                <SidebarGroupLabel className="text-white/50">
+                <SidebarGroupLabel className="text-gray-500 dark:text-white/50">
                   Administração
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -203,15 +204,18 @@ export default function Layout() {
                             isActive={isActive}
                             tooltip={item.title}
                             className={cn(
-                              'text-[#ADADAD] hover:text-white hover:bg-white/5',
-                              isActive && 'bg-white/10 text-white font-medium',
+                              'text-gray-500 dark:text-[#ADADAD] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5',
+                              isActive &&
+                                'bg-gray-200 dark:bg-white/10 text-slate-900 dark:text-white font-medium',
                             )}
                           >
                             <NavLink to={item.url}>
                               <item.icon
                                 className={cn(
                                   'w-4 h-4',
-                                  isActive ? 'text-primary' : 'text-[#ADADAD]',
+                                  isActive
+                                    ? 'text-primary'
+                                    : 'text-gray-500 dark:text-[#ADADAD]',
                                 )}
                               />
                               <span>{item.title}</span>
@@ -239,19 +243,19 @@ export default function Layout() {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-white/10 data-[state=open]:text-white text-[#ADADAD] hover:bg-white/5 hover:text-white"
+                    className="data-[state=open]:bg-gray-200 dark:data-[state=open]:bg-white/10 data-[state=open]:text-slate-900 dark:data-[state=open]:text-white text-gray-500 dark:text-[#ADADAD] hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   >
-                    <Avatar className="h-8 w-8 rounded-lg border border-white/10">
+                    <Avatar className="h-8 w-8 rounded-lg border border-gray-200 dark:border-white/10">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
                       <AvatarFallback className="rounded-lg bg-primary/20 text-primary">
                         {user?.name?.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold text-white">
+                      <span className="truncate font-semibold text-slate-900 dark:text-white">
                         {user?.name}
                       </span>
-                      <span className="truncate text-xs text-[#ADADAD]">
+                      <span className="truncate text-xs text-gray-500 dark:text-[#ADADAD]">
                         {user?.email}
                       </span>
                     </div>
@@ -266,17 +270,17 @@ export default function Layout() {
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                      <Avatar className="h-8 w-8 rounded-lg border border-white/10">
+                      <Avatar className="h-8 w-8 rounded-lg border border-gray-200 dark:border-white/10">
                         <AvatarImage src={user?.avatar} alt={user?.name} />
                         <AvatarFallback className="rounded-lg bg-primary/20 text-primary">
                           {user?.name?.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold text-white">
+                        <span className="truncate font-semibold text-slate-900 dark:text-white">
                           {user?.name}
                         </span>
-                        <span className="truncate text-xs text-[#ADADAD]">
+                        <span className="truncate text-xs text-gray-500 dark:text-[#ADADAD]">
                           {user?.email}
                         </span>
                       </div>
@@ -303,13 +307,13 @@ export default function Layout() {
 
       <SidebarInset className="bg-transparent flex flex-col min-h-screen relative">
         {/* Full-width header */}
-        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center w-full bg-[#081a17]/80 backdrop-blur-xl border-b border-white/5 transition-[width,height] ease-linear">
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center w-full bg-white/80 dark:bg-[#081a17]/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-[width,height] ease-linear">
           <div className="flex items-center justify-between w-full px-4 md:px-6 lg:px-8">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1 text-[#ADADAD] hover:text-white" />
-              <div className="flex items-center gap-2 text-sm text-[#ADADAD]">
-                <div className="w-px h-4 bg-white/10 mx-2" />
-                <span className="font-medium text-white">
+              <SidebarTrigger className="-ml-1 text-gray-500 dark:text-[#ADADAD] hover:text-slate-900 dark:hover:text-white" />
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-[#ADADAD]">
+                <div className="w-px h-4 bg-gray-300 dark:bg-white/10 mx-2" />
+                <span className="font-medium text-slate-900 dark:text-white">
                   {location.pathname.startsWith('/admin')
                     ? 'Administração'
                     : 'Adapta Swag Store'}
@@ -318,7 +322,8 @@ export default function Layout() {
             </div>
 
             <div className="flex items-center gap-2">
-              <CartSheet />
+              <ThemeToggle />
+              {!location.pathname.startsWith('/admin') && <CartSheet />}
 
               {!isAdmin && (
                 <>

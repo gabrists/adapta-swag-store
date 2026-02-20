@@ -6,7 +6,54 @@
 
 @layer base {
   :root {
-    --background: 170 54% 5%; /* #061412 */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 156 72% 45%;
+    --primary-foreground: 170 54% 5%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 156 72% 45%;
+
+    --radius: 1.25rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 156 72% 45%;
+    --sidebar-primary-foreground: 170 54% 5%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 156 72% 45%;
+
+    --chart-1: 156 72% 45%;
+    --chart-2: 170 60% 35%;
+    --chart-3: 190 70% 40%;
+    --chart-4: 210 60% 45%;
+    --chart-5: 230 50% 50%;
+  }
+
+  .dark {
+    --background: 170 54% 5%;
     --foreground: 0 0% 95%;
 
     --card: 170 40% 7%;
@@ -34,8 +81,6 @@
     --input: 170 30% 15%;
     --ring: 156 72% 45%;
 
-    --radius: 1.25rem; /* 20px */
-
     --sidebar-background: 170 54% 4%;
     --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 156 72% 45%;
@@ -44,16 +89,13 @@
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 170 30% 12%;
     --sidebar-ring: 156 72% 45%;
-
-    --chart-1: 156 72% 45%;
-    --chart-2: 170 60% 35%;
-    --chart-3: 190 70% 40%;
-    --chart-4: 210 60% 45%;
-    --chart-5: 230 50% 50%;
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen overflow-x-hidden font-sans;
+    @apply bg-gray-50 dark:bg-background text-slate-900 dark:text-foreground min-h-screen overflow-x-hidden font-sans transition-colors duration-300;
+  }
+
+  .dark body {
     background-image:
       radial-gradient(
         circle at 15% 50%,
@@ -75,10 +117,6 @@
     background-color: #061412;
   }
 
-  .dark {
-    /* Kept same as root since we are forcing dark theme */
-  }
-
   section[aria-label='Notifications alt+T'] {
     padding: 0 !important;
     margin: 0 !important;
@@ -87,11 +125,11 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-[#081a17]/60 backdrop-blur-xl border border-white/5 shadow-lg;
+    @apply bg-white dark:bg-[#081a17]/60 backdrop-blur-xl border border-gray-200 dark:border-white/5 shadow-sm dark:shadow-lg;
   }
 
   .glass-panel-hover {
-    @apply hover:bg-[#081a17]/80 hover:border-primary/30 hover:shadow-[0_0_20px_rgba(20,240,214,0.15)] transition-all duration-300;
+    @apply hover:bg-gray-50 dark:hover:bg-[#081a17]/80 hover:border-primary/30 dark:hover:border-primary/30 hover:shadow-[0_0_20px_rgba(20,240,214,0.05)] dark:hover:shadow-[0_0_20px_rgba(20,240,214,0.15)] transition-all duration-300;
   }
 
   .btn-primary-glow {
@@ -99,11 +137,11 @@
   }
 
   .btn-secondary-outline {
-    @apply bg-transparent text-foreground border border-white/20 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-none hover:shadow-[0_4px_12px_rgba(20,240,214,0.1)];
+    @apply bg-transparent text-slate-900 dark:text-foreground border border-gray-200 dark:border-white/20 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-none hover:shadow-[0_4px_12px_rgba(20,240,214,0.1)];
   }
 
   .input-glow {
-    @apply bg-black/20 border-white/10 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:shadow-[0_0_10px_rgba(20,240,214,0.2)] transition-all duration-300 text-white placeholder:text-white/40;
+    @apply bg-white dark:bg-black/20 border-gray-200 dark:border-white/10 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:shadow-[0_0_10px_rgba(20,240,214,0.2)] transition-all duration-300 text-slate-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/40;
   }
 }
 

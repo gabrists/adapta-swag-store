@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { ThemeProvider } from 'next-themes'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -30,41 +31,46 @@ const App = () => {
     <BrowserRouter
       future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
     >
-      <TooltipProvider>
-        <AuthProvider>
-          <SwagProvider>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/login" element={<Login />} />
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <TooltipProvider>
+          <AuthProvider>
+            <SwagProvider>
+              <Toaster />
+              <Sonner />
+              <Routes>
+                <Route path="/login" element={<Login />} />
 
-              <Route element={<RequireAuth />}>
-                <Route element={<Layout />}>
-                  {/* Storefront Routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/orders" element={<OrdersPage />} />
-                  <Route path="/profile" element={<Profile />} />
+                <Route element={<RequireAuth />}>
+                  <Route element={<Layout />}>
+                    {/* Storefront Routes */}
+                    <Route path="/" element={<Index />} />
+                    <Route path="/orders" element={<OrdersPage />} />
+                    <Route path="/profile" element={<Profile />} />
 
-                  {/* Admin Routes - Protected by RequireAdmin */}
-                  <Route element={<RequireAdmin />}>
-                    <Route path="/historico" element={<HistoryPage />} />
-                    <Route path="/gerenciar" element={<ManageProducts />} />
-                    <Route path="/admin">
-                      <Route index element={<Dashboard />} />
-                      <Route path="approvals" element={<ApprovalsPage />} />
-                      <Route path="inventory" element={<Inventory />} />
-                      <Route path="collaborators" element={<Collaborators />} />
-                      <Route path="settings" element={<Settings />} />
+                    {/* Admin Routes - Protected by RequireAdmin */}
+                    <Route element={<RequireAdmin />}>
+                      <Route path="/historico" element={<HistoryPage />} />
+                      <Route path="/gerenciar" element={<ManageProducts />} />
+                      <Route path="/admin">
+                        <Route index element={<Dashboard />} />
+                        <Route path="approvals" element={<ApprovalsPage />} />
+                        <Route path="inventory" element={<Inventory />} />
+                        <Route
+                          path="collaborators"
+                          element={<Collaborators />}
+                        />
+                        <Route path="settings" element={<Settings />} />
+                      </Route>
                     </Route>
                   </Route>
                 </Route>
-              </Route>
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </SwagProvider>
-        </AuthProvider>
-      </TooltipProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </SwagProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }
