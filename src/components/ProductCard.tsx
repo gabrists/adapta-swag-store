@@ -242,7 +242,7 @@ export function ProductCard({
                 : isOutOfStock
                   ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none'
                   : product.hasGrid && !selectedSize
-                    ? 'text-slate-600 dark:text-slate-300 shadow-none'
+                    ? 'text-slate-600 dark:text-slate-300 shadow-none border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
                     : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow shadow-md',
             )}
             onClick={handleAddToCartClick}
