@@ -4,11 +4,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Plus, Check } from 'lucide-react'
+import { Plus, Check, Minus } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
-  onAddToCart: (product: Product, size?: string) => void
+  onAddToCart: (product: Product, size?: string, quantity?: number) => void
   hasOrdered?: boolean
 }
 
@@ -18,22 +18,9 @@ export function ProductCard({
   hasOrdered = false,
 }: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [quantity, setQuantity] = useState<number>(1)
 
   const isOutOfStock = product.stock === 0
-  const isLowStock = product.stock > 0 && product.stock < 3
-
-  // Determine image source: URL, Data URI, or Placeholder Query
-  const imageUrl =
-    product.imageQuery.startsWith('http') ||
-    product.imageQuery.startsWith('data:')
-      ? product.imageQuery
-      : `https://img.usecurling.com/p/400/300?q=${product.imageQuery}&dpr=2`
-
-  const handleSizeSelect = (size: string, stock: number) => {
-    if (stock > 0) {
-      setSelectedSize(size)
-    }
-  }
 
   const getDisplayStock = () => {
     if (product.hasGrid && selectedSize && product.grid) {
@@ -45,11 +32,38 @@ export function ProductCard({
   const currentStock = getDisplayStock()
   const displayLowStock = currentStock > 0 && currentStock < 3
 
-  // Disable if single quota and already ordered
+  // Single quota limits max quantity to 1
+  const maxQuantity = product.isSingleQuota ? 1 : currentStock
+
+  // Determine image source: URL, Data URI, or Placeholder Query
+  const imageUrl =
+    product.imageQuery.startsWith('http') ||
+    product.imageQuery.startsWith('data:')
+      ? product.imageQuery
+      : `https://img.usecurling.com/p/400/300?q=${product.imageQuery}&dpr=2`
+
+  const handleSizeSelect = (size: string, stock: number) => {
+    if (stock > 0) {
+      setSelectedSize(size)
+      // Adjust quantity down if current quantity exceeds new size's stock
+      if (quantity > stock) {
+        setQuantity(stock)
+      }
+    }
+  }
+
+  // Disable interaction if out of stock, requires size selection, or already ordered single quota
   const isDisabled =
     isOutOfStock ||
     (product.hasGrid && !selectedSize) ||
     (product.isSingleQuota && hasOrdered)
+
+  const isStepperDisabled = isDisabled
+
+  const handleAddToCartClick = () => {
+    onAddToCart(product, selectedSize || undefined, quantity)
+    setQuantity(1)
+  }
 
   return (
     <Card className="overflow-hidden border-slate-200 dark:border-white/5 bg-white dark:bg-[#081a17]/60 glass-panel glass-panel-hover flex flex-col h-full rounded-2xl group">
@@ -88,11 +102,7 @@ export function ProductCard({
           <h3 className="font-semibold text-lg leading-tight text-slate-900 dark:text-white line-clamp-2 min-h-[3rem]">
             {product.name}
           </h3>
-          {product.price > 0 && (
-            <span className="font-bold text-[#0E9C8B] dark:text-primary shrink-0">
-              R$ {product.price.toFixed(2).replace('.', ',')}
-            </span>
-          )}
+          {/* Price display removed as per user story */}
         </div>
 
         {product.hasGrid && product.grid && (
@@ -160,7 +170,42 @@ export function ProductCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-5 pt-0 mt-auto">
+      <CardFooter className="p-5 pt-0 mt-auto flex-col gap-3">
+        {/* Quantity Stepper */}
+        <div
+          className={cn(
+            'flex items-center justify-between w-full bg-slate-50 dark:bg-black/20 rounded-xl p-1.5 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
+            isStepperDisabled && 'opacity-50 pointer-events-none',
+          )}
+        >
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400 pl-2 select-none">
+            Quantidade
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              disabled={quantity <= 1 || isStepperDisabled}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-semibold w-8 text-center tabular-nums text-slate-900 dark:text-white select-none">
+              {quantity}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+              onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+              disabled={quantity >= maxQuantity || isStepperDisabled}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
         <Button
           className={cn(
             'w-full font-medium active:scale-[0.98] transition-all rounded-xl shadow-md',
@@ -168,7 +213,7 @@ export function ProductCard({
               ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border border-slate-200 dark:border-white/5'
               : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow border-transparent',
           )}
-          onClick={() => onAddToCart(product, selectedSize || undefined)}
+          onClick={handleAddToCartClick}
           disabled={isDisabled}
         >
           {product.isSingleQuota && hasOrdered ? (
@@ -183,7 +228,9 @@ export function ProductCard({
           ) : (
             <>
               <Plus className="w-4 h-4 mr-2" />
-              Solicitar Resgate
+              {quantity > 1
+                ? `Solicitar ${quantity} itens`
+                : 'Solicitar Resgate'}
             </>
           )}
         </Button>

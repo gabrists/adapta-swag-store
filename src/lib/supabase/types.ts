@@ -15,6 +15,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaign_responses: {
+        Row: {
+          campaign_id: string
+          choice: string
+          employee_id: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          choice: string
+          employee_id: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          choice?: string
+          employee_id?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'campaign_responses_campaign_id_fkey'
+            columns: ['campaign_id']
+            isOneToOne: false
+            referencedRelation: 'swag_campaigns'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'campaign_responses_employee_id_fkey'
+            columns: ['employee_id']
+            isOneToOne: false
+            referencedRelation: 'employees'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       departments: {
         Row: {
           created_at: string | null
@@ -251,6 +290,33 @@ export type Database = {
         }
         Relationships: []
       }
+      swag_campaigns: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          options: Json
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          options?: Json
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          options?: Json
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -395,6 +461,11 @@ export const Constants = {
 // indexes and materialized views not present in the type definitions above.
 
 // --- CONSTRAINTS ---
+// Table: campaign_responses
+//   UNIQUE campaign_responses_campaign_id_employee_id_key: UNIQUE (campaign_id, employee_id)
+//   FOREIGN KEY campaign_responses_campaign_id_fkey: FOREIGN KEY (campaign_id) REFERENCES swag_campaigns(id) ON DELETE CASCADE
+//   FOREIGN KEY campaign_responses_employee_id_fkey: FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+//   PRIMARY KEY campaign_responses_pkey: PRIMARY KEY (id)
 // Table: departments
 //   UNIQUE departments_name_key: UNIQUE (name)
 //   PRIMARY KEY departments_pkey: PRIMARY KEY (id)
@@ -416,6 +487,9 @@ export const Constants = {
 //   CHECK orders_status_check: CHECK ((status = ANY (ARRAY['Pendente'::text, 'Entregue'::text, 'Rejeitado'::text])))
 // Table: slack_settings
 //   PRIMARY KEY slack_settings_pkey: PRIMARY KEY (id)
+// Table: swag_campaigns
+//   PRIMARY KEY swag_campaigns_pkey: PRIMARY KEY (id)
+//   CHECK swag_campaigns_status_check: CHECK ((status = ANY (ARRAY['Aberta'::text, 'Fechada'::text])))
 
 // --- DATABASE FUNCTIONS ---
 // FUNCTION update_stock_after_movement()
@@ -443,6 +517,8 @@ export const Constants = {
 //   update_stock_trigger: CREATE TRIGGER update_stock_trigger AFTER INSERT ON public.inventory_movements FOR EACH ROW EXECUTE FUNCTION update_stock_after_movement()
 
 // --- INDEXES ---
+// Table: campaign_responses
+//   CREATE UNIQUE INDEX campaign_responses_campaign_id_employee_id_key ON public.campaign_responses USING btree (campaign_id, employee_id)
 // Table: departments
 //   CREATE UNIQUE INDEX departments_name_key ON public.departments USING btree (name)
 // Table: employees

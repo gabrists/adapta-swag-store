@@ -36,11 +36,15 @@ export default function Index() {
     })
   }, [products, searchQuery, selectedCategory])
 
-  const handleAddToCart = (product: Product, size?: string) => {
-    addToCart(product, 1, size)
+  const handleAddToCart = (
+    product: Product,
+    size?: string,
+    quantity: number = 1,
+  ) => {
+    addToCart(product, quantity, size)
     toast({
       title: 'Adicionado ao carrinho',
-      description: `${product.name} ${size ? `(${size})` : ''} foi adicionado.`,
+      description: `${quantity}x ${product.name} ${size ? `(${size})` : ''} ${quantity > 1 ? 'foram adicionados' : 'foi adicionado'}.`,
       duration: 2000,
     })
   }
