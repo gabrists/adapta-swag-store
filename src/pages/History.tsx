@@ -129,7 +129,7 @@ export default function HistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 max-w-4xl mx-auto">
+      <div className="space-y-4 w-full max-w-7xl mx-auto">
         <div className="h-8 w-48 bg-slate-100 rounded animate-pulse mb-6" />
         <div className="h-12 w-full bg-slate-100 rounded animate-pulse mb-4" />
         {[...Array(5)].map((_, i) => (
@@ -140,7 +140,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">

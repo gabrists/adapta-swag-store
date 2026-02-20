@@ -76,7 +76,7 @@ export default function ApprovalsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="w-full max-w-7xl mx-auto space-y-4">
         <div className="h-8 w-48 bg-slate-100 rounded animate-pulse" />
         <div className="h-24 w-full bg-slate-100 rounded-xl animate-pulse" />
       </div>
@@ -84,7 +84,7 @@ export default function ApprovalsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">

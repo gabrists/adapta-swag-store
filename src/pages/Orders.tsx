@@ -201,7 +201,7 @@ export default function OrdersPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-4xl mx-auto p-4 sm:p-0">
+      <div className="space-y-6 w-full max-w-7xl mx-auto p-4 sm:p-0">
         <div className="space-y-2">
           <div className="h-8 w-48 bg-slate-100 rounded animate-pulse" />
           <div className="h-4 w-64 bg-slate-100 rounded animate-pulse" />
@@ -216,7 +216,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full max-w-7xl mx-auto">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Meus Pedidos

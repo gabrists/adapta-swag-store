@@ -265,50 +265,51 @@ export default function Layout() {
       </Sidebar>
 
       <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-white px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-px h-4 bg-border mx-2" />
-              <span className="font-medium text-foreground">
-                {location.pathname.startsWith('/admin')
-                  ? 'Administração'
-                  : 'Adapta Swag Store'}
-              </span>
+        <header className="flex h-16 shrink-0 items-center border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-white">
+          <div className="flex items-center justify-between w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="w-px h-4 bg-border mx-2" />
+                <span className="font-medium text-foreground">
+                  {location.pathname.startsWith('/admin')
+                    ? 'Administração'
+                    : 'Adapta Swag Store'}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <CartSheet />
+
+              {!isAdmin && (
+                <>
+                  <Button
+                    asChild
+                    size="sm"
+                    className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+                  >
+                    <Link to="/gerenciar">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Cadastrar Brinde
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    size="icon"
+                    className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
+                  >
+                    <Link to="/gerenciar">
+                      <Plus className="h-4 w-4" />
+                      <span className="sr-only">Cadastrar Brinde</span>
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <CartSheet />
-
-            {/* Admin Add Product button removed as per requirements */}
-            {!isAdmin && (
-              <>
-                <Button
-                  asChild
-                  size="sm"
-                  className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
-                >
-                  <Link to="/gerenciar">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Cadastrar Brinde
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="icon"
-                  className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
-                >
-                  <Link to="/gerenciar">
-                    <Plus className="h-4 w-4" />
-                    <span className="sr-only">Cadastrar Brinde</span>
-                  </Link>
-                </Button>
-              </>
-            )}
-          </div>
         </header>
-        <main className="flex-1 p-4 md:p-6 lg:p-8 pt-6 w-full max-w-7xl mx-auto animate-fade-in h-full">
+        <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 pt-6 animate-fade-in h-full">
           <Outlet />
         </main>
       </SidebarInset>

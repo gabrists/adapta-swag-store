@@ -280,7 +280,7 @@ export default function Dashboard() {
   } satisfies ChartConfig
 
   return (
-    <div className="space-y-6 md:space-y-8 bg-gray-50 min-h-screen p-4 md:p-8 rounded-xl">
+    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8 bg-gray-50 min-h-screen p-4 md:p-8 rounded-xl">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

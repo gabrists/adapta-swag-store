@@ -127,7 +127,7 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight text-slate-900">
           Gerenciar Conta

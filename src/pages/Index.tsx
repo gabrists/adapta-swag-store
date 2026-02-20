@@ -48,7 +48,7 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 w-full max-w-7xl mx-auto">
         <div className="flex gap-4">
           <Skeleton className="h-10 w-full rounded-xl" />
         </div>
@@ -67,7 +67,7 @@ export default function Index() {
   }
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-6 md:space-y-8 w-full max-w-7xl mx-auto">
       {/* Header Section */}
       <section className="bg-white p-4 -mx-4 md:mx-0 md:rounded-xl md:shadow-sm md:border md:border-slate-100">
         <div className="relative">

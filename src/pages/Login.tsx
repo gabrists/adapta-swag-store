@@ -95,98 +95,100 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md animate-fade-in-up">
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
-              <Package2 className="w-6 h-6" />
-            </div>
-            <span className="font-display font-bold text-2xl tracking-tight text-slate-900">
-              Adapta <span className="text-primary">Swag</span>
-            </span>
-          </div>
-        </div>
-
-        <Card className="border-slate-200 shadow-xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">
-              Acesse sua conta
-            </CardTitle>
-            <CardDescription className="text-center">
-              Entre com seu e-mail corporativo para acessar a loja
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {errorMessage && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Erro</AlertTitle>
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>E-mail</FormLabel>
-                      <FormControl>
-                        <Input placeholder="seu.nome@adapta.org" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full font-bold bg-primary hover:bg-primary/90"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Entrando...
-                    </>
-                  ) : (
-                    <>
-                      Entrar <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col items-center justify-center text-sm text-slate-500 gap-2">
-            <p>
-              Esqueceu sua senha?{' '}
-              <span className="text-primary cursor-pointer hover:underline">
-                Recuperar acesso
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-center">
+        <div className="w-full max-w-md animate-fade-in-up">
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <Package2 className="w-6 h-6" />
+              </div>
+              <span className="font-display font-bold text-2xl tracking-tight text-slate-900">
+                Adapta <span className="text-primary">Swag</span>
               </span>
-            </p>
-          </CardFooter>
-        </Card>
+            </div>
+          </div>
+
+          <Card className="border-slate-200 shadow-xl">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold text-center">
+                Acesse sua conta
+              </CardTitle>
+              <CardDescription className="text-center">
+                Entre com seu e-mail corporativo para acessar a loja
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {errorMessage && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Erro</AlertTitle>
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+              )}
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-4"
+                >
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>E-mail</FormLabel>
+                        <FormControl>
+                          <Input placeholder="seu.nome@adapta.org" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="••••••••"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full font-bold bg-primary hover:bg-primary/90"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Entrando...
+                      </>
+                    ) : (
+                      <>
+                        Entrar <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+            <CardFooter className="flex flex-col items-center justify-center text-sm text-slate-500 gap-2">
+              <p>
+                Esqueceu sua senha?{' '}
+                <span className="text-primary cursor-pointer hover:underline">
+                  Recuperar acesso
+                </span>
+              </p>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
     </div>
   )
