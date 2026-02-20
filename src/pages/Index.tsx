@@ -91,7 +91,7 @@ export default function Index() {
       </section>
 
       {/* Category Navigation (Pills) */}
-      <section className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
+      <section className="flex gap-2 overflow-x-auto py-4 px-4 -mx-4 md:px-6 md:-mx-6 scrollbar-none">
         {categories.map((category) => (
           <button
             key={category}
