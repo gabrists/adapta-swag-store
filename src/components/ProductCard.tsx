@@ -227,13 +227,23 @@ export function ProductCard({
           </Button>
         ) : (
           <Button
+            variant={
+              product.hasGrid &&
+              !selectedSize &&
+              !isOutOfStock &&
+              !(hasOrdered && product.isSingleQuota)
+                ? 'ghost'
+                : 'default'
+            }
             className={cn(
-              'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md min-w-0 border border-transparent',
+              'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl min-w-0 border border-transparent',
               hasOrdered && product.isSingleQuota
                 ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border-slate-200 dark:border-white/5'
                 : isOutOfStock
                   ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none'
-                  : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow',
+                  : product.hasGrid && !selectedSize
+                    ? 'text-slate-600 dark:text-slate-300 shadow-none'
+                    : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow shadow-md',
             )}
             onClick={handleAddToCartClick}
             disabled={isDisabled}
@@ -247,7 +257,7 @@ export function ProductCard({
               <span className="truncate text-xs sm:text-sm">Indisponível</span>
             ) : product.hasGrid && !selectedSize ? (
               <span className="truncate text-xs sm:text-sm">
-                Selecione Tamanho
+                Selec. Tamanho
               </span>
             ) : (
               <>
