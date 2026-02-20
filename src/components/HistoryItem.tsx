@@ -14,20 +14,17 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog'
-import { Calendar, MapPin, User, Package, ShoppingBag } from 'lucide-react'
-import useSwagStore from '@/stores/useSwagStore'
+import { MapPin, Package, ShoppingBag } from 'lucide-react'
 
 interface HistoryItemProps {
   entry: HistoryEntry
 }
 
 export function HistoryItem({ entry }: HistoryItemProps) {
-  const { team } = useSwagStore()
-
   const date = parseISO(entry.date)
-  const collaborator = team.find((c) => c.name === entry.user)
+
   const userAvatarUrl =
-    collaborator?.avatarUrl ||
+    entry.userAvatar ||
     `https://img.usecurling.com/ppl/thumbnail?gender=male&seed=${encodeURIComponent(entry.user)}`
 
   // Get first item image for the card thumbnail
@@ -73,7 +70,12 @@ export function HistoryItem({ entry }: HistoryItemProps) {
               </h4>
             </div>
             <div className="flex items-center gap-1.5 text-sm text-slate-500">
-              <User className="w-3.5 h-3.5" />
+              <Avatar className="h-5 w-5 shrink-0">
+                <AvatarImage src={userAvatarUrl} alt={entry.user} />
+                <AvatarFallback className="text-[8px] bg-slate-100 text-slate-600">
+                  {entry.user.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <span className="truncate max-w-[150px]">{entry.user}</span>
             </div>
           </div>

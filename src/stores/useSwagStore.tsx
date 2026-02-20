@@ -212,7 +212,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         `
         *,
         items (name, image_url),
-        employees (name)
+        employees (name, avatar_url)
       `,
       )
       .eq('type', 'OUT')
@@ -228,6 +228,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
           id: row.group_id,
           items: [],
           user: row.employees?.name || 'Desconhecido',
+          userAvatar: row.employees?.avatar_url,
           destination: row.destination || '',
           date: row.created_at,
           totalQuantity: 0,

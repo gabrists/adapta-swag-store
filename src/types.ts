@@ -45,6 +45,7 @@ export interface HistoryEntry {
   id: string
   items: HistoryItemEntry[]
   user: string
+  userAvatar?: string // Added for Avatar support
   destination: string
   date: string // ISO string
   totalQuantity: number
