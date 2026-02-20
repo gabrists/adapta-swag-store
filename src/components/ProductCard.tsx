@@ -52,37 +52,40 @@ export function ProductCard({
     (product.isSingleQuota && hasOrdered)
 
   return (
-    <Card className="overflow-hidden border-border/50 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 group bg-white flex flex-col h-full rounded-xl">
-      <div className="aspect-[4/3] relative overflow-hidden bg-muted">
+    <Card className="overflow-hidden border-white/5 bg-transparent glass-panel glass-panel-hover flex flex-col h-full rounded-2xl group">
+      <div className="aspect-[4/3] relative overflow-hidden bg-black/40">
         <img
           src={imageUrl}
           alt={product.name}
           className={cn(
             'w-full h-full object-cover transition-transform duration-500 group-hover:scale-105',
-            isOutOfStock && 'grayscale opacity-60',
+            isOutOfStock && 'grayscale opacity-50',
           )}
           loading="lazy"
         />
+        {/* Subtle inner shadow overlay */}
+        <div className="absolute inset-0 shadow-[inset_0_-20px_40px_rgba(0,0,0,0.5)] pointer-events-none" />
+
         <div className="absolute top-3 left-3">
           <Badge
             variant="secondary"
-            className="bg-white/90 text-slate-700 backdrop-blur-sm shadow-sm font-medium"
+            className="bg-black/50 text-white backdrop-blur-md shadow-sm font-medium border border-white/10"
           >
             {product.category}
           </Badge>
         </div>
         {product.isSingleQuota && (
           <div className="absolute top-3 right-3">
-            <Badge className="bg-[#0E9C8B]/90 text-white backdrop-blur-sm shadow-sm font-medium border-none">
+            <Badge className="bg-primary/90 text-white backdrop-blur-md shadow-[0_0_10px_rgba(20,240,214,0.3)] font-medium border-none">
               Cota Única
             </Badge>
           </div>
         )}
       </div>
 
-      <CardContent className="p-4 space-y-3 flex-grow">
+      <CardContent className="p-5 space-y-4 flex-grow">
         <div className="flex justify-between items-start gap-2">
-          <h3 className="font-semibold text-lg leading-tight text-slate-800 line-clamp-2 min-h-[3rem]">
+          <h3 className="font-semibold text-lg leading-tight text-white line-clamp-2 min-h-[3rem]">
             {product.name}
           </h3>
         </div>
@@ -100,12 +103,12 @@ export function ProductCard({
                   onClick={() => handleSizeSelect(size, sizeStock)}
                   disabled={!hasStock}
                   className={cn(
-                    'w-8 h-8 rounded-full text-xs font-bold transition-all border flex items-center justify-center',
+                    'w-9 h-9 rounded-full text-xs font-bold transition-all border flex items-center justify-center',
                     isSelected
-                      ? 'bg-primary text-primary-foreground border-primary ring-2 ring-offset-2 ring-primary/50'
+                      ? 'bg-primary/20 text-primary border-primary shadow-[0_0_10px_rgba(20,240,214,0.3)]'
                       : hasStock
-                        ? 'bg-white text-slate-700 border-slate-200 hover:border-primary hover:text-primary'
-                        : 'bg-slate-100 text-slate-300 border-slate-100 cursor-not-allowed line-through opacity-50',
+                        ? 'bg-black/20 text-slate-300 border-white/10 hover:border-primary/50 hover:text-primary hover:bg-primary/10'
+                        : 'bg-black/10 text-slate-600 border-white/5 cursor-not-allowed line-through opacity-50',
                   )}
                 >
                   {size}
@@ -117,27 +120,27 @@ export function ProductCard({
 
         <div className="flex items-center gap-2">
           {product.hasGrid && !selectedSize ? (
-            <span className="text-sm text-slate-500">Selecione um tamanho</span>
+            <span className="text-sm text-slate-400">Selecione um tamanho</span>
           ) : (
             <>
               {currentStock === 0 ? (
                 <Badge
                   variant="outline"
-                  className="bg-slate-100 text-slate-500 border-slate-200"
+                  className="bg-white/5 text-slate-400 border-white/10"
                 >
                   Esgotado
                 </Badge>
               ) : displayLowStock ? (
                 <Badge
                   variant="outline"
-                  className="bg-red-50 text-red-600 border-red-200 animate-pulse"
+                  className="bg-red-500/10 text-red-400 border-red-500/20 animate-pulse"
                 >
                   Acabando: {currentStock} un
                 </Badge>
               ) : (
                 <Badge
                   variant="outline"
-                  className="bg-emerald-50 text-emerald-600 border-emerald-200"
+                  className="bg-primary/10 text-primary border-primary/20"
                 >
                   {selectedSize && (
                     <span className="mr-1 font-bold">{selectedSize}:</span>
@@ -150,13 +153,13 @@ export function ProductCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 mt-auto">
+      <CardFooter className="p-5 pt-0 mt-auto">
         <Button
           className={cn(
-            'w-full font-medium active:scale-95 transition-all rounded-lg',
+            'w-full font-medium active:scale-[0.98] transition-all rounded-xl',
             hasOrdered && product.isSingleQuota
-              ? 'bg-slate-200 text-slate-500 cursor-not-allowed hover:bg-slate-200'
-              : 'bg-primary hover:bg-primary/90 text-white',
+              ? 'bg-white/10 text-slate-400 cursor-not-allowed hover:bg-white/10 shadow-none border border-white/5'
+              : 'btn-primary-glow',
           )}
           onClick={() => onAddToCart(product, selectedSize || undefined)}
           disabled={isDisabled}

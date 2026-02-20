@@ -49,6 +49,7 @@ import { Button } from '@/components/ui/button'
 import useAuthStore from '@/stores/useAuthStore'
 import { CartSheet } from '@/components/CartSheet'
 import useSwagStore from '@/stores/useSwagStore'
+import { cn } from '@/lib/utils'
 
 export default function Layout() {
   const { user, logout } = useAuthStore()
@@ -118,18 +119,25 @@ export default function Layout() {
 
   return (
     <SidebarProvider>
-      <Sidebar collapsible="icon" className="border-r border-border">
+      <Sidebar
+        collapsible="icon"
+        className="border-r border-white/10 bg-[#061412]"
+      >
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <Link to="/">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-[0_0_10px_rgba(20,240,214,0.3)]">
                     <Package2 className="size-4" />
                   </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-bold">Adapta Swag</span>
-                    <span className="truncate text-xs">Store</span>
+                  <div className="grid flex-1 text-left text-sm leading-tight text-white">
+                    <span className="truncate font-bold text-[15px]">
+                      Neura Swag
+                    </span>
+                    <span className="truncate text-xs text-primary font-medium">
+                      Store
+                    </span>
                   </div>
                 </Link>
               </SidebarMenuButton>
@@ -139,7 +147,9 @@ export default function Layout() {
 
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Loja</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-white/50">
+              Loja
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {storefrontItems.map((item) => (
@@ -148,9 +158,21 @@ export default function Layout() {
                       asChild
                       isActive={location.pathname === item.url}
                       tooltip={item.title}
+                      className={cn(
+                        'text-slate-300 hover:text-white hover:bg-white/5',
+                        location.pathname === item.url &&
+                          'bg-white/10 text-white font-medium',
+                      )}
                     >
                       <NavLink to={item.url}>
-                        <item.icon className="text-primary" />
+                        <item.icon
+                          className={cn(
+                            'w-4 h-4',
+                            location.pathname === item.url
+                              ? 'text-primary'
+                              : 'text-slate-400',
+                          )}
+                        />
                         <span>{item.title}</span>
                       </NavLink>
                     </SidebarMenuButton>
@@ -162,9 +184,11 @@ export default function Layout() {
 
           {isAdmin && (
             <>
-              <SidebarSeparator />
+              <SidebarSeparator className="bg-white/5" />
               <SidebarGroup>
-                <SidebarGroupLabel>Administração</SidebarGroupLabel>
+                <SidebarGroupLabel className="text-white/50">
+                  Administração
+                </SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {adminItems.map((item) => {
@@ -178,12 +202,21 @@ export default function Layout() {
                             asChild
                             isActive={isActive}
                             tooltip={item.title}
+                            className={cn(
+                              'text-slate-300 hover:text-white hover:bg-white/5',
+                              isActive && 'bg-white/10 text-white font-medium',
+                            )}
                           >
                             <NavLink to={item.url}>
-                              <item.icon className="text-slate-600" />
+                              <item.icon
+                                className={cn(
+                                  'w-4 h-4',
+                                  isActive ? 'text-primary' : 'text-slate-400',
+                                )}
+                              />
                               <span>{item.title}</span>
                               {item.badge && (
-                                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                                <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow-[0_0_10px_rgba(20,240,214,0.3)]">
                                   {item.badge}
                                 </span>
                               )}
@@ -206,42 +239,46 @@ export default function Layout() {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    className="data-[state=open]:bg-white/10 data-[state=open]:text-white text-slate-300 hover:bg-white/5 hover:text-white"
                   >
-                    <Avatar className="h-8 w-8 rounded-lg">
+                    <Avatar className="h-8 w-8 rounded-lg border border-white/10">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="rounded-lg">
+                      <AvatarFallback className="rounded-lg bg-primary/20 text-primary">
                         {user?.name?.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
+                      <span className="truncate font-semibold text-white">
                         {user?.name}
                       </span>
-                      <span className="truncate text-xs">{user?.email}</span>
+                      <span className="truncate text-xs text-slate-400">
+                        {user?.email}
+                      </span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-xl"
                   side="bottom"
                   align="end"
                   sideOffset={4}
                 >
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                      <Avatar className="h-8 w-8 rounded-lg">
+                      <Avatar className="h-8 w-8 rounded-lg border border-white/10">
                         <AvatarImage src={user?.avatar} alt={user?.name} />
-                        <AvatarFallback className="rounded-lg">
+                        <AvatarFallback className="rounded-lg bg-primary/20 text-primary">
                           {user?.name?.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
+                        <span className="truncate font-semibold text-white">
                           {user?.name}
                         </span>
-                        <span className="truncate text-xs">{user?.email}</span>
+                        <span className="truncate text-xs text-slate-400">
+                          {user?.email}
+                        </span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
@@ -252,7 +289,7 @@ export default function Layout() {
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleLogout}
-                    className="text-red-600 focus:text-red-600"
+                    className="text-red-400 focus:text-red-400 focus:bg-red-500/10"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Deslogar
@@ -264,17 +301,18 @@ export default function Layout() {
         </SidebarFooter>
       </Sidebar>
 
-      <SidebarInset className="bg-slate-50">
-        <header className="flex h-16 shrink-0 items-center border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-white">
+      <SidebarInset className="bg-transparent flex flex-col min-h-screen relative">
+        {/* Full-width header */}
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center w-full bg-[#081a17]/80 backdrop-blur-xl border-b border-white/5 transition-[width,height] ease-linear">
           <div className="flex items-center justify-between w-full px-4 md:px-6 lg:px-8">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1" />
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <div className="w-px h-4 bg-border mx-2" />
-                <span className="font-medium text-foreground">
+              <SidebarTrigger className="-ml-1 text-slate-300 hover:text-white" />
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <div className="w-px h-4 bg-white/10 mx-2" />
+                <span className="font-medium text-white">
                   {location.pathname.startsWith('/admin')
                     ? 'Administração'
-                    : 'Adapta Swag Store'}
+                    : 'Neura Swag Store'}
                 </span>
               </div>
             </div>
@@ -287,7 +325,7 @@ export default function Layout() {
                   <Button
                     asChild
                     size="sm"
-                    className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+                    className="hidden sm:flex btn-primary-glow shadow-sm"
                   >
                     <Link to="/gerenciar">
                       <Plus className="mr-2 h-4 w-4" />
@@ -297,7 +335,7 @@ export default function Layout() {
                   <Button
                     asChild
                     size="icon"
-                    className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
+                    className="flex sm:hidden btn-primary-glow shadow-sm h-8 w-8"
                   >
                     <Link to="/gerenciar">
                       <Plus className="h-4 w-4" />
@@ -309,9 +347,13 @@ export default function Layout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 pt-6 animate-fade-in h-full">
-          <Outlet />
-        </main>
+
+        {/* 1280px Centered Main Content */}
+        <div className="flex-1 w-full">
+          <main className="w-full max-w-7xl mx-auto p-4 md:p-6 lg:p-8 pt-6 animate-fade-in">
+            <Outlet />
+          </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

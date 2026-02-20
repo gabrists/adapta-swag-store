@@ -1,17 +1,16 @@
-/* Alert Component primitives - A component that displays an alert - from shadcn/ui (exposes Alert, AlertTitle, AlertDescription) */
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
 
 const alertVariants = cva(
-  'relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground',
+  'relative w-full rounded-xl border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground glass-panel',
   {
     variants: {
       variant: {
-        default: 'bg-background text-foreground',
+        default: 'bg-[#081a17]/80 text-white border-white/10',
         destructive:
-          'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive',
+          'bg-slate-900/80 border-slate-700 text-slate-300 [&>svg]:text-slate-400',
       },
     },
     defaultVariants: {
@@ -39,7 +38,10 @@ const AlertTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h5
     ref={ref}
-    className={cn('mb-1 font-medium leading-none tracking-tight', className)}
+    className={cn(
+      'mb-1 font-semibold leading-none tracking-tight text-white',
+      className,
+    )}
     {...props}
   />
 ))
@@ -51,7 +53,7 @@ const AlertDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn('text-sm [&_p]:leading-relaxed', className)}
+    className={cn('text-sm [&_p]:leading-relaxed text-slate-400', className)}
     {...props}
   />
 ))

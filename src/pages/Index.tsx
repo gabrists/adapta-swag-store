@@ -42,7 +42,6 @@ export default function Index() {
       title: 'Adicionado ao carrinho',
       description: `${product.name} ${size ? `(${size})` : ''} foi adicionado.`,
       duration: 2000,
-      className: 'bg-slate-900 text-white border-none',
     })
   }
 
@@ -50,16 +49,19 @@ export default function Index() {
     return (
       <div className="space-y-6 w-full max-w-7xl mx-auto">
         <div className="flex gap-4">
-          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-12 w-full rounded-xl bg-white/5" />
         </div>
         <div className="flex gap-2 pb-2">
           {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-9 w-24 rounded-full" />
+            <Skeleton key={i} className="h-9 w-24 rounded-full bg-white/5" />
           ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
-            <Skeleton key={i} className="h-[350px] w-full rounded-xl" />
+            <Skeleton
+              key={i}
+              className="h-[350px] w-full rounded-2xl bg-white/5"
+            />
           ))}
         </div>
       </div>
@@ -67,14 +69,14 @@ export default function Index() {
   }
 
   return (
-    <div className="space-y-6 md:space-y-8 w-full max-w-7xl mx-auto">
+    <div className="space-y-6 md:space-y-8 w-full max-w-7xl mx-auto pb-12">
       {/* Header Section */}
-      <section className="bg-white p-4 -mx-4 md:mx-0 md:rounded-xl md:shadow-sm md:border md:border-slate-100">
+      <section className="glass-panel p-4 -mx-4 md:mx-0 md:rounded-xl">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <Input
             placeholder="O que você procura hoje?"
-            className="pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-colors rounded-lg"
+            className="pl-11 h-12 text-lg rounded-xl bg-black/20 border-white/10 focus-visible:border-primary/50 focus-visible:ring-primary/50"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -82,16 +84,16 @@ export default function Index() {
       </section>
 
       {/* Category Navigation (Pills) */}
-      <section className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+      <section className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={cn(
-              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors border',
+              'px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 border',
               selectedCategory === category
-                ? 'bg-primary text-white border-primary'
-                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50',
+                ? 'btn-primary-glow'
+                : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white',
             )}
           >
             {category}
@@ -101,11 +103,13 @@ export default function Index() {
 
       {/* Products Grid */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-slate-800">Todos os itens</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white tracking-tight">
+            Todos os itens
+          </h2>
           <Badge
             variant="secondary"
-            className="bg-slate-100 text-slate-500 rounded-md"
+            className="bg-white/10 text-slate-300 rounded-md px-3 py-1"
           >
             {filteredProducts.length} itens
           </Badge>
@@ -113,7 +117,7 @@ export default function Index() {
 
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {filteredProducts.map((product) => {
+            {filteredProducts.map((product, idx) => {
               const hasOrdered =
                 user && product.isSingleQuota
                   ? orders.some(
@@ -125,26 +129,31 @@ export default function Index() {
                   : false
 
               return (
-                <ProductCard
+                <div
                   key={product.id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                  hasOrdered={hasOrdered}
-                />
+                  className="animate-fade-in-up"
+                  style={{ animationDelay: `${idx * 50}ms` }}
+                >
+                  <ProductCard
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    hasOrdered={hasOrdered}
+                  />
+                </div>
               )
             })}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center">
-              <Search className="w-8 h-8 text-slate-300" />
+          <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 glass-panel rounded-2xl">
+            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center shadow-inner">
+              <Search className="w-10 h-10 text-slate-400" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-slate-900">
+              <h3 className="text-xl font-semibold text-white">
                 Nenhum item encontrado
               </h3>
-              <p className="text-slate-500 text-sm">
-                Tente mudar a busca ou a categoria.
+              <p className="text-slate-400 text-sm mt-2 max-w-sm mx-auto">
+                Tente mudar a busca ou a categoria para encontrar o que procura.
               </p>
             </div>
           </div>

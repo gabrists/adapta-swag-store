@@ -40,7 +40,6 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  // Get return url from location state or default to home
   const from = location.state?.from?.pathname || '/'
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,23 +56,19 @@ export default function Login() {
     try {
       const { data, error } = await login(values.email, values.password)
       if (error) {
-        // Handle specific Supabase Auth errors
         if (error.message === 'Invalid login credentials') {
           throw new Error(
             'Credenciais inválidas. Verifique seu e-mail e senha.',
           )
         }
-        // Handle generic errors
         throw error
       }
 
       toast({
         title: 'Bem-vindo de volta!',
         description: 'Login realizado com sucesso.',
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       })
 
-      // Check for specific admin email to redirect to dashboard
       if (data?.user?.email === 'admin@adapta.org') {
         navigate('/admin', { replace: true })
       } else {
@@ -94,32 +89,32 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-center relative z-10">
         <div className="w-full max-w-md animate-fade-in-up">
-          <div className="flex justify-center mb-8">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                <Package2 className="w-6 h-6" />
+          <div className="flex justify-center mb-10">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-foreground shadow-[0_0_20px_rgba(20,240,214,0.4)]">
+                <Package2 className="w-7 h-7" />
               </div>
-              <span className="font-display font-bold text-2xl tracking-tight text-slate-900">
-                Adapta <span className="text-primary">Swag</span>
+              <span className="font-display font-bold text-3xl tracking-tight text-white">
+                Neura <span className="text-primary">Swag</span>
               </span>
             </div>
           </div>
 
-          <Card className="border-slate-200 shadow-xl">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">
+          <Card className="glass-panel border-white/10 shadow-2xl backdrop-blur-2xl">
+            <CardHeader className="space-y-2 pb-6">
+              <CardTitle className="text-2xl font-bold text-center text-white">
                 Acesse sua conta
               </CardTitle>
-              <CardDescription className="text-center">
+              <CardDescription className="text-center text-slate-400 text-base">
                 Entre com seu e-mail corporativo para acessar a loja
               </CardDescription>
             </CardHeader>
             <CardContent>
               {errorMessage && (
-                <Alert variant="destructive" className="mb-4">
+                <Alert variant="destructive" className="mb-6">
                   <AlertCircle className="h-4 w-4" />
                   <AlertTitle>Erro</AlertTitle>
                   <AlertDescription>{errorMessage}</AlertDescription>
@@ -128,16 +123,20 @@ export default function Login() {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4"
+                  className="space-y-5"
                 >
                   <FormField
                     control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>E-mail</FormLabel>
+                        <FormLabel className="text-slate-300">E-mail</FormLabel>
                         <FormControl>
-                          <Input placeholder="seu.nome@adapta.org" {...field} />
+                          <Input
+                            className="h-12"
+                            placeholder="seu.nome@neura.ai"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -148,10 +147,11 @@ export default function Login() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Senha</FormLabel>
+                        <FormLabel className="text-slate-300">Senha</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
+                            className="h-12"
                             placeholder="••••••••"
                             {...field}
                           />
@@ -160,29 +160,31 @@ export default function Login() {
                       </FormItem>
                     )}
                   />
-                  <Button
-                    type="submit"
-                    className="w-full font-bold bg-primary hover:bg-primary/90"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Entrando...
-                      </>
-                    ) : (
-                      <>
-                        Entrar <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
+                  <div className="pt-2">
+                    <Button
+                      type="submit"
+                      className="w-full h-12 text-base font-bold btn-primary-glow"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Entrando...
+                        </>
+                      ) : (
+                        <>
+                          Entrar <ArrowRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </form>
               </Form>
             </CardContent>
-            <CardFooter className="flex flex-col items-center justify-center text-sm text-slate-500 gap-2">
+            <CardFooter className="flex flex-col items-center justify-center text-sm text-slate-500 gap-2 pt-6 border-t border-white/5">
               <p>
                 Esqueceu sua senha?{' '}
-                <span className="text-primary cursor-pointer hover:underline">
+                <span className="text-primary font-medium cursor-pointer hover:underline transition-colors">
                   Recuperar acesso
                 </span>
               </p>

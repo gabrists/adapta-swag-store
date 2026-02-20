@@ -1,4 +1,3 @@
-/* Form Component primitives - A component that displays a form - from shadcn/ui (exposes Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage) */
 import * as React from 'react'
 import * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
@@ -94,7 +93,7 @@ const FormLabel = React.forwardRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && 'text-destructive', className)}
+      className={cn(error && 'text-red-400', className, 'text-slate-200')}
       htmlFor={formItemId}
       {...props}
     />
@@ -134,7 +133,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn('text-sm text-slate-500', className)}
       {...props}
     />
   )
@@ -156,7 +155,7 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn('text-sm font-medium text-destructive', className)}
+      className={cn('text-sm font-medium text-red-400', className)}
       {...props}
     >
       {body}

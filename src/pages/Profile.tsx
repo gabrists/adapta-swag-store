@@ -70,21 +70,18 @@ export default function Profile() {
     if (file) {
       try {
         setIsUploading(true)
-        // Optimistic preview
         const reader = new FileReader()
         reader.onloadend = () => {
           setAvatarPreview(reader.result as string)
         }
         reader.readAsDataURL(file)
 
-        // Upload to R2
         const url = await uploadToR2(file)
         setAvatarPreview(url)
 
         toast({
           title: 'Foto enviada',
-          description: 'Nova foto de perfil armazenada no Cloudflare R2.',
-          className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+          description: 'Nova foto de perfil atualizada com sucesso.',
         })
       } catch (error) {
         toast({
@@ -108,8 +105,6 @@ export default function Profile() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true)
-
-    // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
     updateProfile({
@@ -120,26 +115,25 @@ export default function Profile() {
     toast({
       title: 'Perfil atualizado!',
       description: `As alterações foram salvas com sucesso.`,
-      className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
     })
 
     setIsSubmitting(false)
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+    <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in-up pb-12">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-white">
           Gerenciar Conta
         </h1>
-        <p className="text-sm text-slate-500">
-          Atualize suas informações pessoais.
+        <p className="text-base text-slate-400">
+          Atualize suas informações pessoais e foto de perfil.
         </p>
       </div>
 
-      <Card className="border-slate-200 shadow-sm">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row items-center gap-6">
+      <Card>
+        <CardHeader className="border-b border-white/5 pb-8 mb-6">
+          <div className="flex flex-col md:flex-row items-center gap-8">
             <div
               className={cn(
                 'relative group cursor-pointer',
@@ -147,7 +141,7 @@ export default function Profile() {
               )}
               onClick={handleAvatarClick}
             >
-              <Avatar className="h-24 w-24 border-4 border-white shadow-md group-hover:opacity-90 transition-opacity">
+              <Avatar className="h-28 w-28 border-4 border-white/10 shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:border-primary/50 transition-all bg-black/40">
                 <AvatarImage
                   src={avatarPreview || user?.avatar}
                   className={cn(
@@ -155,22 +149,22 @@ export default function Profile() {
                     isUploading && 'opacity-50',
                   )}
                 />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className="text-3xl bg-white/5 text-slate-400">
                   {user?.name?.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
 
               {isUploading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10 rounded-full">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full backdrop-blur-sm">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                 </div>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                   <CloudUpload className="w-8 h-8 text-white" />
                 </div>
               )}
 
-              <div className="absolute bottom-0 right-0 bg-primary text-white p-1.5 rounded-full shadow-lg border-2 border-white">
+              <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full shadow-[0_0_10px_rgba(20,240,214,0.4)] border-2 border-background">
                 <Camera className="w-4 h-4" />
               </div>
             </div>
@@ -184,40 +178,42 @@ export default function Profile() {
               disabled={isUploading}
             />
 
-            <div className="text-center md:text-left space-y-1">
-              <CardTitle className="text-xl">{user?.name}</CardTitle>
-              <CardDescription>
+            <div className="text-center md:text-left space-y-2">
+              <CardTitle className="text-2xl">{user?.name}</CardTitle>
+              <CardDescription className="text-base">
                 {user?.role === 'admin' ? 'Administrador' : 'Colaborador'}
               </CardDescription>
               <Button
                 variant="outline"
                 size="sm"
-                className="mt-2 h-8 gap-2 text-xs"
+                className="mt-3 gap-2 border-white/20 hover:bg-white/10"
                 onClick={handleAvatarClick}
                 disabled={isUploading}
               >
                 {isUploading ? (
-                  <Loader2 className="w-3 h-3 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <CloudUpload className="w-3 h-3" />
+                  <CloudUpload className="w-4 h-4" />
                 )}
-                Upload Foto
+                Trocar Foto
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                    <FormLabel className="text-slate-300">
+                      Nome Completo
+                    </FormLabel>
                     <div className="relative">
-                      <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                      <Input className="pl-9" {...field} />
+                      <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <Input className="pl-11 h-12" {...field} />
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -229,17 +225,17 @@ export default function Profile() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail</FormLabel>
+                    <FormLabel className="text-slate-300">E-mail</FormLabel>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                       <Input
-                        className="pl-9 bg-slate-50"
+                        className="pl-11 h-12 bg-black/40 text-slate-400 border-white/5 opacity-70"
                         {...field}
                         readOnly
                         disabled
                       />
                     </div>
-                    <FormDescription>
+                    <FormDescription className="text-slate-500 mt-2">
                       O e-mail não pode ser alterado. Contate o suporte se
                       necessário.
                     </FormDescription>
@@ -248,20 +244,20 @@ export default function Profile() {
                 )}
               />
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-4">
                 <Button
                   type="submit"
-                  className="min-w-[150px] gap-2"
+                  className="min-w-[180px] h-12 text-base gap-2 btn-primary-glow"
                   disabled={isSubmitting || isUploading}
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                       Salvando...
                     </>
                   ) : (
                     <>
-                      <Save className="h-4 w-4" />
+                      <Save className="h-5 w-5" />
                       Salvar Alterações
                     </>
                   )}

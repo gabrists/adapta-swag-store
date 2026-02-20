@@ -1,4 +1,3 @@
-/* Tabs Component primitives - A component that displays a tabs (a component that displays a list of selectable tabs) - from shadcn/ui (exposes Tabs, TabsList, TabsTrigger, TabsContent) */
 import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 
@@ -13,7 +12,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground',
+      'inline-flex h-auto items-center justify-center rounded-xl bg-black/20 p-1.5 text-muted-foreground border border-white/5',
       className,
     )}
     {...props}
@@ -28,7 +27,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      'inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm',
+      'inline-flex items-center justify-center whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm data-[state=active]:border-primary/50 border border-transparent text-slate-400',
       className,
     )}
     {...props}

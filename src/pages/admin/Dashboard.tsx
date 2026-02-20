@@ -61,7 +61,6 @@ export default function Dashboard() {
   const { products, history, team } = useSwagStore()
   const [dateRange, setDateRange] = useState('30days')
 
-  // --- Filtering Logic ---
   const filteredHistory = useMemo(() => {
     const now = new Date()
     let startDate: Date
@@ -87,9 +86,6 @@ export default function Dashboard() {
     })
   }, [history, dateRange])
 
-  // --- KPI Calculations ---
-
-  // 1. Total Outputs
   const totalOutputs = useMemo(
     () =>
       filteredHistory.reduce((acc, entry) => {
@@ -99,7 +95,6 @@ export default function Dashboard() {
     [filteredHistory],
   )
 
-  // 2. Critical Stock
   const criticalStockCount = useMemo(
     () =>
       products.filter((p) => {
@@ -109,7 +104,6 @@ export default function Dashboard() {
     [products],
   )
 
-  // 3. Top Consuming Area
   const topConsumingArea = useMemo(() => {
     const departmentCounts: Record<string, number> = {}
 
@@ -128,13 +122,11 @@ export default function Dashboard() {
     return sortedDepts.length > 0 ? sortedDepts[0][0] : 'N/A'
   }, [filteredHistory, team])
 
-  // 4. Monthly Total Cost (Current Calendar Month)
   const monthlyTotalCost = useMemo(() => {
     const now = new Date()
     const start = startOfMonth(now)
     const end = endOfMonth(now)
 
-    // Filter history for current month only, regardless of dashboard filter
     const currentMonthHistory = history.filter((entry) => {
       if (!entry.date) return false
       const entryDate = new Date(entry.date)
@@ -144,9 +136,6 @@ export default function Dashboard() {
     return currentMonthHistory.reduce((acc, entry) => acc + entry.totalValue, 0)
   }, [history])
 
-  // --- Chart Data Preparation ---
-
-  // Department Distribution (Quantity)
   const departmentData = useMemo(() => {
     const deptCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
@@ -157,13 +146,11 @@ export default function Dashboard() {
       deptCounts[dept] = (deptCounts[dept] || 0) + safeQty
     })
 
-    // Sort by value to make the donut chart look better
     return Object.entries(deptCounts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory, team])
 
-  // Department Cost Data (Cost) - For Bar Chart
   const departmentCostData = useMemo(() => {
     const deptCosts: Record<string, number> = {}
 
@@ -178,7 +165,6 @@ export default function Dashboard() {
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory, team])
 
-  // Replenishment List (Critical Stock)
   const lowStockProducts = useMemo(
     () =>
       products
@@ -190,7 +176,6 @@ export default function Dashboard() {
     [products],
   )
 
-  // Recent Transactions
   const recentTransactions = useMemo(() => {
     return filteredHistory.slice(0, 10).map((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
@@ -209,7 +194,6 @@ export default function Dashboard() {
     })
   }, [filteredHistory, team])
 
-  // --- Helper Functions ---
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -220,27 +204,24 @@ export default function Dashboard() {
   const getDepartmentBadgeStyles = (dept: string | undefined) => {
     switch (dept) {
       case 'Vendas B2B':
-        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100'
+        return 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
       case 'Engenharia':
-        return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100'
+        return 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
       case 'Marketing':
-        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100'
+        return 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
       case 'RH':
-        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100'
+        return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
+        return 'bg-slate-500/20 text-slate-300 border border-slate-500/30'
     }
   }
 
-  // --- Chart Configs ---
-
-  // Bar Chart Colors per Department
   const departmentColors: Record<string, string> = {
-    'Vendas B2B': '#3b82f6', // blue-500
-    Engenharia: '#a855f7', // purple-500
-    Marketing: '#f97316', // orange-500
-    RH: '#22c55e', // green-500
-    Outros: '#94a3b8', // slate-400
+    'Vendas B2B': '#3b82f6',
+    Engenharia: '#06b6d4',
+    Marketing: '#0ea5e9',
+    RH: '#10b981',
+    Outros: '#94a3b8',
   }
 
   const costBarChartConfig = {
@@ -255,13 +236,12 @@ export default function Dashboard() {
     ),
   } satisfies ChartConfig
 
-  // Monochromatic Palette for Donut Chart (#0E9C8B shades)
   const monochromePalette = [
-    '#0E9C8B', // Base (Teal)
-    '#11B8A3', // Lighter
-    '#14F0D6', // Even Lighter
-    '#096B5F', // Darker
-    '#053D36', // Even Darker
+    '#14F0D6',
+    '#0E9C8B',
+    '#0A7064',
+    '#06b6d4',
+    '#0ea5e9',
   ]
 
   const pieChartConfig = {
@@ -280,19 +260,19 @@ export default function Dashboard() {
   } satisfies ChartConfig
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8 bg-gray-50 min-h-screen p-4 md:p-8 rounded-xl">
+    <div className="w-full max-w-7xl mx-auto space-y-6 md:space-y-8 pb-12 animate-fade-in-up">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Dashboard
+          <h1 className="text-3xl font-bold tracking-tight text-white">
+            Dashboard Analítico
           </h1>
-          <p className="text-slate-500 mt-1">
-            Visão geral da Adapta Swag Store.
+          <p className="text-slate-400 mt-1">
+            Visão geral da Neura Swag Store.
           </p>
         </div>
         <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[180px] bg-white border-slate-200">
+          <SelectTrigger className="w-[200px] bg-black/20 border-white/10 h-12">
             <SelectValue placeholder="Selecione o período" />
           </SelectTrigger>
           <SelectContent>
@@ -305,84 +285,84 @@ export default function Dashboard() {
 
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card className="hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-slate-400">
               Total de Saídas
             </CardTitle>
-            <TrendingUp className="h-4 w-4 text-slate-400" />
+            <TrendingUp className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {totalOutputs}
+            <div className="text-3xl font-bold text-white">
+              {totalItems ? totalOutputs : 0}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-slate-500 mt-2">
               Itens retirados no período
             </p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card className="hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-slate-400">
               Custo Total Mensal
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-slate-400" />
+            <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
+            <div className="text-3xl font-bold text-white">
               {formatCurrency(monthlyTotalCost)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Gasto no mês atual
-            </p>
+            <p className="text-xs text-slate-500 mt-2">Gasto no mês atual</p>
           </CardContent>
         </Card>
 
         <Card
           className={cn(
-            'shadow-sm border-slate-100 bg-white',
-            criticalStockCount > 0 && 'border-l-4 border-l-red-500',
+            'transition-colors',
+            criticalStockCount > 0
+              ? 'border-sky-500/50 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+              : 'hover:border-primary/30',
           )}
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-slate-400">
               Estoque Crítico
             </CardTitle>
             <AlertTriangle
               className={cn(
                 'h-4 w-4',
-                criticalStockCount > 0 ? 'text-red-500' : 'text-slate-400',
+                criticalStockCount > 0 ? 'text-sky-400' : 'text-slate-500',
               )}
             />
           </CardHeader>
           <CardContent>
             <div
               className={cn(
-                'text-2xl font-bold',
-                criticalStockCount > 0 ? 'text-red-600' : 'text-slate-900',
+                'text-3xl font-bold',
+                criticalStockCount > 0 ? 'text-sky-400' : 'text-white',
               )}
             >
               {criticalStockCount}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-slate-500 mt-2">
               Itens com &lt; 5 unidades
             </p>
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card className="hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">
+            <CardTitle className="text-sm font-medium text-slate-400">
               Área que mais Consome
             </CardTitle>
-            <Users className="h-4 w-4 text-slate-400" />
+            <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900 truncate">
+            <div className="text-2xl font-bold text-white truncate min-h-[36px] flex items-center">
               {topConsumingArea}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-slate-500 mt-2">
               Departamento com mais retiradas
             </p>
           </CardContent>
@@ -391,29 +371,34 @@ export default function Dashboard() {
 
       {/* Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800">
+            <CardTitle className="text-lg font-semibold text-white">
               Custo por Departamento (R$)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer
               config={costBarChartConfig}
-              className="h-[300px] w-full min-w-0"
+              className="h-[320px] w-full min-w-0"
             >
               <BarChart
                 accessibilityLayer
                 data={departmentCostData}
                 margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
               >
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                <CartesianGrid
+                  vertical={false}
+                  strokeDasharray="3 3"
+                  stroke="rgba(255,255,255,0.05)"
+                />
                 <XAxis
                   dataKey="name"
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
                   tickFormatter={(value) => value.slice(0, 10)}
+                  stroke="rgba(255,255,255,0.4)"
                 />
                 <YAxis
                   tickLine={false}
@@ -426,9 +411,10 @@ export default function Dashboard() {
                       maximumFractionDigits: 1,
                     }).format(value)
                   }
+                  stroke="rgba(255,255,255,0.4)"
                 />
                 <ChartTooltip
-                  cursor={false}
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                   content={
                     <ChartTooltipContent
                       indicator="dashed"
@@ -438,10 +424,11 @@ export default function Dashboard() {
                           currency: 'BRL',
                         }).format(Number(value))
                       }
+                      className="bg-[#081a17]/90 border-white/10 text-white backdrop-blur-md shadow-xl"
                     />
                   }
                 />
-                <Bar dataKey="value" radius={4} barSize={40}>
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={40}>
                   {departmentCostData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -456,16 +443,16 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800">
+            <CardTitle className="text-lg font-semibold text-white">
               Distribuição por Departamento (Qtd)
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ChartContainer
               config={pieChartConfig}
-              className="h-[300px] w-full min-w-0 mx-auto"
+              className="h-[320px] w-full min-w-0 mx-auto"
             >
               <PieChart>
                 <Pie
@@ -474,9 +461,10 @@ export default function Dashboard() {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={2}
+                  innerRadius={70}
+                  outerRadius={110}
+                  paddingAngle={3}
+                  stroke="transparent"
                 >
                   {departmentData.map((entry, index) => (
                     <Cell
@@ -491,20 +479,26 @@ export default function Dashboard() {
                   ))}
                 </Pie>
                 <ChartTooltip
-                  content={<ChartTooltipContent nameKey="name" hideLabel />}
+                  content={
+                    <ChartTooltipContent
+                      nameKey="name"
+                      hideLabel
+                      className="bg-[#081a17]/90 border-white/10 text-white backdrop-blur-md"
+                    />
+                  }
                 />
                 <Legend
                   verticalAlign="bottom"
-                  height={36}
+                  height={40}
                   content={({ payload }) => (
-                    <div className="flex flex-wrap justify-center gap-2 mt-4 text-xs text-slate-500">
+                    <div className="flex flex-wrap justify-center gap-4 mt-6 text-sm text-slate-300">
                       {payload?.map((entry: any, index: number) => (
                         <div
                           key={`legend-${index}`}
-                          className="flex items-center gap-1"
+                          className="flex items-center gap-2"
                         >
                           <div
-                            className="w-2 h-2 rounded-full"
+                            className="w-3 h-3 rounded-full shadow-sm"
                             style={{ backgroundColor: entry.color }}
                           />
                           <span>
@@ -523,24 +517,28 @@ export default function Dashboard() {
 
       {/* Bottom Section: Transactions & Alerts */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Recent Transactions Table - Takes 2 cols */}
-        <Card className="shadow-sm border-slate-100 bg-white lg:col-span-2">
+        {/* Recent Transactions Table */}
+        <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800">
+            <CardTitle className="text-lg font-semibold text-white">
               Transações Recentes
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-b-2xl">
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="pl-6">Data</TableHead>
-                    <TableHead>Colaborador</TableHead>
-                    <TableHead>Item Retirado</TableHead>
-                    <TableHead>Qtd</TableHead>
-                    <TableHead>Depto</TableHead>
-                    <TableHead className="text-right pr-6">
+                  <TableRow className="hover:bg-transparent border-white/10 bg-black/20">
+                    <TableHead className="pl-6 text-slate-400">Data</TableHead>
+                    <TableHead className="text-slate-400">
+                      Colaborador
+                    </TableHead>
+                    <TableHead className="text-slate-400">
+                      Item Retirado
+                    </TableHead>
+                    <TableHead className="text-slate-400">Qtd</TableHead>
+                    <TableHead className="text-slate-400">Depto</TableHead>
+                    <TableHead className="text-right pr-6 text-slate-400">
                       Valor Total
                     </TableHead>
                   </TableRow>
@@ -550,51 +548,54 @@ export default function Dashboard() {
                     <TableRow>
                       <TableCell
                         colSpan={6}
-                        className="h-24 text-center text-slate-500"
+                        className="h-32 text-center text-slate-500"
                       >
                         Nenhuma transação encontrada no período.
                       </TableCell>
                     </TableRow>
                   ) : (
                     recentTransactions.map((tx) => (
-                      <TableRow key={tx.id} className="hover:bg-slate-50">
-                        <TableCell className="pl-6 font-medium text-slate-600 text-xs whitespace-nowrap">
+                      <TableRow
+                        key={tx.id}
+                        className="hover:bg-white/5 border-white/5 transition-colors"
+                      >
+                        <TableCell className="pl-6 font-medium text-slate-400 text-xs whitespace-nowrap">
                           {new Date(tx.date).toLocaleDateString('pt-BR')}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8 border border-white/10">
                               <AvatarImage
                                 src={tx.collaborator?.avatarUrl}
                                 alt={tx.user}
                               />
-                              <AvatarFallback className="text-[10px]">
+                              <AvatarFallback className="text-xs bg-white/5 text-slate-300">
                                 {tx.user.substring(0, 2).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-slate-900 font-medium truncate max-w-[120px]">
+                            <span className="text-sm text-slate-200 font-medium truncate max-w-[120px]">
                               {tx.user}
                             </span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <span className="text-sm text-slate-700 truncate block max-w-[150px]">
+                          <span className="text-sm text-slate-300 truncate block max-w-[180px]">
                             {tx.mainItemName}
                             {tx.moreItemsCount > 0 && (
-                              <span className="text-xs text-slate-400 ml-1">
+                              <span className="text-xs text-primary ml-2 bg-primary/10 px-1.5 py-0.5 rounded">
                                 +{tx.moreItemsCount}
                               </span>
                             )}
                           </span>
                         </TableCell>
-                        <TableCell className="text-sm text-slate-700">
+                        <TableCell className="text-sm text-slate-300">
                           {tx.totalQuantity}
                         </TableCell>
                         <TableCell>
                           <Badge
                             variant="outline"
                             className={cn(
-                              'text-[10px] font-medium border',
+                              'text-[10px] font-medium',
                               getDepartmentBadgeStyles(
                                 tx.collaborator?.department,
                               ),
@@ -603,7 +604,7 @@ export default function Dashboard() {
                             {tx.collaborator?.department || 'N/A'}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right pr-6 text-sm font-medium text-slate-900">
+                        <TableCell className="text-right pr-6 text-sm font-medium text-primary">
                           {formatCurrency(tx.totalValue)}
                         </TableCell>
                       </TableRow>
@@ -615,37 +616,41 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Replenishment Alerts Widget (Atenção List) */}
-        <Card className="shadow-sm border-slate-100 bg-white h-full flex flex-col">
+        {/* Replenishment Alerts Widget */}
+        <Card className="h-full flex flex-col">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-sky-400" />
               Atenção: Reposição
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto max-h-[400px]">
+          <CardContent className="flex-1 overflow-y-auto max-h-[420px] pr-2">
             {lowStockProducts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500 h-full">
-                <Package className="h-10 w-10 text-emerald-100 mb-2" />
+              <div className="flex flex-col items-center justify-center py-12 text-center text-slate-500 h-full bg-black/20 rounded-xl border border-white/5">
+                <Package className="h-12 w-12 text-primary/40 mb-3" />
                 <p className="text-sm">Estoque saudável!</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {lowStockProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex flex-col gap-2 p-3 rounded-lg bg-red-50 border border-red-100"
+                    className="flex flex-col gap-3 p-4 rounded-xl bg-sky-500/5 border border-sky-500/20 shadow-sm"
                   >
                     <div className="flex items-start gap-3">
                       <div className="mt-0.5">
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <AlertTriangle className="h-5 w-5 text-sky-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-red-900 line-clamp-1">
+                        <h4 className="text-sm font-semibold text-white line-clamp-1">
                           {product.name}
                         </h4>
-                        <p className="text-xs text-red-700 font-medium mt-0.5">
-                          Restam apenas {Number(product.stock) || 0} unidades
+                        <p className="text-xs text-sky-300 mt-1">
+                          Restam apenas{' '}
+                          <span className="font-bold">
+                            {Number(product.stock) || 0}
+                          </span>{' '}
+                          unidades
                         </p>
                       </div>
                     </div>
@@ -653,7 +658,7 @@ export default function Dashboard() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="w-full text-xs h-7 bg-white hover:bg-red-100 border-red-200 text-red-700 gap-1"
+                      className="w-full text-xs h-8 bg-sky-500/10 hover:bg-sky-500/20 border-sky-500/30 text-sky-300 gap-2 mt-1"
                       disabled={!product.supplierUrl}
                       onClick={() => {
                         if (product.supplierUrl) {

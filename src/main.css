@@ -1,7 +1,4 @@
-/* Global styles - Theme, font, utilities, animations and global components */
-
-/* CHANGE THE FONT BELOW TO WHATEVER YOU WANT */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -9,109 +6,108 @@
 
 @layer base {
   :root {
-    /* Change the colors to match the design system */
-    /* Primary Brand Color: #0E9C8B (Teal/Greenish) -> HSL 173 84% 33% */
+    --background: 170 54% 5%; /* #061412 */
+    --foreground: 0 0% 95%;
 
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --card: 170 40% 7%;
+    --card-foreground: 0 0% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --popover: 170 40% 7%;
+    --popover-foreground: 0 0% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 156 72% 45%;
+    --primary-foreground: 170 54% 5%;
 
-    --primary: 173 84% 33%;
-    --primary-foreground: 210 40% 98%;
+    --secondary: 170 30% 12%;
+    --secondary-foreground: 0 0% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 170 30% 12%;
+    --muted-foreground: 170 10% 60%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 156 72% 45%;
+    --accent-foreground: 170 54% 5%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 60% 40%;
+    --destructive-foreground: 0 0% 95%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --border: 170 30% 15%;
+    --input: 170 30% 15%;
+    --ring: 156 72% 45%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 173 84% 33%;
+    --radius: 1.25rem; /* 20px */
 
-    --radius: 0.75rem; /* Rounded-xl */
+    --sidebar-background: 170 54% 4%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 156 72% 45%;
+    --sidebar-primary-foreground: 170 54% 5%;
+    --sidebar-accent: 170 30% 12%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 170 30% 12%;
+    --sidebar-ring: 156 72% 45%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --chart-1: 156 72% 45%;
+    --chart-2: 170 60% 35%;
+    --chart-3: 190 70% 40%;
+    --chart-4: 210 60% 45%;
+    --chart-5: 230 50% 50%;
+  }
 
-    --chart-1: 173 84% 33%;
-    --chart-2: 189 100% 38%;
-    --chart-3: 209 100% 32%;
-    --chart-4: 42 100% 50%;
-    --chart-5: 33 100% 50%;
+  body {
+    @apply bg-background text-foreground min-h-screen overflow-x-hidden font-sans;
+    background-image:
+      radial-gradient(
+        circle at 15% 50%,
+        rgba(14, 156, 139, 0.15),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 85% 30%,
+        rgba(20, 240, 214, 0.1),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 50% 80%,
+        rgba(0, 100, 200, 0.05),
+        transparent 40%
+      ),
+      url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%2314f0d6' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+    background-color: #061412;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 173 84% 33%;
-    --primary-foreground: 222.2 84% 4.9%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-
-    --chart-1: 173 84% 33%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Kept same as root since we are forcing dark theme */
   }
 
-  /* NEVER REMOVE THIS */
   section[aria-label='Notifications alt+T'] {
     padding: 0 !important;
     margin: 0 !important;
   }
 }
 
+@layer components {
+  .glass-panel {
+    @apply bg-[#081a17]/60 backdrop-blur-xl border border-white/5 shadow-lg;
+  }
+
+  .glass-panel-hover {
+    @apply hover:bg-[#081a17]/80 hover:border-primary/30 hover:shadow-[0_0_20px_rgba(20,240,214,0.15)] transition-all duration-300;
+  }
+
+  .btn-primary-glow {
+    @apply bg-primary text-primary-foreground font-semibold shadow-[0_0_15px_rgba(20,240,214,0.2)] hover:shadow-[0_0_25px_rgba(20,240,214,0.4)] transition-all duration-300 border border-primary/50;
+  }
+
+  .btn-secondary-outline {
+    @apply bg-transparent text-foreground border border-white/20 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 shadow-none hover:shadow-[0_4px_12px_rgba(20,240,214,0.1)];
+  }
+
+  .input-glow {
+    @apply bg-black/20 border-white/10 focus-visible:border-primary/50 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:shadow-[0_0_10px_rgba(20,240,214,0.2)] transition-all duration-300 text-white placeholder:text-white/40;
+  }
+}
+
 @layer utilities {
-  /* KEEP ALL THE ANIMATIONS CLASSES THAT ARE USED BELOW */
   @keyframes accordion-down {
     from {
       height: 0;

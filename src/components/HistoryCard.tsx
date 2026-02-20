@@ -21,7 +21,6 @@ export function HistoryCard({ entry }: HistoryCardProps) {
     entry.userAvatar ||
     `https://img.usecurling.com/ppl/thumbnail?gender=male&seed=${encodeURIComponent(entry.user)}`
 
-  // Construct summary string: "2x Item A, 1x Item B (M)"
   const summaryText = entry.items
     .map(
       (item) =>
@@ -29,7 +28,6 @@ export function HistoryCard({ entry }: HistoryCardProps) {
     )
     .join(', ')
 
-  // Total Value formatting
   const formattedTotalValue = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -39,25 +37,25 @@ export function HistoryCard({ entry }: HistoryCardProps) {
     <Accordion
       type="single"
       collapsible
-      className="w-full bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-all"
+      className="w-full glass-panel rounded-2xl hover:border-primary/30 transition-all"
     >
       <AccordionItem value={entry.id} className="border-none">
-        <AccordionTrigger className="px-5 py-4 hover:bg-slate-50/50 hover:no-underline rounded-t-lg data-[state=open]:bg-slate-50 transition-all">
+        <AccordionTrigger className="px-5 py-4 hover:bg-white/5 hover:no-underline rounded-t-2xl data-[state=open]:bg-white/5 transition-all text-white">
           <div className="flex flex-col md:flex-row md:items-center w-full text-left gap-4 pr-4">
             {/* User Info Section */}
-            <div className="flex items-center gap-3 md:w-1/4 min-w-[200px]">
-              <Avatar className="h-10 w-10 border border-slate-200">
+            <div className="flex items-center gap-4 md:w-1/4 min-w-[220px]">
+              <Avatar className="h-12 w-12 border border-white/10 shadow-sm">
                 <AvatarImage src={userAvatarUrl} alt={entry.user} />
-                <AvatarFallback>
+                <AvatarFallback className="bg-primary/20 text-primary font-bold">
                   {entry.user.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="font-semibold text-sm text-slate-900 line-clamp-1">
+                <span className="font-semibold text-base text-white line-clamp-1">
                   {entry.user}
                 </span>
-                <span className="text-xs text-slate-500 font-mono">
-                  ID: {entry.id.substring(0, 8)}...
+                <span className="text-xs text-slate-400 font-mono mt-0.5 bg-black/20 px-2 py-0.5 rounded border border-white/5 w-fit">
+                  ID: {entry.id.substring(0, 8)}
                 </span>
               </div>
             </div>
@@ -65,7 +63,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
             {/* Summary Text Section */}
             <div className="flex-1 min-w-0 hidden md:block">
               <p
-                className="text-sm text-slate-600 truncate"
+                className="text-sm text-slate-300 truncate"
                 title={summaryText}
               >
                 {summaryText}
@@ -73,85 +71,91 @@ export function HistoryCard({ entry }: HistoryCardProps) {
             </div>
 
             {/* Date and Value Section */}
-            <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-1 md:w-[120px] shrink-0">
-              <span className="font-bold text-sm text-slate-900">
+            <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-1.5 md:w-[130px] shrink-0">
+              <span className="font-bold text-base text-primary">
                 {formattedTotalValue}
               </span>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-slate-400 font-medium bg-black/20 px-2 py-1 rounded-md border border-white/5">
                 {format(date, 'd MMM, HH:mm', { locale: ptBR })}
               </span>
             </div>
 
-            {/* Mobile Only Summary (below) */}
-            <div className="md:hidden w-full pt-1">
-              <p className="text-sm text-slate-600 truncate">{summaryText}</p>
+            {/* Mobile Only Summary */}
+            <div className="md:hidden w-full pt-2">
+              <p className="text-sm text-slate-400 truncate bg-black/20 p-2 rounded-lg border border-white/5">
+                {summaryText}
+              </p>
             </div>
           </div>
         </AccordionTrigger>
 
-        <AccordionContent className="px-5 pb-5 pt-2 bg-slate-50/50 rounded-b-lg border-t border-slate-100">
-          <div className="space-y-3 mt-2">
-            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+        <AccordionContent className="px-5 pb-5 pt-4 bg-black/20 rounded-b-2xl border-t border-white/5">
+          <div className="space-y-4 mt-2">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+              <span className="w-4 h-px bg-slate-600"></span>
               Detalhes da Retirada
+              <span className="flex-1 h-px bg-slate-600/30"></span>
             </h4>
-            {entry.items.map((item, idx) => {
-              const itemTotal = item.quantity * item.unitCost
-              const formattedItemTotal = new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(itemTotal)
+            <div className="grid gap-3">
+              {entry.items.map((item, idx) => {
+                const itemTotal = item.quantity * item.unitCost
+                const formattedItemTotal = new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                }).format(itemTotal)
 
-              return (
-                <div
-                  key={`${entry.id}-${idx}`}
-                  className="flex items-center gap-3 p-3 bg-white rounded-md border border-slate-100 shadow-sm"
-                >
-                  <Avatar className="h-10 w-10 border border-slate-100 rounded-md">
-                    <AvatarImage
-                      src={
-                        item.productImageQuery.startsWith('http') ||
-                        item.productImageQuery.startsWith('data:')
-                          ? item.productImageQuery
-                          : `https://img.usecurling.com/p/100/100?q=${item.productImageQuery}&dpr=2`
-                      }
-                      alt={item.productName}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="rounded-md">
-                      {item.productName.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                return (
+                  <div
+                    key={`${entry.id}-${idx}`}
+                    className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/10 transition-colors"
+                  >
+                    <Avatar className="h-12 w-12 border border-white/10 rounded-lg shrink-0 bg-black/40">
+                      <AvatarImage
+                        src={
+                          item.productImageQuery.startsWith('http') ||
+                          item.productImageQuery.startsWith('data:')
+                            ? item.productImageQuery
+                            : `https://img.usecurling.com/p/100/100?q=${item.productImageQuery}&dpr=2`
+                        }
+                        alt={item.productName}
+                        className="object-cover rounded-lg"
+                      />
+                      <AvatarFallback className="rounded-lg bg-white/5 text-slate-400">
+                        {item.productName.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 truncate">
-                      {item.productName}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {item.size && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] h-4 px-1 rounded-sm bg-slate-100 text-slate-600 border border-slate-200"
-                        >
-                          {item.size}
-                        </Badge>
-                      )}
-                      <span className="text-xs text-slate-500">
-                        Qtd: {item.quantity}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">
+                        {item.productName}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        {item.size && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] h-5 px-1.5 rounded-md bg-black/40 text-slate-300 border border-white/10"
+                          >
+                            {item.size}
+                          </Badge>
+                        )}
+                        <span className="text-xs font-medium text-slate-400 bg-black/20 px-2 py-0.5 rounded-md border border-white/5">
+                          Qtd: {item.quantity}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <span className="text-sm font-bold text-white block">
+                        {formattedItemTotal}
                       </span>
+                      <div className="text-[10px] text-slate-500 mt-1">
+                        Unid: {item.unitCost.toFixed(2)}
+                      </div>
                     </div>
                   </div>
-
-                  <div className="text-right">
-                    <span className="text-sm font-medium text-slate-900">
-                      {formattedItemTotal}
-                    </span>
-                    <div className="text-[10px] text-slate-400">
-                      Unid: {item.unitCost.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </AccordionContent>
       </AccordionItem>

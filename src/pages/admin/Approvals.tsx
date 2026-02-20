@@ -42,7 +42,6 @@ export default function ApprovalsPage() {
     reason: '',
   })
 
-  // Filter pending orders
   const pendingOrders = useMemo(() => {
     return orders
       .filter((order) => order.status === 'Pendente')
@@ -76,29 +75,29 @@ export default function ApprovalsPage() {
 
   if (isLoading) {
     return (
-      <div className="w-full max-w-7xl mx-auto space-y-4">
-        <div className="h-8 w-48 bg-slate-100 rounded animate-pulse" />
-        <div className="h-24 w-full bg-slate-100 rounded-xl animate-pulse" />
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        <div className="h-10 w-48 bg-white/5 rounded-lg animate-pulse" />
+        <div className="h-32 w-full bg-white/5 rounded-2xl animate-pulse" />
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in-up pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
             Fila de Pedidos
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-base text-slate-400">
             Gerencie as solicitações de brindes pendentes de aprovação.
           </p>
         </div>
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <Input
             placeholder="Buscar por nome ou item..."
-            className="pl-9"
+            className="pl-11 h-12"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -106,44 +105,41 @@ export default function ApprovalsPage() {
       </div>
 
       {pendingOrders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-dashed border-slate-200 rounded-xl">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-            <CheckCircle className="w-8 h-8 text-slate-300" />
+        <div className="flex flex-col items-center justify-center py-24 text-center glass-panel rounded-2xl border-dashed">
+          <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 shadow-inner">
+            <CheckCircle className="w-10 h-10 text-primary" />
           </div>
-          <h3 className="text-lg font-medium text-slate-900">Tudo em dia!</h3>
-          <p className="text-slate-500 text-sm mt-1">
+          <h3 className="text-xl font-semibold text-white">Fila vazia!</h3>
+          <p className="text-slate-400 text-sm mt-2">
             Não há solicitações pendentes no momento.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-5">
           {pendingOrders.map((order) => (
-            <Card
-              key={order.id}
-              className="overflow-hidden border-slate-200 shadow-sm hover:shadow-md transition-shadow"
-            >
+            <Card key={order.id} className="overflow-hidden group">
               <CardContent className="p-0">
                 <div className="flex flex-col md:flex-row md:items-center">
-                  <div className="w-full md:w-2 h-2 md:h-auto md:self-stretch bg-yellow-400" />
+                  <div className="w-full md:w-2 h-2 md:h-auto md:self-stretch bg-sky-400" />
 
-                  <div className="flex-1 p-4 md:p-6 flex flex-col sm:flex-row gap-6 md:items-center">
+                  <div className="flex-1 p-5 md:p-6 flex flex-col sm:flex-row gap-6 md:items-center">
                     {/* User Info */}
-                    <div className="flex items-center gap-3 min-w-[200px]">
-                      <Avatar className="h-10 w-10 border border-slate-100">
+                    <div className="flex items-center gap-4 min-w-[220px]">
+                      <Avatar className="h-12 w-12 border border-white/10 shrink-0">
                         <AvatarImage
                           src={order.employeeAvatar}
                           alt={order.employeeName}
                         />
-                        <AvatarFallback>
+                        <AvatarFallback className="bg-primary/20 text-primary font-bold">
                           {order.employeeName?.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-semibold text-slate-900 text-sm">
+                        <div className="font-semibold text-white text-base">
                           {order.employeeName}
                         </div>
-                        <div className="text-xs text-slate-500 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
+                        <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                          <Clock className="w-3.5 h-3.5" />
                           {format(parseISO(order.createdAt), 'd MMM, HH:mm', {
                             locale: ptBR,
                           })}
@@ -152,8 +148,8 @@ export default function ApprovalsPage() {
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="h-12 w-12 rounded bg-slate-100 border border-slate-200 overflow-hidden shrink-0">
+                    <div className="flex items-center gap-4 flex-1 bg-black/20 p-3 rounded-xl border border-white/5">
+                      <div className="h-14 w-14 rounded-lg bg-black/40 border border-white/10 overflow-hidden shrink-0">
                         <img
                           src={
                             order.productImage?.startsWith('http') ||
@@ -166,20 +162,20 @@ export default function ApprovalsPage() {
                         />
                       </div>
                       <div>
-                        <div className="font-medium text-slate-900 text-sm">
+                        <div className="font-semibold text-white text-sm">
                           {order.productName}
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-1.5">
                           <Badge
                             variant="secondary"
-                            className="text-[10px] h-5 px-1.5 font-normal bg-slate-100"
+                            className="text-[10px] h-5 px-2 font-medium bg-white/10 text-slate-300 border-white/5"
                           >
                             Qtd: {order.quantity}
                           </Badge>
                           {order.size && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-5 px-1.5 font-normal"
+                              className="text-[10px] h-5 px-2 font-medium border-white/20 text-slate-300"
                             >
                               Tam: {order.size}
                             </Badge>
@@ -189,17 +185,17 @@ export default function ApprovalsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                    <div className="flex items-center gap-3 mt-4 sm:mt-0">
                       <Button
                         variant="outline"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        className="btn-secondary-outline h-10 px-4 text-slate-300 hover:text-white border-white/10"
                         onClick={() => handleRejectClick(order)}
                       >
-                        <X className="w-4 h-4 mr-2" />
+                        <X className="w-4 h-4 mr-2 text-slate-400" />
                         Rejeitar
                       </Button>
                       <Button
-                        className="bg-[#0E9C8B] hover:bg-[#0E9C8B]/90 text-white"
+                        className="btn-primary-glow h-10 px-6"
                         onClick={() => handleApprove(order)}
                       >
                         <Check className="w-4 h-4 mr-2" />
@@ -218,7 +214,7 @@ export default function ApprovalsPage() {
         open={rejectDialog.open}
         onOpenChange={(open) => setRejectDialog((prev) => ({ ...prev, open }))}
       >
-        <DialogContent className="sm:max-w-[425px] rounded-xl">
+        <DialogContent className="sm:max-w-[460px]">
           <DialogHeader>
             <DialogTitle>Rejeitar Solicitação</DialogTitle>
             <DialogDescription>
@@ -226,7 +222,7 @@ export default function ApprovalsPage() {
               aconteceu.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-2">
+          <div className="py-4">
             <Textarea
               placeholder="Ex: Item indisponível no estoque físico..."
               value={rejectDialog.reason}
@@ -236,7 +232,7 @@ export default function ApprovalsPage() {
                   reason: e.target.value,
                 }))
               }
-              className="min-h-[100px]"
+              className="min-h-[120px]"
             />
           </div>
           <DialogFooter>
@@ -245,13 +241,14 @@ export default function ApprovalsPage() {
               onClick={() =>
                 setRejectDialog({ open: false, order: null, reason: '' })
               }
+              className="btn-secondary-outline border-white/10"
             >
               Cancelar
             </Button>
             <Button
-              variant="destructive"
               onClick={confirmReject}
               disabled={!rejectDialog.reason.trim()}
+              className="bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
             >
               Confirmar Rejeição
             </Button>

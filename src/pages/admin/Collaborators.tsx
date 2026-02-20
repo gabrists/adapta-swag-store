@@ -64,13 +64,13 @@ import { CollaboratorProfile } from '@/components/admin/CollaboratorProfile'
 import { ManualDeliveryDialog } from '@/components/admin/ManualDeliveryDialog'
 
 const departmentColors: Record<string, string> = {
-  Marketing: 'bg-pink-100 text-pink-800',
-  B2B: 'bg-blue-100 text-blue-800',
-  B2C: 'bg-cyan-100 text-cyan-800',
-  Produto: 'bg-purple-100 text-purple-800',
-  Engenharia: 'bg-slate-100 text-slate-800',
-  RH: 'bg-primary/10 text-primary',
-  Financeiro: 'bg-emerald-100 text-emerald-800',
+  Marketing: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
+  B2B: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
+  B2C: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
+  Produto: 'bg-sky-500/20 text-sky-400 border border-sky-500/30',
+  Engenharia: 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
+  RH: 'bg-primary/20 text-primary border border-primary/30',
+  Financeiro: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
 }
 
 type SortKey =
@@ -112,15 +112,12 @@ export default function Collaborators() {
     direction: 'asc',
   })
 
-  // Get distinct departments for filter
   const departments = useMemo(() => {
     const depts = Array.from(new Set(team.map((c) => c.department)))
     return ['Todas', ...depts.sort()]
   }, [team])
 
-  // Process team data: calculate counts, filter, and sort
   const processedTeam = useMemo(() => {
-    // 1. Pre-calculate redeemed counts for performance
     const counts = orders.reduce(
       (acc, order) => {
         if (order.status === 'Entregue') {
@@ -131,13 +128,11 @@ export default function Collaborators() {
       {} as Record<string, number>,
     )
 
-    // 2. Extend team data with counts
     let data = team.map((collab) => ({
       ...collab,
       redeemedCount: counts[collab.id] || 0,
     }))
 
-    // 3. Filter
     if (searchQuery || departmentFilter !== 'Todas') {
       const lowerQuery = searchQuery.toLowerCase()
       data = data.filter((collab) => {
@@ -154,7 +149,6 @@ export default function Collaborators() {
       })
     }
 
-    // 4. Sort
     data.sort((a, b) => {
       const aValue = a[sortConfig.key]
       const bValue = b[sortConfig.key]
@@ -205,13 +199,11 @@ export default function Collaborators() {
       toast({
         title: 'Acesso removido',
         description: `${deleteCollab.name} foi removido do time.`,
-        variant: 'destructive',
       })
     }
   }
 
   const handleSave = async (values: any) => {
-    // Simulate delay
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     if (selectedCollab) {
@@ -222,21 +214,19 @@ export default function Collaborators() {
       toast({
         title: 'Colaborador atualizado!',
         description: `Os dados de ${values.name} foram salvos.`,
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       })
     } else {
       addCollaborator(values)
       toast({
         title: 'Colaborador adicionado!',
         description: `Colaborador ${values.name} adicionado ao time!`,
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       })
     }
   }
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sortConfig.key !== column) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-slate-400" />
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" />
     }
     return sortConfig.direction === 'asc' ? (
       <ArrowUp className="ml-2 h-4 w-4 text-primary" />
@@ -246,38 +236,38 @@ export default function Collaborators() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 animate-fade-in-up">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
             Time & Colaboradores
           </h1>
-          <p className="text-sm text-slate-500">
-            Gerencie quem tem acesso aos benefícios do Swag.
+          <p className="text-base text-slate-400">
+            Gerencie quem tem acesso aos benefícios da loja.
           </p>
         </div>
         <Button
           onClick={handleCreate}
-          className="bg-primary hover:bg-primary/90 text-white shadow-sm rounded-lg"
+          className="btn-primary-glow h-12 px-6 text-base rounded-xl"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5 mr-2" />
           Novo Colaborador
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="flex items-center space-x-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm max-w-sm flex-1">
-          <Search className="w-4 h-4 text-slate-400 ml-2" />
+      <div className="flex flex-col sm:flex-row gap-4 glass-panel p-4 md:p-5 rounded-2xl">
+        <div className="relative flex-1 min-w-[250px]">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <Input
             placeholder="Buscar por nome, email ou área..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border-none shadow-none focus-visible:ring-0"
+            className="pl-11 h-12 w-full"
           />
         </div>
-        <div className="w-[200px]">
+        <div className="w-full sm:w-[220px]">
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="bg-white border-slate-200 shadow-sm">
+            <SelectTrigger className="h-12 bg-black/20 border-white/10">
               <SelectValue placeholder="Filtrar por Área" />
             </SelectTrigger>
             <SelectContent>
@@ -291,15 +281,15 @@ export default function Collaborators() {
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
+      <div className="glass-panel rounded-2xl overflow-hidden">
         <Table className="min-w-[1100px]">
           <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="w-[300px] min-w-[300px]">
+            <TableRow className="bg-black/20 hover:bg-black/20 border-white/10">
+              <TableHead className="w-[300px] min-w-[300px] pl-6">
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('name')}
-                  className="-ml-4 h-8 hover:bg-transparent hover:text-primary font-semibold text-slate-700 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
                 >
                   Colaborador
                   <SortIcon column="name" />
@@ -309,7 +299,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('department')}
-                  className="-ml-4 h-8 hover:bg-transparent hover:text-primary font-semibold text-slate-700 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
                 >
                   Área/Time
                   <SortIcon column="department" />
@@ -319,7 +309,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('role')}
-                  className="-ml-4 h-8 hover:bg-transparent hover:text-primary font-semibold text-slate-700 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
                 >
                   Cargo
                   <SortIcon column="role" />
@@ -330,7 +320,7 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('redeemedCount')}
-                    className="h-8 hover:bg-transparent hover:text-primary font-semibold text-slate-700 data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
                   >
                     Itens Resgatados
                     <SortIcon column="redeemedCount" />
@@ -342,14 +332,14 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('onboardingKitStatus')}
-                    className="h-8 hover:bg-transparent hover:text-primary font-semibold text-slate-700 data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
                   >
                     Kit Onboarding
                     <SortIcon column="onboardingKitStatus" />
                   </Button>
                 </div>
               </TableHead>
-              <TableHead className="text-right w-[100px] min-w-[100px]">
+              <TableHead className="text-right w-[100px] min-w-[100px] pr-6 text-slate-400">
                 Ações
               </TableHead>
             </TableRow>
@@ -359,10 +349,12 @@ export default function Collaborators() {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="h-32 text-center text-slate-500"
+                  className="h-40 text-center text-slate-400"
                 >
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <Users className="h-8 w-8 text-slate-300" />
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <div className="bg-white/5 p-4 rounded-full">
+                      <Users className="h-8 w-8 text-slate-500" />
+                    </div>
                     <span>Nenhum colaborador encontrado.</span>
                   </div>
                 </TableCell>
@@ -370,23 +362,26 @@ export default function Collaborators() {
             ) : (
               processedTeam.map((collab) => {
                 return (
-                  <TableRow key={collab.id} className="whitespace-nowrap">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 border border-slate-100">
+                  <TableRow
+                    key={collab.id}
+                    className="whitespace-nowrap hover:bg-white/5 border-white/5 transition-colors"
+                  >
+                    <TableCell className="pl-6">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-10 w-10 border border-white/10 shrink-0">
                           <AvatarImage
                             src={collab.avatarUrl}
                             alt={collab.name}
                           />
-                          <AvatarFallback className="text-xs font-bold text-primary bg-primary/10">
+                          <AvatarFallback className="text-sm font-bold text-primary bg-primary/20">
                             {collab.name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-bold text-slate-800 text-sm truncate max-w-[200px]">
+                          <span className="font-bold text-white text-sm truncate max-w-[200px]">
                             {collab.name}
                           </span>
-                          <span className="text-xs text-slate-500 truncate max-w-[200px]">
+                          <span className="text-xs text-slate-400 truncate max-w-[200px] mt-0.5">
                             {collab.email}
                           </span>
                         </div>
@@ -396,15 +391,16 @@ export default function Collaborators() {
                       <Badge
                         variant="secondary"
                         className={cn(
-                          'font-medium rounded-md hover:bg-opacity-80',
-                          departmentColors[collab.department] || 'bg-slate-100',
+                          'font-medium rounded-md px-2',
+                          departmentColors[collab.department] ||
+                            'bg-white/5 text-white border border-white/10',
                         )}
                       >
                         {collab.department}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-slate-600 font-medium truncate block max-w-[180px]">
+                      <span className="text-sm text-slate-300 font-medium truncate block max-w-[180px]">
                         {collab.role}
                       </span>
                     </TableCell>
@@ -414,11 +410,11 @@ export default function Collaborators() {
                           collab.redeemedCount > 0 ? 'default' : 'secondary'
                         }
                         className={cn(
-                          'rounded-full px-2 min-w-[2rem] justify-center',
+                          'rounded-full px-2 min-w-[2rem] justify-center text-xs',
                           collab.redeemedCount === 0 &&
-                            'bg-slate-100 text-slate-500 hover:bg-slate-100',
+                            'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10',
                           collab.redeemedCount > 0 &&
-                            'bg-[#0E9C8B] hover:bg-[#0E9C8B]/90',
+                            'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(20,240,214,0.2)] hover:bg-primary/30',
                         )}
                       >
                         {collab.redeemedCount}
@@ -428,29 +424,29 @@ export default function Collaborators() {
                       <Badge
                         variant="outline"
                         className={cn(
-                          'font-normal rounded-md border-0',
+                          'font-medium rounded-md border text-xs px-2',
                           collab.onboardingKitStatus === 'Entregue'
-                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                            : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                            : 'bg-sky-500/20 text-sky-400 border-sky-500/30',
                         )}
                       >
                         {collab.onboardingKitStatus || 'Pendente'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end items-center gap-1">
+                    <TableCell className="text-right pr-6">
+                      <div className="flex justify-end items-center gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
                               onClick={() => handleManualDelivery(collab)}
-                              className="h-8 w-8 p-0 text-slate-500 hover:text-[#0E9C8B] hover:bg-[#0E9C8B]/10 rounded-md"
+                              className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg"
                             >
                               <Gift className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-[#081a17]/90 border-white/10 text-white">
                             <p>Enviar Brinde Manual</p>
                           </TooltipContent>
                         </Tooltip>
@@ -459,14 +455,14 @@ export default function Collaborators() {
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
-                              size="sm"
+                              size="icon"
                               onClick={() => handleViewProfile(collab)}
-                              className="h-8 w-8 p-0 text-slate-500 hover:text-[#0E9C8B] hover:bg-[#0E9C8B]/10 rounded-md"
+                              className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>
+                          <TooltipContent className="bg-[#081a17]/90 border-white/10 text-white">
                             <p>Visualizar Perfil</p>
                           </TooltipContent>
                         </Tooltip>
@@ -475,29 +471,26 @@ export default function Collaborators() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 rounded-md"
+                              className="h-8 w-8 p-0 rounded-lg hover:bg-white/10"
                             >
                               <span className="sr-only">Menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHorizontal className="h-4 w-4 text-slate-400" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="rounded-lg"
-                          >
+                          <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => handleEdit(collab)}
                             >
-                              <Pencil className="h-4 w-4" />
+                              <Pencil className="h-4 w-4 mr-2" />
                               Editar
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => handleDelete(collab)}
-                              className="text-red-600 focus:text-red-600"
+                              className="text-slate-400 focus:text-slate-300 focus:bg-white/5"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-4 w-4 mr-2" />
                               Excluir
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -540,26 +533,24 @@ export default function Collaborators() {
         open={!!deleteCollab}
         onOpenChange={(open) => !open && setDeleteCollab(null)}
       >
-        <AlertDialogContent className="rounded-xl">
+        <AlertDialogContent className="rounded-2xl glass-panel">
           <AlertDialogHeader>
-            <AlertDialogTitle>
+            <AlertDialogTitle className="text-white">
               Tem certeza que deseja remover este acesso?
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-slate-400">
               O colaborador{' '}
-              <span className="font-bold text-slate-900">
-                {deleteCollab?.name}
-              </span>{' '}
+              <span className="font-bold text-white">{deleteCollab?.name}</span>{' '}
               perderá o acesso e não constará mais na lista do time.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-lg">
+            <AlertDialogCancel className="rounded-xl border-white/10 bg-transparent text-white hover:bg-white/5">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-lg"
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700"
             >
               Sim, remover acesso
             </AlertDialogAction>

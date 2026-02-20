@@ -21,7 +21,6 @@ import {
   parseISO,
   format,
 } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 
 type DateFilterType = 'today' | 'last7days' | 'thisMonth' | 'all'
 
@@ -34,7 +33,6 @@ export default function HistoryPage() {
   const filteredHistory = useMemo(() => {
     let filtered = history
 
-    // 1. Filter by Search Term (User Name or Group ID)
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase()
       filtered = filtered.filter(
@@ -44,7 +42,6 @@ export default function HistoryPage() {
       )
     }
 
-    // 2. Filter by Date
     const now = new Date()
     if (dateFilter === 'today') {
       const today = startOfToday()
@@ -77,12 +74,10 @@ export default function HistoryPage() {
         return
       }
 
-      // Headers
       let csvContent =
         'data:text/csv;charset=utf-8,' +
         'ID da Transação,Data,Colaborador,Itens,Valor Total\n'
 
-      // Rows
       filteredHistory.forEach((entry) => {
         const dateStr = format(parseISO(entry.date), 'dd/MM/yyyy HH:mm:ss')
         const itemsStr = entry.items
@@ -90,17 +85,15 @@ export default function HistoryPage() {
             (i) =>
               `${i.quantity}x ${i.productName}${i.size ? ` (${i.size})` : ''}`,
           )
-          .join('; ') // Use semicolon within CSV field to avoid splitting
+          .join('; ')
         const valueStr = entry.totalValue.toFixed(2).replace('.', ',')
 
-        // Escape quotes if needed
         const safeItems = `"${itemsStr.replace(/"/g, '""')}"`
         const safeUser = `"${entry.user.replace(/"/g, '""')}"`
 
         csvContent += `${entry.id},${dateStr},${safeUser},${safeItems},${valueStr}\n`
       })
 
-      // Download
       const encodedUri = encodeURI(csvContent)
       const link = document.createElement('a')
       link.setAttribute('href', encodedUri)
@@ -108,14 +101,13 @@ export default function HistoryPage() {
         'download',
         `historico_saidas_${format(new Date(), 'yyyyMMdd_HHmm')}.csv`,
       )
-      document.body.appendChild(link) // Required for FF
+      document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
 
       toast({
         title: 'Download iniciado!',
         description: 'O arquivo CSV foi gerado com sucesso.',
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       })
     } catch (error) {
       console.error('Export error:', error)
@@ -130,46 +122,46 @@ export default function HistoryPage() {
   if (isLoading) {
     return (
       <div className="space-y-4 w-full max-w-7xl mx-auto">
-        <div className="h-8 w-48 bg-slate-100 rounded animate-pulse mb-6" />
-        <div className="h-12 w-full bg-slate-100 rounded animate-pulse mb-4" />
+        <div className="h-10 w-64 bg-white/5 rounded-lg animate-pulse mb-8" />
+        <div className="h-16 w-full bg-white/5 rounded-2xl animate-pulse mb-6" />
         {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          <Skeleton key={i} className="h-28 w-full rounded-2xl bg-white/5" />
         ))}
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto pb-12">
+    <div className="space-y-6 md:space-y-8 w-full max-w-7xl mx-auto pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-white">
             Histórico de Saídas
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-base text-slate-400">
             Gerencie e audite todas as retiradas de brindes da empresa.
           </p>
         </div>
       </div>
 
       {/* Audit Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-4">
+      <div className="glass-panel p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
           <Input
             placeholder="Buscar por colaborador ou ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 bg-slate-50 border-slate-200 focus-visible:ring-offset-0 focus-visible:ring-[#0E9C8B]"
+            className="pl-11 h-12"
           />
         </div>
 
-        <div className="w-full md:w-48">
+        <div className="w-full md:w-56">
           <Select
             value={dateFilter}
             onValueChange={(val) => setDateFilter(val as DateFilterType)}
           >
-            <SelectTrigger className="bg-slate-50 border-slate-200">
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -184,7 +176,7 @@ export default function HistoryPage() {
         <Button
           variant="outline"
           onClick={handleExportCSV}
-          className="w-full md:w-auto border-slate-200 hover:bg-slate-50 text-slate-700"
+          className="w-full md:w-auto h-12 px-6"
         >
           <Download className="mr-2 h-4 w-4" />
           Exportar CSV
@@ -192,23 +184,27 @@ export default function HistoryPage() {
       </div>
 
       {/* Content List */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {filteredHistory.length > 0 ? (
-          filteredHistory.map((entry) => (
-            <div key={entry.id} className="animate-fade-in-up">
+          filteredHistory.map((entry, idx) => (
+            <div
+              key={entry.id}
+              className="animate-fade-in-up"
+              style={{ animationDelay: `${idx * 50}ms` }}
+            >
               <HistoryCard entry={entry} />
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white rounded-xl border border-dashed border-slate-200">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center">
-              <FolderOpen className="w-8 h-8 text-slate-300" />
+          <div className="flex flex-col items-center justify-center py-24 text-center space-y-5 glass-panel rounded-2xl border-dashed">
+            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center shadow-inner">
+              <FolderOpen className="w-10 h-10 text-slate-500" />
             </div>
-            <div className="max-w-xs">
-              <h3 className="text-lg font-semibold text-slate-900">
+            <div className="max-w-md">
+              <h3 className="text-xl font-semibold text-white">
                 Nenhuma saída encontrada
               </h3>
-              <p className="text-slate-500 mt-1 text-sm">
+              <p className="text-slate-400 mt-2 text-sm">
                 Tente ajustar os filtros ou buscar por outro termo.
               </p>
             </div>
@@ -219,7 +215,6 @@ export default function HistoryPage() {
                   setSearchTerm('')
                   setDateFilter('all')
                 }}
-                className="text-[#0E9C8B]"
               >
                 Limpar filtros
               </Button>

@@ -119,8 +119,7 @@ export default function ManageProducts() {
 
         toast({
           title: 'Upload concluído',
-          description: 'Imagem armazenada no Cloudflare R2.',
-          className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+          description: 'Imagem armazenada com sucesso.',
         })
       } catch (error) {
         toast({
@@ -169,7 +168,6 @@ export default function ManageProducts() {
       toast({
         title: 'Brinde cadastrado!',
         description: `${values.name} foi adicionado ao catálogo com sucesso.`,
-        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
       })
 
       form.reset()
@@ -187,17 +185,17 @@ export default function ManageProducts() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+    <div className="w-full max-w-7xl mx-auto space-y-8 pb-12 animate-fade-in-up">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight text-white">
           Gerenciar Brindes
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-base text-slate-400">
           Cadastre novos itens no catálogo da loja.
         </p>
       </div>
 
-      <Card className="border-slate-200 shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>Novo Brinde</CardTitle>
           <CardDescription>
@@ -207,14 +205,16 @@ export default function ManageProducts() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome do Brinde</FormLabel>
+                      <FormLabel className="text-slate-200">
+                        Nome do Brinde
+                      </FormLabel>
                       <FormControl>
                         <Input placeholder="Ex: Mochila Executiva" {...field} />
                       </FormControl>
@@ -228,7 +228,9 @@ export default function ManageProducts() {
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Categoria</FormLabel>
+                      <FormLabel className="text-slate-200">
+                        Categoria
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -257,13 +259,15 @@ export default function ManageProducts() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <FormField
                   control={form.control}
                   name="stock"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Estoque Inicial</FormLabel>
+                      <FormLabel className="text-slate-200">
+                        Estoque Inicial
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -282,7 +286,9 @@ export default function ManageProducts() {
                   name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Valor (R$)</FormLabel>
+                      <FormLabel className="text-slate-200">
+                        Valor (R$)
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -292,7 +298,9 @@ export default function ManageProducts() {
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>Valor de venda</FormDescription>
+                      <FormDescription className="text-slate-500">
+                        Valor referencial
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -303,7 +311,9 @@ export default function ManageProducts() {
                   name="unitCost"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Custo Unitário (R$)</FormLabel>
+                      <FormLabel className="text-slate-200">
+                        Custo Unitário (R$)
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -313,7 +323,9 @@ export default function ManageProducts() {
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>Custo para a empresa</FormDescription>
+                      <FormDescription className="text-slate-500">
+                        Custo para a empresa
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -325,7 +337,9 @@ export default function ManageProducts() {
                 name="supplierUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>URL do Fornecedor</FormLabel>
+                    <FormLabel className="text-slate-200">
+                      URL do Fornecedor
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="https://fornecedor.com.br/produto"
@@ -338,11 +352,13 @@ export default function ManageProducts() {
               />
 
               <div className="space-y-4">
-                <FormLabel>Imagem do Produto</FormLabel>
+                <FormLabel className="text-slate-200">
+                  Imagem do Produto
+                </FormLabel>
 
                 <div className="flex flex-col gap-4">
                   {imagePreview ? (
-                    <div className="relative w-full h-64 bg-slate-100 rounded-lg overflow-hidden border border-slate-200 group">
+                    <div className="relative w-full h-64 bg-black/40 rounded-xl overflow-hidden border border-white/10 group">
                       <img
                         src={imagePreview}
                         alt="Preview"
@@ -360,7 +376,7 @@ export default function ManageProducts() {
                         <button
                           type="button"
                           onClick={handleRemoveImage}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-md hover:bg-red-600 transition-colors"
+                          className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full shadow-lg hover:bg-red-500/20 hover:text-red-400 border border-white/10 transition-colors"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -375,36 +391,36 @@ export default function ManageProducts() {
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
                       className={cn(
-                        'w-full h-40 border-2 border-dashed rounded-lg flex flex-col items-center justify-center transition-all duration-200',
+                        'w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300',
                         isUploading
-                          ? 'cursor-wait bg-slate-50'
+                          ? 'cursor-wait bg-black/20 border-white/5'
                           : 'cursor-pointer',
                         isDragging && !isUploading
-                          ? 'border-primary bg-primary/5'
-                          : 'border-slate-300 hover:bg-slate-50 hover:border-slate-400',
+                          ? 'border-primary bg-primary/10 shadow-[0_0_15px_rgba(20,240,214,0.1)]'
+                          : 'border-white/20 bg-black/20 hover:bg-white/5 hover:border-white/30',
                       )}
                     >
                       {isUploading ? (
-                        <div className="flex flex-col items-center gap-2">
+                        <div className="flex flex-col items-center gap-3">
                           <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                          <span className="text-sm font-medium text-slate-600">
-                            Enviando para R2...
+                          <span className="text-sm font-medium text-slate-300">
+                            Processando imagem...
                           </span>
                         </div>
                       ) : (
                         <>
-                          <div className="bg-slate-100 p-3 rounded-full mb-3">
+                          <div className="bg-white/5 p-4 rounded-full mb-3 shadow-inner">
                             <CloudUpload
                               className={cn(
-                                'w-6 h-6',
+                                'w-8 h-8',
                                 isDragging ? 'text-primary' : 'text-slate-400',
                               )}
                             />
                           </div>
-                          <span className="text-sm font-medium text-slate-700">
+                          <span className="text-base font-medium text-slate-200">
                             Clique para Upload
                           </span>
-                          <span className="text-xs text-slate-500 mt-1">
+                          <span className="text-sm text-slate-500 mt-1">
                             ou arraste e solte (PNG, JPG, WEBP)
                           </span>
                         </>
@@ -421,12 +437,12 @@ export default function ManageProducts() {
                     disabled={isUploading}
                   />
 
-                  <div className="flex items-center gap-2">
-                    <div className="h-px bg-slate-200 flex-1"></div>
-                    <span className="text-xs text-slate-400 uppercase font-medium">
+                  <div className="flex items-center gap-4 py-2">
+                    <div className="h-px bg-white/10 flex-1"></div>
+                    <span className="text-xs text-slate-500 uppercase font-bold tracking-wider">
                       Ou use URL / Termo
                     </span>
-                    <div className="h-px bg-slate-200 flex-1"></div>
+                    <div className="h-px bg-white/10 flex-1"></div>
                   </div>
 
                   <FormField
@@ -436,20 +452,15 @@ export default function ManageProducts() {
                       <FormItem>
                         <FormControl>
                           <div className="relative">
-                            <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                             <Input
                               placeholder="Ex: 'black backpack' ou cole uma URL"
-                              className="pl-9"
+                              className="pl-11 h-12"
                               {...field}
                               onChange={(e) => {
                                 field.onChange(e)
                                 if (e.target.value.startsWith('http')) {
                                   setImagePreview(e.target.value)
-                                } else if (
-                                  imagePreview &&
-                                  imagePreview.startsWith('data:')
-                                ) {
-                                  // Keep preview if it's a data URL unless cleared
                                 }
                               }}
                             />
@@ -467,11 +478,11 @@ export default function ManageProducts() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Descrição</FormLabel>
+                    <FormLabel className="text-slate-200">Descrição</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="Descreva os detalhes do item..."
-                        className="resize-none min-h-[100px]"
+                        className="resize-none min-h-[120px]"
                         {...field}
                       />
                     </FormControl>
@@ -480,20 +491,20 @@ export default function ManageProducts() {
                 )}
               />
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-end pt-4">
                 <Button
                   type="submit"
-                  className="min-w-[150px] gap-2"
+                  className="min-w-[180px] h-12 text-base gap-2"
                   disabled={isSubmitting || isUploading}
                 >
                   {isSubmitting || isUploading ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                       Processando...
                     </>
                   ) : (
                     <>
-                      <Save className="h-4 w-4" />
+                      <Save className="h-5 w-5" />
                       Salvar Brinde
                     </>
                   )}
