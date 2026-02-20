@@ -27,7 +27,6 @@ import {
   Pie,
   Cell,
   Legend,
-  LabelList,
 } from 'recharts'
 
 import useSwagStore from '@/stores/useSwagStore'
@@ -142,41 +141,10 @@ export default function Dashboard() {
       return isValid(entryDate) && isWithinInterval(entryDate, { start, end })
     })
 
-    let totalCost = 0
-    currentMonthHistory.forEach((entry) => {
-      if (Array.isArray(entry.items)) {
-        entry.items.forEach((item) => {
-          const product = products.find((p) => p.id === item.productId)
-          const qty = Number(item.quantity) || 0
-          const unitCost = Number(product?.unitCost) || 0
-          totalCost += qty * unitCost
-        })
-      }
-    })
-    return totalCost
-  }, [history, products])
+    return currentMonthHistory.reduce((acc, entry) => acc + entry.totalValue, 0)
+  }, [history])
 
   // --- Chart Data Preparation ---
-
-  // Top 5 Popular Items
-  const popularItemsData = useMemo(() => {
-    const itemCounts: Record<string, number> = {}
-    filteredHistory.forEach((entry) => {
-      if (Array.isArray(entry.items)) {
-        entry.items.forEach((item) => {
-          const qty = Number(item.quantity)
-          const safeQty = isNaN(qty) ? 0 : qty
-          const name = item.productName || 'Item Desconhecido'
-          itemCounts[name] = (itemCounts[name] || 0) + safeQty
-        })
-      }
-    })
-
-    return Object.entries(itemCounts)
-      .map(([name, quantity]) => ({ name, quantity }))
-      .sort((a, b) => b.quantity - a.quantity)
-      .slice(0, 5)
-  }, [filteredHistory])
 
   // Department Distribution (Quantity)
   const departmentData = useMemo(() => {
@@ -189,36 +157,26 @@ export default function Dashboard() {
       deptCounts[dept] = (deptCounts[dept] || 0) + safeQty
     })
 
+    // Sort by value to make the donut chart look better
     return Object.entries(deptCounts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
   }, [filteredHistory, team])
 
-  // Department Cost Data (Cost)
+  // Department Cost Data (Cost) - For Bar Chart
   const departmentCostData = useMemo(() => {
     const deptCosts: Record<string, number> = {}
 
     filteredHistory.forEach((entry) => {
       const collaborator = team.find((c) => c.name === entry.user)
       const dept = collaborator?.department || 'Outros'
-
-      let entryCost = 0
-      if (Array.isArray(entry.items)) {
-        entry.items.forEach((item) => {
-          const product = products.find((p) => p.id === item.productId)
-          const qty = Number(item.quantity) || 0
-          const unitCost = Number(product?.unitCost) || 0
-          entryCost += qty * unitCost
-        })
-      }
-
-      deptCosts[dept] = (deptCosts[dept] || 0) + entryCost
+      deptCosts[dept] = (deptCosts[dept] || 0) + entry.totalValue
     })
 
     return Object.entries(deptCosts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-  }, [filteredHistory, team, products])
+  }, [filteredHistory, team])
 
   // Replenishment List (Critical Stock)
   const lowStockProducts = useMemo(
@@ -228,7 +186,7 @@ export default function Dashboard() {
           const stock = Number(p.stock)
           return !isNaN(stock) && stock < 5
         })
-        .slice(0, 8), // Show slightly more if space allows
+        .slice(0, 8),
     [products],
   )
 
@@ -251,20 +209,60 @@ export default function Dashboard() {
     })
   }, [filteredHistory, team])
 
+  // --- Helper Functions ---
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value)
+  }
+
+  const getDepartmentBadgeStyles = (dept: string | undefined) => {
+    switch (dept) {
+      case 'Vendas B2B':
+        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100'
+      case 'Engenharia':
+        return 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100'
+      case 'Marketing':
+        return 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-100'
+      case 'RH':
+        return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-100'
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-200 hover:bg-slate-100'
+    }
+  }
+
   // --- Chart Configs ---
-  const barChartConfig = {
-    quantity: {
-      label: 'Quantidade',
-      color: '#0E9C8B',
-    },
-  } satisfies ChartConfig
+
+  // Bar Chart Colors per Department
+  const departmentColors: Record<string, string> = {
+    'Vendas B2B': '#3b82f6', // blue-500
+    Engenharia: '#a855f7', // purple-500
+    Marketing: '#f97316', // orange-500
+    RH: '#22c55e', // green-500
+    Outros: '#94a3b8', // slate-400
+  }
 
   const costBarChartConfig = {
     value: {
       label: 'Custo (R$)',
-      color: '#6366F1',
     },
+    ...Object.fromEntries(
+      Object.entries(departmentColors).map(([dept, color]) => [
+        dept,
+        { label: dept, color },
+      ]),
+    ),
   } satisfies ChartConfig
+
+  // Monochromatic Palette for Donut Chart (#0E9C8B shades)
+  const monochromePalette = [
+    '#0E9C8B', // Base (Teal)
+    '#11B8A3', // Lighter
+    '#14F0D6', // Even Lighter
+    '#096B5F', // Darker
+    '#053D36', // Even Darker
+  ]
 
   const pieChartConfig = {
     value: {
@@ -275,15 +273,7 @@ export default function Dashboard() {
         d.name,
         {
           label: d.name,
-          color: [
-            '#0E9C8B',
-            '#2DD4BF',
-            '#5EEAD4',
-            '#99F6E4',
-            '#CCFBF1',
-            '#F0FDFA',
-            '#134E4A',
-          ][i % 7],
+          color: monochromePalette[i % monochromePalette.length],
         },
       ]),
     ),
@@ -341,10 +331,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-slate-900">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(monthlyTotalCost)}
+              {formatCurrency(monthlyTotalCost)}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Gasto no mês atual
@@ -418,7 +405,7 @@ export default function Dashboard() {
               <BarChart
                 accessibilityLayer
                 data={departmentCostData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
               >
                 <CartesianGrid vertical={false} strokeDasharray="3 3" />
                 <XAxis
@@ -428,16 +415,42 @@ export default function Dashboard() {
                   axisLine={false}
                   tickFormatter={(value) => value.slice(0, 10)}
                 />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) =>
+                    new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                      notation: 'compact',
+                      maximumFractionDigits: 1,
+                    }).format(value)
+                  }
+                />
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent indicator="dashed" />}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dashed"
+                      formatter={(value) =>
+                        new Intl.NumberFormat('pt-BR', {
+                          style: 'currency',
+                          currency: 'BRL',
+                        }).format(Number(value))
+                      }
+                    />
+                  }
                 />
-                <Bar
-                  dataKey="value"
-                  fill="var(--color-value)"
-                  radius={4}
-                  barSize={40}
-                />
+                <Bar dataKey="value" radius={4} barSize={40}>
+                  {departmentCostData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        departmentColors[entry.name] || departmentColors.Outros
+                      }
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -471,7 +484,7 @@ export default function Dashboard() {
                       fill={
                         pieChartConfig[
                           entry.name as keyof typeof pieChartConfig
-                        ]?.color || '#e2e8f0'
+                        ]?.color || monochromePalette[0]
                       }
                       strokeWidth={0}
                     />
@@ -494,7 +507,9 @@ export default function Dashboard() {
                             className="w-2 h-2 rounded-full"
                             style={{ backgroundColor: entry.color }}
                           />
-                          <span>{entry.value}</span>
+                          <span>
+                            {entry.value} ({entry.payload.value})
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -525,13 +540,16 @@ export default function Dashboard() {
                     <TableHead>Item Retirado</TableHead>
                     <TableHead>Qtd</TableHead>
                     <TableHead>Depto</TableHead>
+                    <TableHead className="text-right pr-6">
+                      Valor Total
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {recentTransactions.length === 0 ? (
                     <TableRow>
                       <TableCell
-                        colSpan={5}
+                        colSpan={6}
                         className="h-24 text-center text-slate-500"
                       >
                         Nenhuma transação encontrada no período.
@@ -575,10 +593,18 @@ export default function Dashboard() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className="text-[10px] font-normal text-slate-500 bg-slate-50"
+                            className={cn(
+                              'text-[10px] font-medium border',
+                              getDepartmentBadgeStyles(
+                                tx.collaborator?.department,
+                              ),
+                            )}
                           >
                             {tx.collaborator?.department || 'N/A'}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-right pr-6 text-sm font-medium text-slate-900">
+                          {formatCurrency(tx.totalValue)}
                         </TableCell>
                       </TableRow>
                     ))
