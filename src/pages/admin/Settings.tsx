@@ -92,17 +92,17 @@ export default function Settings() {
   return (
     <div className="w-full max-w-7xl mx-auto space-y-8 animate-fade-in-up pb-12">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           Configurações
         </h1>
-        <p className="text-base text-[#ADADAD]">
+        <p className="text-base text-gray-500 dark:text-[#ADADAD]">
           Gerencie as integrações e preferências do sistema.
         </p>
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-start gap-5 space-y-0 pb-8 border-b border-white/5 mb-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white shadow-inner shrink-0">
+        <CardHeader className="flex flex-row items-start gap-5 space-y-0 pb-8 border-b border-gray-200 dark:border-white/5 mb-6">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-slate-700 dark:text-white shadow-inner shrink-0">
             <Slack className="h-7 w-7 text-primary" />
           </div>
           <div className="space-y-2">
@@ -121,7 +121,7 @@ export default function Settings() {
                 name="webhookUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-200">
+                    <FormLabel className="text-slate-900 dark:text-slate-200">
                       URL do Webhook do Slack
                     </FormLabel>
                     <FormControl>
@@ -131,7 +131,7 @@ export default function Settings() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className="text-[#ADADAD]">
+                    <FormDescription className="text-gray-500 dark:text-[#ADADAD]">
                       Copie a URL do Webhook nas configurações do seu App no
                       Slack.
                     </FormDescription>
@@ -144,12 +144,12 @@ export default function Settings() {
                 control={form.control}
                 name="isEnabled"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-xl border border-white/10 bg-black/20 p-5">
+                  <FormItem className="flex flex-row items-center justify-between rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 p-5">
                     <div className="space-y-1">
-                      <FormLabel className="text-base text-slate-200">
+                      <FormLabel className="text-base text-slate-900 dark:text-slate-200">
                         Ativar notificações
                       </FormLabel>
-                      <FormDescription className="text-[#ADADAD]">
+                      <FormDescription className="text-gray-500 dark:text-[#ADADAD]">
                         O sistema enviará alertas automáticos para a URL
                         configurada.
                       </FormDescription>
@@ -164,7 +164,7 @@ export default function Settings() {
                 )}
               />
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-white/5">
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-gray-200 dark:border-white/5">
                 <Button
                   type="submit"
                   className="w-full sm:w-auto btn-primary-glow h-12 text-base px-8"
