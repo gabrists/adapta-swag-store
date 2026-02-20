@@ -4,7 +4,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Plus, Check, Minus, ShoppingCart } from 'lucide-react'
+import { Plus, Check, Minus, ShoppingCart, ExternalLink } from 'lucide-react'
+import useAuthStore from '@/stores/useAuthStore'
+import { useToast } from '@/hooks/use-toast'
 
 interface ProductCardProps {
   product: Product
@@ -19,12 +21,15 @@ export function ProductCard({
 }: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState<number>(1)
+  const { user } = useAuthStore()
+  const { toast } = useToast()
 
+  const isAdmin = user?.role === 'admin'
   const isOutOfStock = product.stock === 0
 
   const getDisplayStock = () => {
     if (product.hasGrid && selectedSize && product.grid) {
-      return product.grid[selectedSize]
+      return product.grid[selectedSize] || 0
     }
     return product.stock
   }
@@ -102,13 +107,12 @@ export function ProductCard({
           <h3 className="font-semibold text-lg leading-tight text-slate-900 dark:text-white line-clamp-2 min-h-[3rem]">
             {product.name}
           </h3>
-          {/* Price display removed as per user story */}
         </div>
 
         {product.hasGrid && product.grid && (
           <div className="flex flex-wrap gap-2">
             {['P', 'M', 'G', 'GG'].map((size) => {
-              const sizeStock = product.grid![size]
+              const sizeStock = product.grid![size] || 0
               const hasStock = sizeStock > 0
               const isSelected = selectedSize === size
 
@@ -134,13 +138,13 @@ export function ProductCard({
         )}
 
         <div className="flex items-center gap-2">
-          {product.hasGrid && !selectedSize ? (
+          {product.hasGrid && !selectedSize && !isOutOfStock ? (
             <span className="text-sm text-slate-500 dark:text-slate-400">
               Selecione um tamanho
             </span>
           ) : (
             <>
-              {currentStock === 0 ? (
+              {isOutOfStock ? (
                 <Badge
                   variant="outline"
                   className="bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 border-slate-200 dark:border-white/10"
@@ -171,64 +175,88 @@ export function ProductCard({
       </CardContent>
 
       <CardFooter className="p-5 pt-0 mt-auto flex flex-row items-center gap-3 w-full">
-        {/* Quantity Stepper */}
-        <div
-          className={cn(
-            'flex items-center shrink-0 bg-slate-50 dark:bg-black/20 rounded-xl p-1 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
-            isStepperDisabled && 'opacity-50 pointer-events-none',
-          )}
-        >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            disabled={quantity <= 1 || isStepperDisabled}
+        {/* Quantity Stepper - Hidden when out of stock */}
+        {!isOutOfStock && (
+          <div
+            className={cn(
+              'flex items-center shrink-0 bg-slate-50 dark:bg-black/20 rounded-xl p-1 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
+              isStepperDisabled && 'opacity-50 pointer-events-none',
+            )}
           >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <span className="text-sm font-semibold w-6 text-center tabular-nums text-slate-900 dark:text-white select-none">
-            {quantity}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-            onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
-            disabled={quantity >= maxQuantity || isStepperDisabled}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <Button
-          className={cn(
-            'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md min-w-0',
-            hasOrdered && product.isSingleQuota
-              ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border border-slate-200 dark:border-white/5'
-              : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow border-transparent',
-          )}
-          onClick={handleAddToCartClick}
-          disabled={isDisabled}
-        >
-          {product.isSingleQuota && hasOrdered ? (
-            <>
-              <Check className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
-              <span className="truncate text-xs sm:text-sm">Resgatado</span>
-            </>
-          ) : isOutOfStock ? (
-            <span className="truncate text-xs sm:text-sm">Indisponível</span>
-          ) : product.hasGrid && !selectedSize ? (
-            <span className="truncate text-xs sm:text-sm">
-              Selecione Tamanho
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              disabled={quantity <= 1 || isStepperDisabled}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-semibold w-6 text-center tabular-nums text-slate-900 dark:text-white select-none">
+              {quantity}
             </span>
-          ) : (
-            <>
-              <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
-              <span className="truncate text-xs sm:text-sm">Adicionar</span>
-            </>
-          )}
-        </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+              onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+              disabled={quantity >= maxQuantity || isStepperDisabled}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+
+        {isOutOfStock && isAdmin ? (
+          <Button
+            className="flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md min-w-0 bg-transparent border border-orange-500 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10"
+            onClick={() => {
+              if (!product.supplierUrl) {
+                toast({
+                  description:
+                    'Nenhum contato de fornecedor cadastrado para este item.',
+                  variant: 'destructive',
+                })
+              } else {
+                window.open(product.supplierUrl, '_blank')
+              }
+            }}
+          >
+            <ExternalLink className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+            <span className="truncate text-xs sm:text-sm">Repor Estoque</span>
+          </Button>
+        ) : (
+          <Button
+            className={cn(
+              'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md min-w-0 border border-transparent',
+              hasOrdered && product.isSingleQuota
+                ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border-slate-200 dark:border-white/5'
+                : isOutOfStock
+                  ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none'
+                  : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow',
+            )}
+            onClick={handleAddToCartClick}
+            disabled={isDisabled}
+          >
+            {product.isSingleQuota && hasOrdered ? (
+              <>
+                <Check className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+                <span className="truncate text-xs sm:text-sm">Resgatado</span>
+              </>
+            ) : isOutOfStock ? (
+              <span className="truncate text-xs sm:text-sm">Indisponível</span>
+            ) : product.hasGrid && !selectedSize ? (
+              <span className="truncate text-xs sm:text-sm">
+                Selecione Tamanho
+              </span>
+            ) : (
+              <>
+                <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+                <span className="truncate text-xs sm:text-sm">Adicionar</span>
+              </>
+            )}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )
