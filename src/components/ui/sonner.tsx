@@ -1,4 +1,3 @@
-/* Toaster Component - A component that displays a toaster (a component that displays a toast) - from shadcn/ui (exposes Toaster) */
 import './sonner.css'
 import { useTheme } from 'next-themes'
 import { Toaster as Sonner } from 'sonner'
@@ -12,6 +11,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps['theme']}
       className="toaster group"
+      position="top-right"
+      duration={2000}
       toastOptions={{
         classNames: {
           toast:
