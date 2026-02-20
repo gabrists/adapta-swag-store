@@ -218,7 +218,7 @@ export function ProductCard({
 
         {isOutOfStock && isAdmin ? (
           <Button
-            className="flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md bg-transparent border border-orange-500 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 px-3 sm:px-4 gap-1.5 sm:gap-2"
+            className="flex-1 font-medium active:scale-[0.98] transition-all duration-300 rounded-xl shadow-md hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] dark:hover:shadow-[0_0_15px_rgba(249,115,22,0.5)] bg-transparent border border-orange-500 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 px-3 sm:px-4 gap-1.5 sm:gap-2"
             onClick={() => {
               if (!product.supplierUrl) {
                 toast({
