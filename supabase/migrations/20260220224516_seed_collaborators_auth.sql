@@ -135,7 +135,7 @@ BEGIN
 
         -- Provision Auth User (if not already existing)
         IF NOT EXISTS (SELECT 1 FROM auth.users WHERE LOWER(email) = r.email) THEN
-            -- CRITICAL: Insert with empty strings for tokens and phone to prevent 'Database error finding users'
+            -- CRITICAL: Insert with empty strings for tokens, but NULL for phone to prevent duplicate phone unique constraint violation
             INSERT INTO auth.users (
                 id,
                 instance_id,
@@ -169,7 +169,7 @@ BEGIN
                 jsonb_build_object('name', r.name),
                 now(),
                 now(),
-                '', '', '', '', '', '', '', '', ''
+                '', '', '', '', '', NULL, '', '', ''
             );
 
             INSERT INTO auth.identities (
