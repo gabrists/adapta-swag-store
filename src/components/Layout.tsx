@@ -66,6 +66,8 @@ export default function Layout() {
     (o) => o.status === 'Pendente',
   ).length
 
+  const isAdmin = user?.role === 'admin'
+
   const storefrontItems = [
     {
       title: 'Vitrine',
@@ -158,7 +160,7 @@ export default function Layout() {
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {user?.role === 'admin' && (
+          {isAdmin && (
             <>
               <SidebarSeparator />
               <SidebarGroup>
@@ -277,28 +279,33 @@ export default function Layout() {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <CartSheet />
+            {!isAdmin && <CartSheet />}
 
-            <Button
-              asChild
-              size="sm"
-              className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
-            >
-              <Link to="/gerenciar">
-                <Plus className="mr-2 h-4 w-4" />
-                Cadastrar Brinde
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="icon"
-              className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
-            >
-              <Link to="/gerenciar">
-                <Plus className="h-4 w-4" />
-                <span className="sr-only">Cadastrar Brinde</span>
-              </Link>
-            </Button>
+            {/* Admin Add Product button removed as per requirements */}
+            {!isAdmin && (
+              <>
+                <Button
+                  asChild
+                  size="sm"
+                  className="hidden sm:flex bg-slate-900 hover:bg-slate-800 text-white shadow-sm"
+                >
+                  <Link to="/gerenciar">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Cadastrar Brinde
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  size="icon"
+                  className="flex sm:hidden bg-slate-900 hover:bg-slate-800 text-white shadow-sm h-8 w-8"
+                >
+                  <Link to="/gerenciar">
+                    <Plus className="h-4 w-4" />
+                    <span className="sr-only">Cadastrar Brinde</span>
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8 pt-6 w-full max-w-7xl mx-auto animate-fade-in h-full">

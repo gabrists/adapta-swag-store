@@ -42,7 +42,7 @@ interface SwagContextType {
     date: Date,
   ) => Promise<void>
   addProduct: (
-    product: Omit<Product, 'id' | 'stock'> & {
+    product: Omit<Product, 'id' | 'stock' | 'isActive'> & {
       stock?: number
       grid?: ProductSizeGrid
     },
@@ -54,6 +54,7 @@ interface SwagContextType {
     amount: number,
     size?: string,
   ) => Promise<void>
+  toggleProductStatus: (productId: string, isActive: boolean) => Promise<void>
   addCollaborator: (collaborator: Omit<Collaborator, 'id'>) => Promise<void>
   updateCollaborator: (collaborator: Collaborator) => Promise<void>
   deleteCollaborator: (id: string) => Promise<void>
@@ -86,7 +87,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
   const collaborators = useMemo(() => team.map((c) => c.name).sort(), [team])
 
-  // Fetch initial data
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -98,7 +98,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
           fetchOrders(),
           fetchSlackSettings(),
         ])
-        await fetchHistory() // Depends on items/employees
+        await fetchHistory()
       } catch (error) {
         console.error('Error loading data:', error)
         toast({
@@ -138,13 +138,14 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         category: item.category,
         imageQuery: item.image_url || '',
         stock: item.current_stock,
-        hasGrid: item.has_grid,
-        grid: item.grid as unknown as ProductSizeGrid,
+        hasGrid: item.has_grid || false,
+        grid: (item.grid as unknown as ProductSizeGrid) || undefined,
         description: item.description || '',
         price: Number(item.price) || 0,
         unitCost: Number(item.unit_cost) || 0,
         supplierUrl: item.supplier_url || '',
         isSingleQuota: item.is_single_quota || false,
+        isActive: item.is_active ?? true,
       })) || []
 
     setProducts(mappedProducts)
@@ -305,7 +306,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       console.error('Failed to send Slack notification:', error)
-      console.log('Slack Payload:', JSON.stringify({ text }))
     }
   }
 
@@ -521,7 +521,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     if (!checkAdminPermission()) return
 
     try {
-      // 1. Create Order as Delivered
       const { error: orderError } = await supabase.from('orders').insert({
         employee_id: employeeId,
         item_id: itemId,
@@ -533,7 +532,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       if (orderError) throw orderError
 
-      // 2. Inventory Movement
       const { error: moveError } = await supabase
         .from('inventory_movements')
         .insert({
@@ -614,13 +612,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Critical Stock Alert
     if (newStockLevel < 5 && productName) {
       const stockMsg = `⚠️ *Alerta de Estoque:* O item ${productName} está acabando! Restam apenas ${newStockLevel} unidades. ${productSupplierUrl ? `<${productSupplierUrl}|Link para fornecedor>` : '(Sem link do fornecedor)'}`
       sendSlackNotification(stockMsg)
     }
 
-    // Refetch items to sync with server (since triggers might update DB)
     await fetchItems()
   }
 
@@ -661,7 +657,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
   }
 
   const addProduct = async (
-    productData: Omit<Product, 'id' | 'stock'> & {
+    productData: Omit<Product, 'id' | 'stock' | 'isActive'> & {
       stock?: number
       grid?: ProductSizeGrid
     },
@@ -691,6 +687,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       current_stock: finalStock,
       is_single_quota: productData.isSingleQuota,
       critical_level: 5,
+      is_active: true,
     }
 
     const { error } = await supabase.from('items').insert(newItem as any)
@@ -726,6 +723,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       grid: updatedProduct.grid ? updatedProduct.grid : null,
       current_stock: finalStock,
       is_single_quota: updatedProduct.isSingleQuota,
+      is_active: updatedProduct.isActive,
     }
 
     const { error } = await supabase
@@ -799,6 +797,29 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       console.error(error)
       throw error
     }
+  }
+
+  const toggleProductStatus = async (productId: string, isActive: boolean) => {
+    if (!checkAdminPermission()) return
+
+    const { error } = await supabase
+      .from('items')
+      .update({ is_active: isActive })
+      .eq('id', productId)
+
+    if (error) {
+      console.error(error)
+      toast({
+        title: 'Erro ao atualizar status',
+        description: 'Não foi possível alterar o status do item.',
+        variant: 'destructive',
+      })
+      throw error
+    }
+
+    setProducts((prev) =>
+      prev.map((p) => (p.id === productId ? { ...p, isActive } : p)),
+    )
   }
 
   const addCollaborator = async (data: Omit<Collaborator, 'id'>) => {
@@ -902,6 +923,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         updateProduct,
         deleteProduct,
         adjustStock,
+        toggleProductStatus,
         addCollaborator,
         updateCollaborator,
         deleteCollaborator,

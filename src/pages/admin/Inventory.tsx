@@ -8,6 +8,7 @@ import {
   Trash2,
   ArrowUp,
   ArrowDown,
+  Folder,
 } from 'lucide-react'
 import useSwagStore from '@/stores/useSwagStore'
 import { Product } from '@/types'
@@ -45,6 +46,16 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { ProductDialog } from '@/components/admin/ProductDialog'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const categoryColors: Record<string, string> = {
   Vendas: 'bg-blue-100 text-blue-800 border-blue-200',
@@ -58,22 +69,43 @@ const categoryColors: Record<string, string> = {
 }
 
 export default function Inventory() {
-  const { products, addProduct, updateProduct, deleteProduct, adjustStock } =
-    useSwagStore()
+  const {
+    products,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    adjustStock,
+    toggleProductStatus,
+  } = useSwagStore()
   const { toast } = useToast()
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('Todas')
+  const [criticalStockFilter, setCriticalStockFilter] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [deleteProductData, setDeleteProductData] = useState<Product | null>(
     null,
   )
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    )
-  }, [products, searchQuery])
+    return products.filter((product) => {
+      // Search Filter
+      const matchesSearch = product.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+
+      // Category Filter
+      const matchesCategory =
+        categoryFilter === 'Todas' || product.category === categoryFilter
+
+      // Critical Stock Filter
+      const matchesCritical = !criticalStockFilter || product.stock < 3
+
+      return matchesSearch && matchesCategory && matchesCritical
+    })
+  }, [products, searchQuery, categoryFilter, criticalStockFilter])
 
   const handleCreate = () => {
     setSelectedProduct(null)
@@ -134,6 +166,41 @@ export default function Inventory() {
     })
   }
 
+  const handleToggleStatus = (id: string, currentStatus: boolean) => {
+    toggleProductStatus(id, !currentStatus)
+    toast({
+      title: !currentStatus ? 'Item ativado' : 'Item desativado',
+      description: !currentStatus
+        ? 'O item agora está visível na vitrine.'
+        : 'O item foi ocultado da vitrine.',
+    })
+  }
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedRows(new Set(filteredProducts.map((p) => p.id)))
+    } else {
+      setSelectedRows(new Set())
+    }
+  }
+
+  const toggleSelectRow = (id: string, checked: boolean) => {
+    const newSelected = new Set(selectedRows)
+    if (checked) {
+      newSelected.add(id)
+    } else {
+      newSelected.delete(id)
+    }
+    setSelectedRows(newSelected)
+  }
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -154,39 +221,95 @@ export default function Inventory() {
         </Button>
       </div>
 
-      <div className="flex items-center space-x-2 bg-white p-1 rounded-lg border border-slate-200 shadow-sm max-w-sm">
-        <Search className="w-4 h-4 text-slate-400 ml-2" />
-        <Input
-          placeholder="Buscar item..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border-none shadow-none focus-visible:ring-0"
-        />
+      <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div className="flex items-center space-x-2 bg-slate-50 p-1 rounded-lg border border-slate-200 flex-1">
+          <Search className="w-4 h-4 text-slate-400 ml-2" />
+          <Input
+            placeholder="Buscar item..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border-none shadow-none focus-visible:ring-0 bg-transparent h-8"
+          />
+        </div>
+
+        <div className="flex items-center gap-4 flex-wrap">
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[180px] bg-slate-50 border-slate-200">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Todas">Todas</SelectItem>
+              <SelectItem value="Vestuário">Vestuário</SelectItem>
+              <SelectItem value="Utensílios">Utensílios</SelectItem>
+              <SelectItem value="Kits">Kits</SelectItem>
+              {/* Extra categories to ensure we don't miss any if needed */}
+              <SelectItem value="Institucional">Institucional</SelectItem>
+              <SelectItem value="Tech">Tech</SelectItem>
+              <SelectItem value="Vendas">Vendas</SelectItem>
+              <SelectItem value="Marketing">Marketing</SelectItem>
+              <SelectItem value="RH">RH</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <div className="flex items-center space-x-2 border-l pl-4 border-slate-200">
+            <Switch
+              id="critical-stock"
+              checked={criticalStockFilter}
+              onCheckedChange={setCriticalStockFilter}
+            />
+            <Label htmlFor="critical-stock" className="text-sm font-medium">
+              Mostrar apenas alertas
+            </Label>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-xl border bg-white shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-50 hover:bg-slate-50">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={
+                    filteredProducts.length > 0 &&
+                    selectedRows.size === filteredProducts.length
+                  }
+                  onCheckedChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-[300px]">Item</TableHead>
               <TableHead>Categoria</TableHead>
+              <TableHead>Custo Unitário</TableHead>
               <TableHead className="min-w-[200px]">Estoque</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredProducts.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="h-32 text-center text-slate-500"
-                >
-                  Nenhum item encontrado.
+                <TableCell colSpan={7} className="h-64 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-3 text-slate-500">
+                    <div className="bg-slate-100 p-4 rounded-full">
+                      <Folder className="w-8 h-8 text-slate-400" />
+                    </div>
+                    <p className="font-medium">
+                      Nenhum item encontrado para este filtro
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               filteredProducts.map((product) => (
                 <TableRow key={product.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedRows.has(product.id)}
+                      onCheckedChange={(checked) =>
+                        toggleSelectRow(product.id, checked as boolean)
+                      }
+                    />
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border border-slate-200">
@@ -229,6 +352,9 @@ export default function Inventory() {
                       {product.category}
                     </Badge>
                   </TableCell>
+                  <TableCell className="font-medium text-slate-600">
+                    {formatCurrency(product.unitCost)}
+                  </TableCell>
                   <TableCell>
                     {product.hasGrid && product.grid ? (
                       <div className="flex gap-4">
@@ -261,7 +387,7 @@ export default function Inventory() {
                                 className={cn(
                                   'text-sm font-semibold w-5 text-center',
                                   product.grid![size] < 3
-                                    ? 'text-red-600'
+                                    ? 'text-red-600 font-bold bg-red-50 p-0.5 rounded'
                                     : 'text-slate-700',
                                 )}
                               >
@@ -292,10 +418,10 @@ export default function Inventory() {
                         </Button>
                         <span
                           className={cn(
-                            'text-lg font-semibold w-8 text-center',
+                            'text-lg w-8 text-center flex items-center justify-center',
                             product.stock < 3
-                              ? 'text-red-600'
-                              : 'text-slate-700',
+                              ? 'text-red-600 font-bold bg-red-50 p-1 rounded'
+                              : 'text-slate-700 font-semibold',
                           )}
                         >
                           {product.stock}
@@ -310,6 +436,19 @@ export default function Inventory() {
                         </Button>
                       </div>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={product.isActive}
+                        onCheckedChange={() =>
+                          handleToggleStatus(product.id, product.isActive)
+                        }
+                      />
+                      <span className="text-sm text-slate-500">
+                        {product.isActive ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>

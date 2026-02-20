@@ -22,6 +22,7 @@ export interface Product {
   unitCost: number // Added for Financial KPI
   supplierUrl?: string // Added for Restock
   isSingleQuota: boolean // Added for Single Quota Feature
+  isActive: boolean // Added for Active/Inactive status
 }
 
 export interface CartItem {

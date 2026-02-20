@@ -18,6 +18,9 @@ export default function Index() {
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      // Filter out inactive products for the storefront
+      if (!product.isActive) return false
+
       const matchesSearch = product.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
