@@ -266,7 +266,7 @@ export default function Layout() {
 
       <SidebarInset className="bg-slate-50">
         <header className="flex h-16 shrink-0 items-center border-b transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 bg-white">
-          <div className="flex items-center justify-between w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+          <div className="flex items-center justify-between w-full px-4 md:px-6 lg:px-8">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="-ml-1" />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
