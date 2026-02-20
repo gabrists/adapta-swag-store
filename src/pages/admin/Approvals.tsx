@@ -188,10 +188,10 @@ export default function ApprovalsPage() {
                     <div className="flex items-center gap-3 mt-4 sm:mt-0">
                       <Button
                         variant="outline"
-                        className="btn-secondary-outline h-10 px-4 text-[#ADADAD] hover:text-white border-white/10"
+                        className="btn-secondary-outline h-10 px-4 text-[#ADADAD] border-white/10 hover:text-red-500 hover:border-red-500 hover:bg-red-500/10 transition-all duration-300"
                         onClick={() => handleRejectClick(order)}
                       >
-                        <X className="w-4 h-4 mr-2 text-[#ADADAD]" />
+                        <X className="w-4 h-4 mr-2" />
                         Rejeitar
                       </Button>
                       <Button
