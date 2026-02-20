@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { ShoppingCart, Plus, Check } from 'lucide-react'
+import { Plus, Check } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -100,12 +100,12 @@ export function ProductCard({
                   onClick={() => handleSizeSelect(size, sizeStock)}
                   disabled={!hasStock}
                   className={cn(
-                    'w-8 h-8 rounded-full text-xs font-bold transition-all border',
+                    'w-8 h-8 rounded-full text-xs font-bold transition-all border flex items-center justify-center',
                     isSelected
                       ? 'bg-primary text-primary-foreground border-primary ring-2 ring-offset-2 ring-primary/50'
                       : hasStock
                         ? 'bg-white text-slate-700 border-slate-200 hover:border-primary hover:text-primary'
-                        : 'bg-slate-100 text-slate-300 border-slate-100 cursor-not-allowed line-through',
+                        : 'bg-slate-100 text-slate-300 border-slate-100 cursor-not-allowed line-through opacity-50',
                   )}
                 >
                   {size}
@@ -173,7 +173,7 @@ export function ProductCard({
           ) : (
             <>
               <Plus className="w-4 h-4 mr-2" />
-              Adicionar
+              Solicitar Resgate
             </>
           )}
         </Button>

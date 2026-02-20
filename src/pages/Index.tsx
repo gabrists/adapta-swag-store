@@ -8,6 +8,7 @@ import useAuthStore from '@/stores/useAuthStore'
 import { ProductCard } from '@/components/ProductCard'
 import { Product } from '@/types'
 import { useToast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
 
 export default function Index() {
   const { products, orders, isLoading, addToCart } = useSwagStore()
@@ -15,6 +16,9 @@ export default function Index() {
   const { toast } = useToast()
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('Todos')
+
+  const categories = ['Todos', 'Vestuário', 'Utensílios', 'Kits']
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -24,9 +28,13 @@ export default function Index() {
       const matchesSearch = product.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
-      return matchesSearch
+
+      const matchesCategory =
+        selectedCategory === 'Todos' || product.category === selectedCategory
+
+      return matchesSearch && matchesCategory
     })
-  }, [products, searchQuery])
+  }, [products, searchQuery, selectedCategory])
 
   const handleAddToCart = (product: Product, size?: string) => {
     addToCart(product, 1, size)
@@ -43,6 +51,11 @@ export default function Index() {
       <div className="space-y-6">
         <div className="flex gap-4">
           <Skeleton className="h-10 w-full rounded-xl" />
+        </div>
+        <div className="flex gap-2 pb-2">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-9 w-24 rounded-full" />
+          ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(8)].map((_, i) => (
@@ -66,6 +79,24 @@ export default function Index() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+      </section>
+
+      {/* Category Navigation (Pills) */}
+      <section className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={cn(
+              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors border',
+              selectedCategory === category
+                ? 'bg-primary text-white border-primary'
+                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50',
+            )}
+          >
+            {category}
+          </button>
+        ))}
       </section>
 
       {/* Products Grid */}
@@ -112,7 +143,9 @@ export default function Index() {
               <h3 className="text-lg font-medium text-slate-900">
                 Nenhum item encontrado
               </h3>
-              <p className="text-slate-500 text-sm">Tente mudar a busca.</p>
+              <p className="text-slate-500 text-sm">
+                Tente mudar a busca ou a categoria.
+              </p>
             </div>
           </div>
         )}
