@@ -255,7 +255,7 @@ export default function ApprovalsPage() {
             <Button
               onClick={confirmReject}
               disabled={!rejectDialog.reason.trim()}
-              className="bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white dark:hover:bg-red-700 border-transparent"
             >
               Confirmar Rejeição
             </Button>
