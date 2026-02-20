@@ -118,7 +118,7 @@ const OrderList = ({
                     {order.status === 'Entregue' && (
                       <Badge className="bg-primary/10 text-primary border-primary/20 gap-1 py-0 px-2 text-[10px] sm:text-xs font-medium">
                         <CheckCircle className="w-3 h-3" />
-                        Entregue
+                        Aprovado
                       </Badge>
                     )}
                     {order.status === 'Rejeitado' && (
@@ -228,7 +228,7 @@ export default function OrdersPage() {
             )}
           </TabsTrigger>
           <TabsTrigger value="delivered" className={tabsTriggerBaseClass}>
-            Entregues
+            Aprovados
           </TabsTrigger>
           <TabsTrigger value="rejected" className={tabsTriggerBaseClass}>
             Rejeitados
@@ -242,7 +242,7 @@ export default function OrdersPage() {
           <OrderList orders={pendingOrders} statusLabel="Pendente" />
         </TabsContent>
         <TabsContent value="delivered" className="mt-0 outline-none">
-          <OrderList orders={deliveredOrders} statusLabel="Entregue" />
+          <OrderList orders={deliveredOrders} statusLabel="Aprovado" />
         </TabsContent>
         <TabsContent value="rejected" className="mt-0 outline-none">
           <OrderList orders={rejectedOrders} statusLabel="Rejeitado" />
