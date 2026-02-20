@@ -480,14 +480,14 @@ export function ProductDialog({
                     {isUploading ? (
                       <div className="flex flex-col items-center gap-2">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        <span className="text-sm text-slate-500">
+                        <span className="text-sm text-[#ADADAD]">
                           Enviando...
                         </span>
                       </div>
                     ) : (
                       <>
-                        <CloudUpload className="w-8 h-8 text-slate-400 mb-2" />
-                        <span className="text-sm text-slate-500">
+                        <CloudUpload className="w-8 h-8 text-[#ADADAD] mb-2" />
+                        <span className="text-sm text-[#ADADAD]">
                           Clique para fazer upload
                         </span>
                       </>
@@ -509,7 +509,7 @@ export function ProductDialog({
                     <FormItem>
                       <FormControl>
                         <div className="relative">
-                          <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                          <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#ADADAD]" />
                           <Input
                             placeholder="Ex: black backpack"
                             className="pl-9 rounded-lg"

@@ -201,7 +201,7 @@ export default function Inventory() {
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Gestão de Inventário
           </h1>
-          <p className="text-base text-slate-400">
+          <p className="text-base text-[#ADADAD]">
             Gerencie todos os brindes e estoque da loja.
           </p>
         </div>
@@ -216,7 +216,7 @@ export default function Inventory() {
 
       <div className="flex flex-col md:flex-row md:items-center gap-4 glass-panel p-4 md:p-5 rounded-2xl">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
           <Input
             placeholder="Buscar item..."
             value={searchQuery}
@@ -251,7 +251,7 @@ export default function Inventory() {
             />
             <Label
               htmlFor="critical-stock"
-              className="text-sm font-medium text-slate-300 cursor-pointer"
+              className="text-sm font-medium text-[#ADADAD] cursor-pointer"
             >
               Alertas apenas
             </Label>
@@ -272,14 +272,14 @@ export default function Inventory() {
                   onCheckedChange={toggleSelectAll}
                 />
               </TableHead>
-              <TableHead className="w-[300px] text-slate-400">Item</TableHead>
-              <TableHead className="text-slate-400">Categoria</TableHead>
-              <TableHead className="text-slate-400">Custo Unitário</TableHead>
-              <TableHead className="min-w-[200px] text-slate-400">
+              <TableHead className="w-[300px] text-[#ADADAD]">Item</TableHead>
+              <TableHead className="text-[#ADADAD]">Categoria</TableHead>
+              <TableHead className="text-[#ADADAD]">Custo Unitário</TableHead>
+              <TableHead className="min-w-[200px] text-[#ADADAD]">
                 Estoque
               </TableHead>
-              <TableHead className="text-slate-400">Status</TableHead>
-              <TableHead className="text-right pr-6 text-slate-400">
+              <TableHead className="text-[#ADADAD]">Status</TableHead>
+              <TableHead className="text-right pr-6 text-[#ADADAD]">
                 Ações
               </TableHead>
             </TableRow>
@@ -288,9 +288,9 @@ export default function Inventory() {
             {filteredProducts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-4 text-slate-400">
+                  <div className="flex flex-col items-center justify-center space-y-4 text-[#ADADAD]">
                     <div className="bg-white/5 p-5 rounded-full shadow-inner">
-                      <Folder className="w-10 h-10 text-slate-500" />
+                      <Folder className="w-10 h-10 text-[#ADADAD]" />
                     </div>
                     <p className="font-medium text-base">
                       Nenhum item encontrado para este filtro
@@ -325,7 +325,7 @@ export default function Inventory() {
                           alt={product.name}
                           className="object-cover rounded-lg"
                         />
-                        <AvatarFallback className="rounded-lg bg-white/5 text-slate-400">
+                        <AvatarFallback className="rounded-lg bg-white/5 text-[#ADADAD]">
                           {product.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -354,7 +354,7 @@ export default function Inventory() {
                       {product.category}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-medium text-slate-300">
+                  <TableCell className="font-medium text-[#ADADAD]">
                     {formatCurrency(product.unitCost)}
                   </TableCell>
                   <TableCell>
@@ -369,15 +369,15 @@ export default function Inventory() {
                               className={cn(
                                 'text-[10px] font-bold',
                                 product.grid![size] === 0
-                                  ? 'text-slate-500'
-                                  : 'text-slate-300',
+                                  ? 'text-[#ADADAD]'
+                                  : 'text-[#ADADAD]',
                               )}
                             >
                               {size}
                             </span>
                             <div className="flex items-center gap-0.5 bg-black/20 rounded border border-white/5">
                               <button
-                                className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-30 rounded-l"
+                                className="w-5 h-5 flex items-center justify-center text-[#ADADAD] hover:text-white hover:bg-white/10 disabled:opacity-30 rounded-l"
                                 onClick={() =>
                                   handleAdjustStock(product.id, -1, size)
                                 }
@@ -390,13 +390,13 @@ export default function Inventory() {
                                   'text-xs font-semibold w-5 text-center',
                                   product.grid![size] < 3
                                     ? 'text-sky-400'
-                                    : 'text-slate-200',
+                                    : 'text-[#ADADAD]',
                                 )}
                               >
                                 {product.grid![size]}
                               </span>
                               <button
-                                className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 rounded-r"
+                                className="w-5 h-5 flex items-center justify-center text-[#ADADAD] hover:text-white hover:bg-white/10 rounded-r"
                                 onClick={() =>
                                   handleAdjustStock(product.id, 1, size)
                                 }
@@ -412,7 +412,7 @@ export default function Inventory() {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-8 w-8 rounded-lg bg-black/20 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
+                          className="h-8 w-8 rounded-lg bg-black/20 border-white/10 text-[#ADADAD] hover:bg-white/10 hover:text-white"
                           onClick={() => handleAdjustStock(product.id, -1)}
                           disabled={product.stock <= 0}
                         >
@@ -431,7 +431,7 @@ export default function Inventory() {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-8 w-8 rounded-lg bg-black/20 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white"
+                          className="h-8 w-8 rounded-lg bg-black/20 border-white/10 text-[#ADADAD] hover:bg-white/10 hover:text-white"
                           onClick={() => handleAdjustStock(product.id, 1)}
                         >
                           <ArrowUp className="h-4 w-4" />
@@ -452,7 +452,7 @@ export default function Inventory() {
                           'text-xs font-medium px-2 py-0.5 rounded border',
                           product.isActive
                             ? 'bg-primary/20 text-primary border-primary/30'
-                            : 'bg-white/5 text-slate-400 border-white/10',
+                            : 'bg-white/5 text-[#ADADAD] border-white/10',
                         )}
                       >
                         {product.isActive ? 'Ativo' : 'Inativo'}
@@ -467,7 +467,7 @@ export default function Inventory() {
                           className="h-8 w-8 p-0 rounded-lg hover:bg-white/10"
                         >
                           <span className="sr-only">Menu</span>
-                          <MoreHorizontal className="h-4 w-4 text-slate-300" />
+                          <MoreHorizontal className="h-4 w-4 text-[#ADADAD]" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -479,7 +479,7 @@ export default function Inventory() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => handleDelete(product)}
-                          className="text-slate-400 focus:text-slate-300 focus:bg-white/5"
+                          className="text-[#ADADAD] focus:text-[#ADADAD] focus:bg-white/5"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Excluir Item
@@ -510,7 +510,7 @@ export default function Inventory() {
             <AlertDialogTitle className="text-white">
               Tem certeza absoluta?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-[#ADADAD]">
               Essa ação não pode ser desfeita. Isso excluirá permanentemente o
               item
               <span className="font-bold text-white">

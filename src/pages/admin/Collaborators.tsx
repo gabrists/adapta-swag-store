@@ -68,7 +68,7 @@ const departmentColors: Record<string, string> = {
   B2B: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
   B2C: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
   Produto: 'bg-sky-500/20 text-sky-400 border border-sky-500/30',
-  Engenharia: 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
+  Engenharia: 'bg-slate-500/20 text-[#ADADAD] border border-slate-500/30',
   RH: 'bg-primary/20 text-primary border border-primary/30',
   Financeiro: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
 }
@@ -226,7 +226,7 @@ export default function Collaborators() {
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sortConfig.key !== column) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-slate-500" />
+      return <ArrowUpDown className="ml-2 h-4 w-4 text-[#ADADAD]" />
     }
     return sortConfig.direction === 'asc' ? (
       <ArrowUp className="ml-2 h-4 w-4 text-primary" />
@@ -242,7 +242,7 @@ export default function Collaborators() {
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Time & Colaboradores
           </h1>
-          <p className="text-base text-slate-400">
+          <p className="text-base text-[#ADADAD]">
             Gerencie quem tem acesso aos benefícios da loja.
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function Collaborators() {
 
       <div className="flex flex-col sm:flex-row gap-4 glass-panel p-4 md:p-5 rounded-2xl">
         <div className="relative flex-1 min-w-[250px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
           <Input
             placeholder="Buscar por nome, email ou área..."
             value={searchQuery}
@@ -289,7 +289,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('name')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Colaborador
                   <SortIcon column="name" />
@@ -299,7 +299,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('department')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Área/Time
                   <SortIcon column="department" />
@@ -309,7 +309,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('role')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Cargo
                   <SortIcon column="role" />
@@ -320,7 +320,7 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('redeemedCount')}
-                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
                   >
                     Itens Resgatados
                     <SortIcon column="redeemedCount" />
@@ -332,14 +332,14 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('onboardingKitStatus')}
-                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-slate-300 data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
                   >
                     Kit Onboarding
                     <SortIcon column="onboardingKitStatus" />
                   </Button>
                 </div>
               </TableHead>
-              <TableHead className="text-right w-[100px] min-w-[100px] pr-6 text-slate-400">
+              <TableHead className="text-right w-[100px] min-w-[100px] pr-6 text-[#ADADAD]">
                 Ações
               </TableHead>
             </TableRow>
@@ -349,11 +349,11 @@ export default function Collaborators() {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="h-40 text-center text-slate-400"
+                  className="h-40 text-center text-[#ADADAD]"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="bg-white/5 p-4 rounded-full">
-                      <Users className="h-8 w-8 text-slate-500" />
+                      <Users className="h-8 w-8 text-[#ADADAD]" />
                     </div>
                     <span>Nenhum colaborador encontrado.</span>
                   </div>
@@ -362,10 +362,7 @@ export default function Collaborators() {
             ) : (
               processedTeam.map((collab) => {
                 return (
-                  <TableRow
-                    key={collab.id}
-                    className="whitespace-nowrap hover:bg-white/5 border-white/5 transition-colors"
-                  >
+                  <TableRow key={collab.id} className="whitespace-nowrap hover:bg-white/5 border-white/5 transition-colors">
                     <TableCell className="pl-6">
                       <div className="flex items-center gap-4">
                         <Avatar className="h-10 w-10 border border-white/10 shrink-0">
@@ -381,7 +378,7 @@ export default function Collaborators() {
                           <span className="font-bold text-white text-sm truncate max-w-[200px]">
                             {collab.name}
                           </span>
-                          <span className="text-xs text-slate-400 truncate max-w-[200px] mt-0.5">
+                          <span className="text-xs text-[#ADADAD] truncate max-w-[200px] mt-0.5">
                             {collab.email}
                           </span>
                         </div>
@@ -392,15 +389,14 @@ export default function Collaborators() {
                         variant="secondary"
                         className={cn(
                           'font-medium rounded-md px-2',
-                          departmentColors[collab.department] ||
-                            'bg-white/5 text-white border border-white/10',
+                          departmentColors[collab.department] || 'bg-white/5 text-white border border-white/10',
                         )}
                       >
                         {collab.department}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-slate-300 font-medium truncate block max-w-[180px]">
+                      <span className="text-sm text-[#ADADAD] font-medium truncate block max-w-[180px]">
                         {collab.role}
                       </span>
                     </TableCell>
@@ -412,7 +408,7 @@ export default function Collaborators() {
                         className={cn(
                           'rounded-full px-2 min-w-[2rem] justify-center text-xs',
                           collab.redeemedCount === 0 &&
-                            'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10',
+                            'bg-white/5 text-[#ADADAD] border border-white/10 hover:bg-white/10',
                           collab.redeemedCount > 0 &&
                             'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(20,240,214,0.2)] hover:bg-primary/30',
                         )}
@@ -441,7 +437,7 @@ export default function Collaborators() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleManualDelivery(collab)}
-                              className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-lg"
+                              className="h-8 w-8 text-[#ADADAD] hover:text-primary hover:bg-primary/10 rounded-lg"
                             >
                               <Gift className="h-4 w-4" />
                             </Button>
@@ -457,7 +453,7 @@ export default function Collaborators() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleViewProfile(collab)}
-                              className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 rounded-lg"
+                              className="h-8 w-8 text-[#ADADAD] hover:text-white hover:bg-white/10 rounded-lg"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -474,10 +470,12 @@ export default function Collaborators() {
                               className="h-8 w-8 p-0 rounded-lg hover:bg-white/10"
                             >
                               <span className="sr-only">Menu</span>
-                              <MoreHorizontal className="h-4 w-4 text-slate-400" />
+                              <MoreHorizontal className="h-4 w-4 text-[#ADADAD]" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent
+                            align="end"
+                          >
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => handleEdit(collab)}
@@ -488,7 +486,7 @@ export default function Collaborators() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => handleDelete(collab)}
-                              className="text-slate-400 focus:text-slate-300 focus:bg-white/5"
+                              className="text-[#ADADAD] focus:text-[#ADADAD] focus:bg-white/5"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Excluir
@@ -538,9 +536,11 @@ export default function Collaborators() {
             <AlertDialogTitle className="text-white">
               Tem certeza que deseja remover este acesso?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-[#ADADAD]">
               O colaborador{' '}
-              <span className="font-bold text-white">{deleteCollab?.name}</span>{' '}
+              <span className="font-bold text-white">
+                {deleteCollab?.name}
+              </span>{' '}
               perderá o acesso e não constará mais na lista do time.
             </AlertDialogDescription>
           </AlertDialogHeader>

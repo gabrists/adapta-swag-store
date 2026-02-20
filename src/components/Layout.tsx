@@ -159,7 +159,7 @@ export default function Layout() {
                       isActive={location.pathname === item.url}
                       tooltip={item.title}
                       className={cn(
-                        'text-slate-300 hover:text-white hover:bg-white/5',
+                        'text-[#ADADAD] hover:text-white hover:bg-white/5',
                         location.pathname === item.url &&
                           'bg-white/10 text-white font-medium',
                       )}
@@ -170,7 +170,7 @@ export default function Layout() {
                             'w-4 h-4',
                             location.pathname === item.url
                               ? 'text-primary'
-                              : 'text-slate-400',
+                              : 'text-[#ADADAD]',
                           )}
                         />
                         <span>{item.title}</span>
@@ -203,7 +203,7 @@ export default function Layout() {
                             isActive={isActive}
                             tooltip={item.title}
                             className={cn(
-                              'text-slate-300 hover:text-white hover:bg-white/5',
+                              'text-[#ADADAD] hover:text-white hover:bg-white/5',
                               isActive && 'bg-white/10 text-white font-medium',
                             )}
                           >
@@ -211,7 +211,7 @@ export default function Layout() {
                               <item.icon
                                 className={cn(
                                   'w-4 h-4',
-                                  isActive ? 'text-primary' : 'text-slate-400',
+                                  isActive ? 'text-primary' : 'text-[#ADADAD]',
                                 )}
                               />
                               <span>{item.title}</span>
@@ -239,7 +239,7 @@ export default function Layout() {
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
-                    className="data-[state=open]:bg-white/10 data-[state=open]:text-white text-slate-300 hover:bg-white/5 hover:text-white"
+                    className="data-[state=open]:bg-white/10 data-[state=open]:text-white text-[#ADADAD] hover:bg-white/5 hover:text-white"
                   >
                     <Avatar className="h-8 w-8 rounded-lg border border-white/10">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
@@ -251,7 +251,7 @@ export default function Layout() {
                       <span className="truncate font-semibold text-white">
                         {user?.name}
                       </span>
-                      <span className="truncate text-xs text-slate-400">
+                      <span className="truncate text-xs text-[#ADADAD]">
                         {user?.email}
                       </span>
                     </div>
@@ -276,7 +276,7 @@ export default function Layout() {
                         <span className="truncate font-semibold text-white">
                           {user?.name}
                         </span>
-                        <span className="truncate text-xs text-slate-400">
+                        <span className="truncate text-xs text-[#ADADAD]">
                           {user?.email}
                         </span>
                       </div>
@@ -306,8 +306,8 @@ export default function Layout() {
         <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center w-full bg-[#081a17]/80 backdrop-blur-xl border-b border-white/5 transition-[width,height] ease-linear">
           <div className="flex items-center justify-between w-full px-4 md:px-6 lg:px-8">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="-ml-1 text-slate-300 hover:text-white" />
-              <div className="flex items-center gap-2 text-sm text-slate-400">
+              <SidebarTrigger className="-ml-1 text-[#ADADAD] hover:text-white" />
+              <div className="flex items-center gap-2 text-sm text-[#ADADAD]">
                 <div className="w-px h-4 bg-white/10 mx-2" />
                 <span className="font-medium text-white">
                   {location.pathname.startsWith('/admin')

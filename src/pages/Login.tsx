@@ -108,7 +108,7 @@ export default function Login() {
               <CardTitle className="text-2xl font-bold text-center text-white">
                 Acesse sua conta
               </CardTitle>
-              <CardDescription className="text-center text-slate-400 text-base">
+              <CardDescription className="text-center text-[#ADADAD] text-base">
                 Entre com seu e-mail corporativo para acessar a loja
               </CardDescription>
             </CardHeader>
@@ -130,7 +130,7 @@ export default function Login() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-300">E-mail</FormLabel>
+                        <FormLabel className="text-[#ADADAD]">E-mail</FormLabel>
                         <FormControl>
                           <Input
                             className="h-12"
@@ -147,7 +147,7 @@ export default function Login() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-300">Senha</FormLabel>
+                        <FormLabel className="text-[#ADADAD]">Senha</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
@@ -181,7 +181,7 @@ export default function Login() {
                 </form>
               </Form>
             </CardContent>
-            <CardFooter className="flex flex-col items-center justify-center text-sm text-slate-500 gap-2 pt-6 border-t border-white/5">
+            <CardFooter className="flex flex-col items-center justify-center text-sm text-[#ADADAD] gap-2 pt-6 border-t border-white/5">
               <p>
                 Esqueceu sua senha?{' '}
                 <span className="text-primary font-medium cursor-pointer hover:underline transition-colors">

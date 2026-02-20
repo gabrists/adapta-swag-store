@@ -76,17 +76,17 @@ export function CollaboratorProfile({
               <h2 className="text-xl font-bold text-slate-900 text-center">
                 {collaborator.name}
               </h2>
-              <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
-                <span className="font-medium text-slate-600">
+              <div className="flex items-center gap-2 mt-1 text-sm text-[#ADADAD]">
+                <span className="font-medium text-[#ADADAD]">
                   {collaborator.role}
                 </span>
-                <span className="text-slate-300">•</span>
+                <span className="text-[#ADADAD]">•</span>
                 <span>{collaborator.department}</span>
               </div>
 
               <div className="mt-6 flex items-center gap-6">
                 <div className="flex flex-col items-center">
-                  <span className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">
+                  <span className="text-xs text-[#ADADAD] font-medium uppercase tracking-wider mb-1">
                     Itens Recebidos
                   </span>
                   <Badge
@@ -98,7 +98,7 @@ export function CollaboratorProfile({
                 </div>
               </div>
             </div>
-            <SheetDescription className="text-center mt-4 text-xs text-slate-400">
+            <SheetDescription className="text-center mt-4 text-xs text-[#ADADAD]">
               Membro desde {format(new Date(), 'MMMM yyyy', { locale: ptBR })}
             </SheetDescription>
           </SheetHeader>
@@ -111,7 +111,7 @@ export function CollaboratorProfile({
               </h3>
               <Badge
                 variant="outline"
-                className="text-xs font-normal text-slate-500 bg-slate-50"
+                className="text-xs font-normal text-[#ADADAD] bg-slate-50"
               >
                 {employeeOrders.length} entregas
               </Badge>
@@ -148,7 +148,7 @@ export function CollaboratorProfile({
                                   alt={order.productName}
                                   className="object-cover"
                                 />
-                                <AvatarFallback className="rounded-md text-slate-500 text-xs font-bold bg-slate-100">
+                                <AvatarFallback className="rounded-md text-[#ADADAD] text-xs font-bold bg-slate-100">
                                   {order.productName
                                     ?.substring(0, 2)
                                     .toUpperCase() || 'IT'}
@@ -164,8 +164,8 @@ export function CollaboratorProfile({
                                 </div>
 
                                 <div className="flex items-center gap-2 mt-1.5">
-                                  <div className="flex items-center text-[11px] text-slate-500 font-medium">
-                                    <Calendar className="w-3 h-3 mr-1 text-slate-400" />
+                                  <div className="flex items-center text-[11px] text-[#ADADAD] font-medium">
+                                    <Calendar className="w-3 h-3 mr-1 text-[#ADADAD]" />
                                     {format(
                                       parseISO(order.createdAt),
                                       'dd/MM/yyyy',
@@ -173,12 +173,12 @@ export function CollaboratorProfile({
                                   </div>
                                   {order.size && (
                                     <>
-                                      <span className="text-[10px] text-slate-300">
+                                      <span className="text-[10px] text-[#ADADAD]">
                                         •
                                       </span>
                                       <Badge
                                         variant="secondary"
-                                        className="text-[10px] px-1 h-4 bg-slate-100 text-slate-600 border-none"
+                                        className="text-[10px] px-1 h-4 bg-slate-100 text-[#ADADAD] border-none"
                                       >
                                         Tam: {order.size}
                                       </Badge>
@@ -191,7 +191,7 @@ export function CollaboratorProfile({
                             <Separator className="bg-slate-50" />
 
                             <div className="bg-slate-50/50 px-3 py-2 flex items-center justify-between text-xs">
-                              <span className="text-slate-500 flex items-center gap-1.5">
+                              <span className="text-[#ADADAD] flex items-center gap-1.5">
                                 <Box className="w-3 h-3" />
                                 Entregue
                               </span>
@@ -212,12 +212,12 @@ export function CollaboratorProfile({
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center p-8">
                   <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                    <Package className="w-8 h-8 text-slate-400" />
+                    <Package className="w-8 h-8 text-[#ADADAD]" />
                   </div>
                   <h3 className="text-slate-900 font-medium mb-1">
                     Nenhum item retirado
                   </h3>
-                  <p className="text-slate-500 text-sm max-w-[200px]">
+                  <p className="text-[#ADADAD] text-sm max-w-[200px]">
                     Nenhum item retirado até o momento por este colaborador.
                   </p>
                 </div>

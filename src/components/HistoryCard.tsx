@@ -54,7 +54,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
                 <span className="font-semibold text-base text-white line-clamp-1">
                   {entry.user}
                 </span>
-                <span className="text-xs text-slate-400 font-mono mt-0.5 bg-black/20 px-2 py-0.5 rounded border border-white/5 w-fit">
+                <span className="text-xs text-[#ADADAD] font-mono mt-0.5 bg-black/20 px-2 py-0.5 rounded border border-white/5 w-fit">
                   ID: {entry.id.substring(0, 8)}
                 </span>
               </div>
@@ -63,7 +63,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
             {/* Summary Text Section */}
             <div className="flex-1 min-w-0 hidden md:block">
               <p
-                className="text-sm text-slate-300 truncate"
+                className="text-sm text-[#ADADAD] truncate"
                 title={summaryText}
               >
                 {summaryText}
@@ -75,14 +75,14 @@ export function HistoryCard({ entry }: HistoryCardProps) {
               <span className="font-bold text-base text-primary">
                 {formattedTotalValue}
               </span>
-              <span className="text-xs text-slate-400 font-medium bg-black/20 px-2 py-1 rounded-md border border-white/5">
+              <span className="text-xs text-[#ADADAD] font-medium bg-black/20 px-2 py-1 rounded-md border border-white/5">
                 {format(date, 'd MMM, HH:mm', { locale: ptBR })}
               </span>
             </div>
 
             {/* Mobile Only Summary */}
             <div className="md:hidden w-full pt-2">
-              <p className="text-sm text-slate-400 truncate bg-black/20 p-2 rounded-lg border border-white/5">
+              <p className="text-sm text-[#ADADAD] truncate bg-black/20 p-2 rounded-lg border border-white/5">
                 {summaryText}
               </p>
             </div>
@@ -91,7 +91,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
 
         <AccordionContent className="px-5 pb-5 pt-4 bg-black/20 rounded-b-2xl border-t border-white/5">
           <div className="space-y-4 mt-2">
-            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+            <h4 className="text-xs font-bold text-[#ADADAD] uppercase tracking-wider flex items-center gap-2">
               <span className="w-4 h-px bg-slate-600"></span>
               Detalhes da Retirada
               <span className="flex-1 h-px bg-slate-600/30"></span>
@@ -120,7 +120,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
                         alt={item.productName}
                         className="object-cover rounded-lg"
                       />
-                      <AvatarFallback className="rounded-lg bg-white/5 text-slate-400">
+                      <AvatarFallback className="rounded-lg bg-white/5 text-[#ADADAD]">
                         {item.productName.substring(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
@@ -133,12 +133,12 @@ export function HistoryCard({ entry }: HistoryCardProps) {
                         {item.size && (
                           <Badge
                             variant="secondary"
-                            className="text-[10px] h-5 px-1.5 rounded-md bg-black/40 text-slate-300 border border-white/10"
+                            className="text-[10px] h-5 px-1.5 rounded-md bg-black/40 text-[#ADADAD] border border-white/10"
                           >
                             {item.size}
                           </Badge>
                         )}
-                        <span className="text-xs font-medium text-slate-400 bg-black/20 px-2 py-0.5 rounded-md border border-white/5">
+                        <span className="text-xs font-medium text-[#ADADAD] bg-black/20 px-2 py-0.5 rounded-md border border-white/5">
                           Qtd: {item.quantity}
                         </span>
                       </div>
@@ -148,7 +148,7 @@ export function HistoryCard({ entry }: HistoryCardProps) {
                       <span className="text-sm font-bold text-white block">
                         {formattedItemTotal}
                       </span>
-                      <div className="text-[10px] text-slate-500 mt-1">
+                      <div className="text-[10px] text-[#ADADAD] mt-1">
                         Unid: {item.unitCost.toFixed(2)}
                       </div>
                     </div>

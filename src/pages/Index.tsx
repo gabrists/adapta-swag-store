@@ -73,7 +73,7 @@ export default function Index() {
       {/* Header Section */}
       <section className="glass-panel p-4 -mx-4 md:mx-0 md:rounded-xl">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
           <Input
             placeholder="O que você procura hoje?"
             className="pl-11 h-12 text-lg rounded-xl bg-black/20 border-white/10 focus-visible:border-primary/50 focus-visible:ring-primary/50"
@@ -93,7 +93,7 @@ export default function Index() {
               'px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 border',
               selectedCategory === category
                 ? 'btn-primary-glow'
-                : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10 hover:text-white',
+                : 'bg-white/5 text-[#ADADAD] border-white/10 hover:bg-white/10 hover:text-white',
             )}
           >
             {category}
@@ -109,7 +109,7 @@ export default function Index() {
           </h2>
           <Badge
             variant="secondary"
-            className="bg-white/10 text-slate-300 rounded-md px-3 py-1"
+            className="bg-white/10 text-[#ADADAD] rounded-md px-3 py-1"
           >
             {filteredProducts.length} itens
           </Badge>
@@ -146,13 +146,13 @@ export default function Index() {
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 glass-panel rounded-2xl">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center shadow-inner">
-              <Search className="w-10 h-10 text-slate-400" />
+              <Search className="w-10 h-10 text-[#ADADAD]" />
             </div>
             <div>
               <h3 className="text-xl font-semibold text-white">
                 Nenhum item encontrado
               </h3>
-              <p className="text-slate-400 text-sm mt-2 max-w-sm mx-auto">
+              <p className="text-[#ADADAD] text-sm mt-2 max-w-sm mx-auto">
                 Tente mudar a busca ou a categoria para encontrar o que procura.
               </p>
             </div>

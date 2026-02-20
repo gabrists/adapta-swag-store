@@ -152,7 +152,7 @@ export function CollaboratorDialog({
                     src={avatarPreview || undefined}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-2xl bg-slate-100 text-slate-400">
+                  <AvatarFallback className="text-2xl bg-slate-100 text-[#ADADAD]">
                     <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>

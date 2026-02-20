@@ -69,10 +69,10 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                 Pedido #{entry.id.substring(0, 6)}
               </h4>
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-slate-500">
+            <div className="flex items-center gap-1.5 text-sm text-[#ADADAD]">
               <Avatar className="h-5 w-5 shrink-0">
                 <AvatarImage src={userAvatarUrl} alt={entry.user} />
-                <AvatarFallback className="text-[8px] bg-slate-100 text-slate-600">
+                <AvatarFallback className="text-[8px] bg-slate-100 text-[#ADADAD]">
                   {entry.user.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -87,7 +87,7 @@ export function HistoryItem({ entry }: HistoryItemProps) {
             >
               {itemCount} {itemCount === 1 ? 'item' : 'itens'}
             </Badge>
-            <span className="text-xs text-slate-400 whitespace-nowrap">
+            <span className="text-xs text-[#ADADAD] whitespace-nowrap">
               {format(date, 'd MMM, HH:mm', { locale: ptBR })}
             </span>
           </div>
@@ -120,7 +120,7 @@ export function HistoryItem({ entry }: HistoryItemProps) {
         <div className="flex flex-col max-h-[60vh]">
           <div className="p-6 pb-0 space-y-4">
             <div className="flex items-center p-3 rounded-lg bg-slate-50 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 mr-3 shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[#ADADAD] mr-3 shrink-0 overflow-hidden">
                 <img
                   src={userAvatarUrl}
                   alt={entry.user}
@@ -128,12 +128,12 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                 />
               </div>
               <div className="flex-1">
-                <div className="text-xs text-slate-500">Retirado por</div>
+                <div className="text-xs text-[#ADADAD]">Retirado por</div>
                 <div className="font-medium text-slate-900">{entry.user}</div>
               </div>
               <div className="h-8 w-px bg-slate-200 mx-3" />
               <div className="flex-1">
-                <div className="text-xs text-slate-500 flex items-center gap-1">
+                <div className="text-xs text-[#ADADAD] flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> Destino
                 </div>
                 <div className="font-medium text-slate-900 truncate">
@@ -143,7 +143,7 @@ export function HistoryItem({ entry }: HistoryItemProps) {
             </div>
 
             <h3 className="text-sm font-medium text-slate-900 flex items-center gap-2 pt-2">
-              <Package className="w-4 h-4 text-slate-400" /> Itens Retirados (
+              <Package className="w-4 h-4 text-[#ADADAD]" /> Itens Retirados (
               {itemCount})
             </h3>
           </div>
@@ -177,7 +177,7 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                     {item.size && (
                       <Badge
                         variant="outline"
-                        className="text-[10px] h-5 px-1.5 border-slate-200 text-slate-500 bg-white mt-1"
+                        className="text-[10px] h-5 px-1.5 border-slate-200 text-[#ADADAD] bg-white mt-1"
                       >
                         Tamanho: {item.size}
                       </Badge>

@@ -89,12 +89,12 @@ export default function ApprovalsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Fila de Pedidos
           </h1>
-          <p className="text-base text-slate-400">
+          <p className="text-base text-[#ADADAD]">
             Gerencie as solicitações de brindes pendentes de aprovação.
           </p>
         </div>
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
           <Input
             placeholder="Buscar por nome ou item..."
             className="pl-11 h-12"
@@ -110,7 +110,7 @@ export default function ApprovalsPage() {
             <CheckCircle className="w-10 h-10 text-primary" />
           </div>
           <h3 className="text-xl font-semibold text-white">Fila vazia!</h3>
-          <p className="text-slate-400 text-sm mt-2">
+          <p className="text-[#ADADAD] text-sm mt-2">
             Não há solicitações pendentes no momento.
           </p>
         </div>
@@ -138,7 +138,7 @@ export default function ApprovalsPage() {
                         <div className="font-semibold text-white text-base">
                           {order.employeeName}
                         </div>
-                        <div className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
+                        <div className="text-xs text-[#ADADAD] flex items-center gap-1.5 mt-0.5">
                           <Clock className="w-3.5 h-3.5" />
                           {format(parseISO(order.createdAt), 'd MMM, HH:mm', {
                             locale: ptBR,
@@ -168,14 +168,14 @@ export default function ApprovalsPage() {
                         <div className="flex items-center gap-2 mt-1.5">
                           <Badge
                             variant="secondary"
-                            className="text-[10px] h-5 px-2 font-medium bg-white/10 text-slate-300 border-white/5"
+                            className="text-[10px] h-5 px-2 font-medium bg-white/10 text-[#ADADAD] border-white/5"
                           >
                             Qtd: {order.quantity}
                           </Badge>
                           {order.size && (
                             <Badge
                               variant="outline"
-                              className="text-[10px] h-5 px-2 font-medium border-white/20 text-slate-300"
+                              className="text-[10px] h-5 px-2 font-medium border-white/20 text-[#ADADAD]"
                             >
                               Tam: {order.size}
                             </Badge>
@@ -188,10 +188,10 @@ export default function ApprovalsPage() {
                     <div className="flex items-center gap-3 mt-4 sm:mt-0">
                       <Button
                         variant="outline"
-                        className="btn-secondary-outline h-10 px-4 text-slate-300 hover:text-white border-white/10"
+                        className="btn-secondary-outline h-10 px-4 text-[#ADADAD] hover:text-white border-white/10"
                         onClick={() => handleRejectClick(order)}
                       >
-                        <X className="w-4 h-4 mr-2 text-slate-400" />
+                        <X className="w-4 h-4 mr-2 text-[#ADADAD]" />
                         Rejeitar
                       </Button>
                       <Button

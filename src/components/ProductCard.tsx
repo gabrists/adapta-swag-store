@@ -107,8 +107,8 @@ export function ProductCard({
                     isSelected
                       ? 'bg-primary/20 text-primary border-primary shadow-[0_0_10px_rgba(20,240,214,0.3)]'
                       : hasStock
-                        ? 'bg-black/20 text-slate-300 border-white/10 hover:border-primary/50 hover:text-primary hover:bg-primary/10'
-                        : 'bg-black/10 text-slate-600 border-white/5 cursor-not-allowed line-through opacity-50',
+                        ? 'bg-black/20 text-[#ADADAD] border-white/10 hover:border-primary/50 hover:text-primary hover:bg-primary/10'
+                        : 'bg-black/10 text-[#ADADAD] border-white/5 cursor-not-allowed line-through opacity-50',
                   )}
                 >
                   {size}
@@ -120,13 +120,13 @@ export function ProductCard({
 
         <div className="flex items-center gap-2">
           {product.hasGrid && !selectedSize ? (
-            <span className="text-sm text-slate-400">Selecione um tamanho</span>
+            <span className="text-sm text-[#ADADAD]">Selecione um tamanho</span>
           ) : (
             <>
               {currentStock === 0 ? (
                 <Badge
                   variant="outline"
-                  className="bg-white/5 text-slate-400 border-white/10"
+                  className="bg-white/5 text-[#ADADAD] border-white/10"
                 >
                   Esgotado
                 </Badge>
@@ -158,7 +158,7 @@ export function ProductCard({
           className={cn(
             'w-full font-medium active:scale-[0.98] transition-all rounded-xl',
             hasOrdered && product.isSingleQuota
-              ? 'bg-white/10 text-slate-400 cursor-not-allowed hover:bg-white/10 shadow-none border border-white/5'
+              ? 'bg-white/10 text-[#ADADAD] cursor-not-allowed hover:bg-white/10 shadow-none border border-white/5'
               : 'btn-primary-glow',
           )}
           onClick={() => onAddToCart(product, selectedSize || undefined)}

@@ -126,7 +126,7 @@ export default function Profile() {
         <h1 className="text-3xl font-bold tracking-tight text-white">
           Gerenciar Conta
         </h1>
-        <p className="text-base text-slate-400">
+        <p className="text-base text-[#ADADAD]">
           Atualize suas informações pessoais e foto de perfil.
         </p>
       </div>
@@ -149,7 +149,7 @@ export default function Profile() {
                     isUploading && 'opacity-50',
                   )}
                 />
-                <AvatarFallback className="text-3xl bg-white/5 text-slate-400">
+                <AvatarFallback className="text-3xl bg-white/5 text-[#ADADAD]">
                   {user?.name?.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -208,11 +208,11 @@ export default function Profile() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">
+                    <FormLabel className="text-[#ADADAD]">
                       Nome Completo
                     </FormLabel>
                     <div className="relative">
-                      <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
                       <Input className="pl-11 h-12" {...field} />
                     </div>
                     <FormMessage />
@@ -225,17 +225,17 @@ export default function Profile() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">E-mail</FormLabel>
+                    <FormLabel className="text-[#ADADAD]">E-mail</FormLabel>
                     <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
                       <Input
-                        className="pl-11 h-12 bg-black/40 text-slate-400 border-white/5 opacity-70"
+                        className="pl-11 h-12 bg-black/40 text-[#ADADAD] border-white/5 opacity-70"
                         {...field}
                         readOnly
                         disabled
                       />
                     </div>
-                    <FormDescription className="text-slate-500 mt-2">
+                    <FormDescription className="text-[#ADADAD] mt-2">
                       O e-mail não pode ser alterado. Contate o suporte se
                       necessário.
                     </FormDescription>

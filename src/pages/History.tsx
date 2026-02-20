@@ -138,7 +138,7 @@ export default function HistoryPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white">
             Histórico de Saídas
           </h1>
-          <p className="text-base text-slate-400">
+          <p className="text-base text-[#ADADAD]">
             Gerencie e audite todas as retiradas de brindes da empresa.
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function HistoryPage() {
       {/* Audit Toolbar */}
       <div className="glass-panel p-4 md:p-5 rounded-2xl flex flex-col md:flex-row items-center gap-4">
         <div className="relative flex-1 w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
           <Input
             placeholder="Buscar por colaborador ou ID..."
             value={searchTerm}
@@ -198,13 +198,13 @@ export default function HistoryPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-24 text-center space-y-5 glass-panel rounded-2xl border-dashed">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center shadow-inner">
-              <FolderOpen className="w-10 h-10 text-slate-500" />
+              <FolderOpen className="w-10 h-10 text-[#ADADAD]" />
             </div>
             <div className="max-w-md">
               <h3 className="text-xl font-semibold text-white">
                 Nenhuma saída encontrada
               </h3>
-              <p className="text-slate-400 mt-2 text-sm">
+              <p className="text-[#ADADAD] mt-2 text-sm">
                 Tente ajustar os filtros ou buscar por outro termo.
               </p>
             </div>

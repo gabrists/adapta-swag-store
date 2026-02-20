@@ -95,7 +95,7 @@ export default function Settings() {
         <h1 className="text-3xl font-bold tracking-tight text-white">
           Configurações
         </h1>
-        <p className="text-base text-slate-400">
+        <p className="text-base text-[#ADADAD]">
           Gerencie as integrações e preferências do sistema.
         </p>
       </div>
@@ -131,7 +131,7 @@ export default function Settings() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className="text-slate-500">
+                    <FormDescription className="text-[#ADADAD]">
                       Copie a URL do Webhook nas configurações do seu App no
                       Slack.
                     </FormDescription>
@@ -149,7 +149,7 @@ export default function Settings() {
                       <FormLabel className="text-base text-slate-200">
                         Ativar notificações
                       </FormLabel>
-                      <FormDescription className="text-slate-400">
+                      <FormDescription className="text-[#ADADAD]">
                         O sistema enviará alertas automáticos para a URL
                         configurada.
                       </FormDescription>
