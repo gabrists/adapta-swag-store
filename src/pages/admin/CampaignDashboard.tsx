@@ -19,6 +19,9 @@ import {
   Clock,
   Lock,
   Unlock,
+  Link as LinkIcon,
+  Copy,
+  ExternalLink,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -161,6 +164,17 @@ export default function CampaignDashboard() {
     },
   } satisfies ChartConfig
 
+  const campaignUrl = `${window.location.origin}/coleta/${campaign.id}`
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(campaignUrl)
+    toast({
+      title: 'Link copiado com sucesso!',
+      description: 'Você já pode compartilhar o link com o time.',
+      className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+    })
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 animate-fade-in-up">
       <div className="flex items-center gap-4 text-slate-500 dark:text-[#ADADAD]">
@@ -173,16 +187,16 @@ export default function CampaignDashboard() {
         <span className="font-medium">Detalhes da Campanha</span>
       </div>
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 glass-panel p-6 rounded-2xl">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-16 h-16 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 glass-panel p-6 rounded-2xl">
+        <div className="flex items-start gap-4 flex-1">
+          <Avatar className="w-16 h-16 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm shrink-0 mt-1">
             <AvatarImage src={campaign.imageUrl} className="object-cover" />
             <AvatarFallback className="bg-primary/10 text-primary rounded-xl">
               <Megaphone className="w-8 h-8" />
             </AvatarFallback>
           </Avatar>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
+          <div className="space-y-2 flex-1 min-w-0">
+            <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {campaign.name}
               </h1>
@@ -202,10 +216,36 @@ export default function CampaignDashboard() {
                 {campaign.description}
               </p>
             )}
+            <div className="flex items-center gap-2 mt-2 p-2 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 w-fit max-w-full overflow-hidden">
+              <LinkIcon className="w-4 h-4 text-slate-400 shrink-0" />
+              <span className="text-sm text-slate-600 dark:text-[#ADADAD] truncate select-all">
+                {campaignUrl}
+              </span>
+              <div className="flex gap-1 shrink-0 ml-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleCopyLink}
+                  className="h-7 w-7 hover:bg-slate-200 dark:hover:bg-white/10"
+                  title="Copiar Link"
+                >
+                  <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-[#ADADAD]" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => window.open(campaignUrl, '_blank')}
+                  className="h-7 w-7 hover:bg-slate-200 dark:hover:bg-white/10"
+                  title="Acessar Página"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500 dark:text-[#ADADAD]" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap lg:justify-end shrink-0">
           <Button
             variant="outline"
             className="gap-2 bg-white dark:bg-black/20"

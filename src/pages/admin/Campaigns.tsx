@@ -10,6 +10,9 @@ import {
   Upload,
   ImageIcon,
   Pencil,
+  Link as LinkIcon,
+  ExternalLink,
+  Copy,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -129,6 +132,16 @@ export default function CampaignsPage() {
     })
     setOptions(campaign.options)
     setIsDialogOpen(true)
+  }
+
+  const handleCopyLink = (campaignId: string) => {
+    const url = `${window.location.origin}/coleta/${campaignId}`
+    navigator.clipboard.writeText(url)
+    toast({
+      title: 'Link copiado com sucesso!',
+      description: 'Você já pode compartilhar o link com o time.',
+      className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+    })
   }
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -334,8 +347,29 @@ export default function CampaignsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => handleCopyLink(campaign.id)}
+                          className="hover:bg-slate-200 dark:hover:bg-white/10"
+                          title="Copiar Link"
+                        >
+                          <LinkIcon className="h-4 w-4 text-slate-500 dark:text-[#ADADAD] hover:text-primary dark:hover:text-primary transition-colors" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() =>
+                            window.open(`/coleta/${campaign.id}`, '_blank')
+                          }
+                          className="hover:bg-slate-200 dark:hover:bg-white/10"
+                          title="Acessar Página"
+                        >
+                          <ExternalLink className="h-4 w-4 text-slate-500 dark:text-[#ADADAD] hover:text-primary dark:hover:text-primary transition-colors" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleEdit(campaign)}
                           className="hover:bg-slate-200 dark:hover:bg-white/10"
+                          title="Editar"
                         >
                           <Pencil className="h-4 w-4 text-slate-500 dark:text-[#ADADAD] hover:text-primary dark:hover:text-primary transition-colors" />
                         </Button>
@@ -369,6 +403,42 @@ export default function CampaignsPage() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              {editingCampaign && (
+                <div className="space-y-2">
+                  <FormLabel>Link de Compartilhamento</FormLabel>
+                  <div className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 w-full overflow-hidden">
+                    <LinkIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="text-sm text-slate-600 dark:text-[#ADADAD] truncate select-all">
+                      {`${window.location.origin}/coleta/${editingCampaign.id}`}
+                    </span>
+                    <div className="flex gap-1 shrink-0 ml-auto">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleCopyLink(editingCampaign.id)}
+                        className="h-7 w-7 hover:bg-slate-200 dark:hover:bg-white/10"
+                        title="Copiar Link"
+                      >
+                        <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-[#ADADAD]" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          window.open(`/coleta/${editingCampaign.id}`, '_blank')
+                        }
+                        className="h-7 w-7 hover:bg-slate-200 dark:hover:bg-white/10"
+                        title="Acessar Página"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-slate-500 dark:text-[#ADADAD]" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <FormField
                 control={form.control}
                 name="name"
