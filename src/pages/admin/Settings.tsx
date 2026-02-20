@@ -164,25 +164,7 @@ export default function Settings() {
                 )}
               />
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-gray-200 dark:border-white/5">
-                <Button
-                  type="submit"
-                  className="w-full sm:w-auto btn-primary-glow h-12 text-base px-8"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Salvando
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-5 w-5" />
-                      Salvar Definições
-                    </>
-                  )}
-                </Button>
-
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4 pt-4 border-t border-gray-200 dark:border-white/5">
                 <Button
                   type="button"
                   variant="outline"
@@ -199,6 +181,24 @@ export default function Settings() {
                     <>
                       <Send className="mr-2 h-5 w-5" />
                       Testar Conexão
+                    </>
+                  )}
+                </Button>
+
+                <Button
+                  type="submit"
+                  className="w-full sm:w-auto btn-primary-glow h-12 text-base px-8"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Salvando
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-5 w-5" />
+                      Salvar Definições
                     </>
                   )}
                 </Button>
