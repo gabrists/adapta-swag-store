@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { Plus, Check, Minus } from 'lucide-react'
+import { Plus, Check, Minus, ShoppingCart } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product
@@ -170,45 +170,40 @@ export function ProductCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-5 pt-0 mt-auto flex-col gap-3">
+      <CardFooter className="p-5 pt-0 mt-auto flex flex-row items-center gap-3 w-full">
         {/* Quantity Stepper */}
         <div
           className={cn(
-            'flex items-center justify-between w-full bg-slate-50 dark:bg-black/20 rounded-xl p-1.5 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
+            'flex items-center shrink-0 bg-slate-50 dark:bg-black/20 rounded-xl p-1 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
             isStepperDisabled && 'opacity-50 pointer-events-none',
           )}
         >
-          <span className="text-sm font-medium text-slate-500 dark:text-slate-400 pl-2 select-none">
-            Quantidade
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity <= 1 || isStepperDisabled}
+          >
+            <Minus className="h-4 w-4" />
+          </Button>
+          <span className="text-sm font-semibold w-6 text-center tabular-nums text-slate-900 dark:text-white select-none">
+            {quantity}
           </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              disabled={quantity <= 1 || isStepperDisabled}
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-semibold w-8 text-center tabular-nums text-slate-900 dark:text-white select-none">
-              {quantity}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-              onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
-              disabled={quantity >= maxQuantity || isStepperDisabled}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+            onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+            disabled={quantity >= maxQuantity || isStepperDisabled}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
 
         <Button
           className={cn(
-            'w-full font-medium active:scale-[0.98] transition-all rounded-xl shadow-md',
+            'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl shadow-md min-w-0',
             hasOrdered && product.isSingleQuota
               ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border border-slate-200 dark:border-white/5'
               : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow border-transparent',
@@ -218,19 +213,19 @@ export function ProductCard({
         >
           {product.isSingleQuota && hasOrdered ? (
             <>
-              <Check className="w-4 h-4 mr-2" />
-              Item já resgatado
+              <Check className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate text-xs sm:text-sm">Resgatado</span>
             </>
           ) : isOutOfStock ? (
-            'Indisponível'
+            <span className="truncate text-xs sm:text-sm">Indisponível</span>
           ) : product.hasGrid && !selectedSize ? (
-            'Selecione Tamanho'
+            <span className="truncate text-xs sm:text-sm">
+              Selecione Tamanho
+            </span>
           ) : (
             <>
-              <Plus className="w-4 h-4 mr-2" />
-              {quantity > 1
-                ? `Solicitar ${quantity} itens`
-                : 'Solicitar Resgate'}
+              <ShoppingCart className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+              <span className="truncate text-xs sm:text-sm">Adicionar</span>
             </>
           )}
         </Button>
