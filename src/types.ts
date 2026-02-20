@@ -39,6 +39,7 @@ export interface HistoryItemEntry {
   productImageQuery: string
   size?: string
   quantity: number
+  unitCost: number
 }
 
 export interface HistoryEntry {
@@ -49,6 +50,7 @@ export interface HistoryEntry {
   destination: string
   date: string // ISO string
   totalQuantity: number
+  totalValue: number
 }
 
 export interface Order {

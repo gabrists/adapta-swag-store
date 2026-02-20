@@ -211,7 +211,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       .select(
         `
         *,
-        items (name, image_url),
+        items (name, image_url, unit_cost),
         employees (name, avatar_url)
       `,
       )
@@ -232,8 +232,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
           destination: row.destination || '',
           date: row.created_at,
           totalQuantity: 0,
+          totalValue: 0,
         }
       }
+
+      const unitCost = Number(row.items?.unit_cost) || 0
 
       groups[row.group_id].items.push({
         productId: row.item_id,
@@ -241,9 +244,11 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         productImageQuery: row.items?.image_url || '',
         size: row.size,
         quantity: row.quantity,
+        unitCost: unitCost,
       })
 
       groups[row.group_id].totalQuantity += row.quantity
+      groups[row.group_id].totalValue += row.quantity * unitCost
     })
 
     setHistory(Object.values(groups))
