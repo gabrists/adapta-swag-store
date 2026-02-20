@@ -147,12 +147,12 @@ export function CollaboratorDialog({
                 className="relative group cursor-pointer"
                 onClick={triggerFileInput}
               >
-                <Avatar className="h-24 w-24 border-4 border-slate-50 shadow-md transition-all group-hover:opacity-90">
+                <Avatar className="h-24 w-24 border-4 border-slate-50 dark:border-white/10 shadow-md transition-all group-hover:opacity-90">
                   <AvatarImage
                     src={avatarPreview || undefined}
                     className="object-cover"
                   />
-                  <AvatarFallback className="text-2xl bg-slate-100 text-white">
+                  <AvatarFallback className="bg-slate-100 text-slate-400 dark:bg-slate-800">
                     <User className="h-10 w-10" />
                   </AvatarFallback>
                 </Avatar>
@@ -216,7 +216,7 @@ export function CollaboratorDialog({
                       }}
                     />
                   </FormControl>
-                  <FormDescription className="text-xs">
+                  <FormDescription className="text-xs text-gray-500 dark:text-gray-400">
                     O domínio @adapta.org é adicionado automaticamente.
                   </FormDescription>
                   <FormMessage />
@@ -237,7 +237,7 @@ export function CollaboratorDialog({
                       value={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="text-white">
+                        <SelectTrigger className="text-slate-900 dark:text-white">
                           <SelectValue placeholder="Selecione" />
                         </SelectTrigger>
                       </FormControl>
@@ -283,7 +283,7 @@ export function CollaboratorDialog({
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="text-white">
+                      <SelectTrigger className="text-slate-900 dark:text-white">
                         <SelectValue placeholder="Status do Kit" />
                       </SelectTrigger>
                     </FormControl>

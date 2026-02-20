@@ -64,13 +64,17 @@ import { CollaboratorProfile } from '@/components/admin/CollaboratorProfile'
 import { ManualDeliveryDialog } from '@/components/admin/ManualDeliveryDialog'
 
 const departmentColors: Record<string, string> = {
-  Marketing: 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30',
-  B2B: 'bg-blue-500/20 text-blue-400 border border-blue-500/30',
-  B2C: 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30',
-  Produto: 'bg-sky-500/20 text-sky-400 border border-sky-500/30',
-  Engenharia: 'bg-slate-500/20 text-[#ADADAD] border border-slate-500/30',
-  RH: 'bg-primary/20 text-primary border border-primary/30',
-  Financeiro: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
+  Marketing:
+    'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-500/20 dark:text-cyan-400 dark:border-cyan-500/30',
+  B2B: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30',
+  B2C: 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/30',
+  Produto:
+    'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/30',
+  Engenharia:
+    'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-500/20 dark:text-[#ADADAD] dark:border-slate-500/30',
+  RH: 'bg-teal-100 text-teal-700 border-teal-200 dark:bg-primary/20 dark:text-primary dark:border-primary/30',
+  Financeiro:
+    'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30',
 }
 
 type SortKey =
@@ -226,7 +230,9 @@ export default function Collaborators() {
 
   const SortIcon = ({ column }: { column: SortKey }) => {
     if (sortConfig.key !== column) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 text-[#ADADAD]" />
+      return (
+        <ArrowUpDown className="ml-2 h-4 w-4 text-slate-400 dark:text-[#ADADAD]" />
+      )
     }
     return sortConfig.direction === 'asc' ? (
       <ArrowUp className="ml-2 h-4 w-4 text-primary" />
@@ -239,10 +245,10 @@ export default function Collaborators() {
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 animate-fade-in-up">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Time & Colaboradores
           </h1>
-          <p className="text-base text-[#ADADAD]">
+          <p className="text-base text-gray-600 dark:text-[#ADADAD]">
             Gerencie quem tem acesso aos benefícios da loja.
           </p>
         </div>
@@ -255,19 +261,19 @@ export default function Collaborators() {
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 glass-panel p-4 md:p-5 rounded-2xl">
+      <div className="flex flex-col sm:flex-row gap-4 glass-panel p-4 md:p-5 rounded-2xl bg-white/80 dark:bg-[#081a17]/60 border-gray-200 dark:border-white/5">
         <div className="relative flex-1 min-w-[250px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#ADADAD]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500 dark:text-[#ADADAD]" />
           <Input
             placeholder="Buscar por nome, email ou área..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-11 h-12 w-full"
+            className="pl-11 h-12 w-full placeholder:text-gray-400 dark:placeholder:text-white/40 text-slate-900 dark:text-white"
           />
         </div>
         <div className="w-full sm:w-[220px]">
           <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-            <SelectTrigger className="h-12 bg-black/20 border-white/10">
+            <SelectTrigger className="h-12 bg-white dark:bg-black/20 border-gray-200 dark:border-white/10 text-slate-900 dark:text-white">
               <SelectValue placeholder="Filtrar por Área" />
             </SelectTrigger>
             <SelectContent>
@@ -281,15 +287,15 @@ export default function Collaborators() {
         </div>
       </div>
 
-      <div className="glass-panel rounded-2xl overflow-hidden">
+      <div className="glass-panel rounded-2xl overflow-hidden bg-white dark:bg-[#081a17]/60 border-gray-200 dark:border-white/5">
         <Table className="min-w-[1100px]">
           <TableHeader>
-            <TableRow className="bg-black/20 hover:bg-black/20 border-white/10">
+            <TableRow className="bg-gray-50/50 hover:bg-gray-50/50 dark:bg-black/20 dark:hover:bg-black/20 border-gray-200 dark:border-white/10">
               <TableHead className="w-[300px] min-w-[300px] pl-6">
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('name')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white font-semibold text-slate-700 dark:text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Colaborador
                   <SortIcon column="name" />
@@ -299,7 +305,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('department')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white font-semibold text-slate-700 dark:text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Área/Time
                   <SortIcon column="department" />
@@ -309,7 +315,7 @@ export default function Collaborators() {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort('role')}
-                  className="-ml-4 h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
+                  className="-ml-4 h-8 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white font-semibold text-slate-700 dark:text-[#ADADAD] data-[state=open]:bg-transparent"
                 >
                   Cargo
                   <SortIcon column="role" />
@@ -320,7 +326,7 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('redeemedCount')}
-                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white font-semibold text-slate-700 dark:text-[#ADADAD] data-[state=open]:bg-transparent"
                   >
                     Itens Resgatados
                     <SortIcon column="redeemedCount" />
@@ -332,14 +338,14 @@ export default function Collaborators() {
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('onboardingKitStatus')}
-                    className="h-8 hover:bg-white/5 hover:text-white font-semibold text-[#ADADAD] data-[state=open]:bg-transparent"
+                    className="h-8 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white font-semibold text-slate-700 dark:text-[#ADADAD] data-[state=open]:bg-transparent"
                   >
                     Kit Onboarding
                     <SortIcon column="onboardingKitStatus" />
                   </Button>
                 </div>
               </TableHead>
-              <TableHead className="text-right w-[100px] min-w-[100px] pr-6 text-[#ADADAD]">
+              <TableHead className="text-right w-[100px] min-w-[100px] pr-6 text-slate-700 dark:text-[#ADADAD] font-semibold">
                 Ações
               </TableHead>
             </TableRow>
@@ -349,11 +355,11 @@ export default function Collaborators() {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="h-40 text-center text-[#ADADAD]"
+                  className="h-40 text-center text-gray-500 dark:text-[#ADADAD]"
                 >
                   <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="bg-white/5 p-4 rounded-full">
-                      <Users className="h-8 w-8 text-[#ADADAD]" />
+                    <div className="bg-gray-100 dark:bg-white/5 p-4 rounded-full">
+                      <Users className="h-8 w-8 text-gray-400 dark:text-[#ADADAD]" />
                     </div>
                     <span>Nenhum colaborador encontrado.</span>
                   </div>
@@ -362,23 +368,26 @@ export default function Collaborators() {
             ) : (
               processedTeam.map((collab) => {
                 return (
-                  <TableRow key={collab.id} className="whitespace-nowrap hover:bg-white/5 border-white/5 transition-colors">
+                  <TableRow
+                    key={collab.id}
+                    className="whitespace-nowrap hover:bg-gray-50 dark:hover:bg-white/5 border-gray-100 dark:border-white/5 transition-colors"
+                  >
                     <TableCell className="pl-6">
                       <div className="flex items-center gap-4">
-                        <Avatar className="h-10 w-10 border border-white/10 shrink-0">
+                        <Avatar className="h-10 w-10 border border-gray-200 dark:border-white/10 shrink-0">
                           <AvatarImage
                             src={collab.avatarUrl}
                             alt={collab.name}
                           />
-                          <AvatarFallback className="text-sm font-bold text-primary bg-primary/20">
+                          <AvatarFallback className="text-sm font-bold text-primary bg-primary/10 dark:bg-primary/20">
                             {collab.name.substring(0, 2).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <span className="font-bold text-white text-sm truncate max-w-[200px]">
+                          <span className="font-bold text-slate-900 dark:text-white text-sm truncate max-w-[200px]">
                             {collab.name}
                           </span>
-                          <span className="text-xs text-[#ADADAD] truncate max-w-[200px] mt-0.5">
+                          <span className="text-xs text-gray-500 dark:text-[#ADADAD] truncate max-w-[200px] mt-0.5">
                             {collab.email}
                           </span>
                         </div>
@@ -388,15 +397,16 @@ export default function Collaborators() {
                       <Badge
                         variant="secondary"
                         className={cn(
-                          'font-medium rounded-md px-2',
-                          departmentColors[collab.department] || 'bg-white/5 text-white border border-white/10',
+                          'font-medium rounded-md px-2 border',
+                          departmentColors[collab.department] ||
+                            'bg-gray-100 text-slate-700 border-gray-200 dark:bg-white/5 dark:text-white dark:border-white/10',
                         )}
                       >
                         {collab.department}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-[#ADADAD] font-medium truncate block max-w-[180px]">
+                      <span className="text-sm text-gray-500 dark:text-[#ADADAD] font-medium truncate block max-w-[180px]">
                         {collab.role}
                       </span>
                     </TableCell>
@@ -408,9 +418,9 @@ export default function Collaborators() {
                         className={cn(
                           'rounded-full px-2 min-w-[2rem] justify-center text-xs',
                           collab.redeemedCount === 0 &&
-                            'bg-white/5 text-[#ADADAD] border border-white/10 hover:bg-white/10',
+                            'bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200 dark:bg-white/5 dark:text-[#ADADAD] dark:border-white/10 dark:hover:bg-white/10',
                           collab.redeemedCount > 0 &&
-                            'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(20,240,214,0.2)] hover:bg-primary/30',
+                            'bg-primary/10 text-primary border border-primary/20 shadow-none hover:bg-primary/20 dark:bg-primary/20 dark:border-primary/30 dark:shadow-[0_0_10px_rgba(20,240,214,0.2)] dark:hover:bg-primary/30',
                         )}
                       >
                         {collab.redeemedCount}
@@ -422,8 +432,8 @@ export default function Collaborators() {
                         className={cn(
                           'font-medium rounded-md border text-xs px-2',
                           collab.onboardingKitStatus === 'Entregue'
-                            ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                            : 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+                            ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
+                            : 'bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-500/20 dark:text-sky-400 dark:border-sky-500/30',
                         )}
                       >
                         {collab.onboardingKitStatus || 'Pendente'}
@@ -437,12 +447,12 @@ export default function Collaborators() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleManualDelivery(collab)}
-                              className="h-8 w-8 text-[#ADADAD] hover:text-primary hover:bg-primary/10 rounded-lg"
+                              className="h-8 w-8 text-slate-500 dark:text-[#ADADAD] hover:text-slate-900 dark:hover:text-primary hover:bg-gray-100 dark:hover:bg-primary/10 rounded-lg"
                             >
                               <Gift className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-[#081a17]/90 border-white/10 text-white">
+                          <TooltipContent className="bg-slate-800 dark:bg-[#081a17]/90 border-slate-700 dark:border-white/10 text-white">
                             <p>Enviar Brinde Manual</p>
                           </TooltipContent>
                         </Tooltip>
@@ -453,12 +463,12 @@ export default function Collaborators() {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleViewProfile(collab)}
-                              className="h-8 w-8 text-[#ADADAD] hover:text-white hover:bg-white/10 rounded-lg"
+                              className="h-8 w-8 text-slate-500 dark:text-[#ADADAD] hover:text-slate-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-lg"
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bg-[#081a17]/90 border-white/10 text-white">
+                          <TooltipContent className="bg-slate-800 dark:bg-[#081a17]/90 border-slate-700 dark:border-white/10 text-white">
                             <p>Visualizar Perfil</p>
                           </TooltipContent>
                         </Tooltip>
@@ -467,15 +477,13 @@ export default function Collaborators() {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="h-8 w-8 p-0 rounded-lg hover:bg-white/10"
+                              className="h-8 w-8 p-0 rounded-lg text-slate-500 dark:text-[#ADADAD] hover:bg-gray-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white"
                             >
                               <span className="sr-only">Menu</span>
-                              <MoreHorizontal className="h-4 w-4 text-[#ADADAD]" />
+                              <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                          >
+                          <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Ações</DropdownMenuLabel>
                             <DropdownMenuItem
                               onClick={() => handleEdit(collab)}
@@ -486,7 +494,7 @@ export default function Collaborators() {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() => handleDelete(collab)}
-                              className="text-[#ADADAD] focus:text-[#ADADAD] focus:bg-white/5"
+                              className="text-red-600 focus:text-red-700 focus:bg-red-50 dark:text-red-400 dark:focus:text-red-300 dark:focus:bg-red-900/20"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Excluir
@@ -531,26 +539,26 @@ export default function Collaborators() {
         open={!!deleteCollab}
         onOpenChange={(open) => !open && setDeleteCollab(null)}
       >
-        <AlertDialogContent className="rounded-2xl glass-panel">
+        <AlertDialogContent className="rounded-2xl glass-panel bg-white dark:bg-[#081a17]/90 border-gray-200 dark:border-white/10">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">
+            <AlertDialogTitle className="text-slate-900 dark:text-white">
               Tem certeza que deseja remover este acesso?
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[#ADADAD]">
+            <AlertDialogDescription className="text-gray-600 dark:text-[#ADADAD]">
               O colaborador{' '}
-              <span className="font-bold text-white">
+              <span className="font-bold text-slate-900 dark:text-white">
                 {deleteCollab?.name}
               </span>{' '}
               perderá o acesso e não constará mais na lista do time.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl border-white/10 bg-transparent text-white hover:bg-white/5">
+            <AlertDialogCancel className="rounded-xl border-gray-200 dark:border-white/10 bg-transparent text-slate-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/5">
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700"
+              className="bg-red-600 hover:bg-red-700 text-white border border-red-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700 rounded-xl"
             >
               Sim, remover acesso
             </AlertDialogAction>
