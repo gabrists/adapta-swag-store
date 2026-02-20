@@ -328,6 +328,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         id: d.id,
         name: d.name,
         description: d.description,
+        imageUrl: d.image_url,
         status: d.status as 'Aberta' | 'Fechada',
         options: d.options as string[],
         createdAt: d.created_at,
@@ -365,6 +366,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.from('swag_campaigns' as any).insert({
       name: data.name,
       description: data.description,
+      image_url: data.imageUrl,
       options: data.options,
     })
     if (error) throw error

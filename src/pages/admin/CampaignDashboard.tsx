@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Table,
   TableBody,
@@ -173,30 +174,35 @@ export default function CampaignDashboard() {
       </div>
 
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 glass-panel p-6 rounded-2xl">
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
-              <Megaphone className="w-5 h-5" />
+        <div className="flex items-center gap-4">
+          <Avatar className="w-16 h-16 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+            <AvatarImage src={campaign.imageUrl} className="object-cover" />
+            <AvatarFallback className="bg-primary/10 text-primary rounded-xl">
+              <Megaphone className="w-8 h-8" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {campaign.name}
+              </h1>
+              <Badge
+                variant="outline"
+                className={
+                  campaign.status === 'Aberta'
+                    ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
+                    : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10'
+                }
+              >
+                {campaign.status}
+              </Badge>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-              {campaign.name}
-            </h1>
-            <Badge
-              variant="outline"
-              className={
-                campaign.status === 'Aberta'
-                  ? 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30'
-                  : 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10'
-              }
-            >
-              {campaign.status}
-            </Badge>
+            {campaign.description && (
+              <p className="text-slate-600 dark:text-[#ADADAD] max-w-2xl">
+                {campaign.description}
+              </p>
+            )}
           </div>
-          {campaign.description && (
-            <p className="text-slate-600 dark:text-[#ADADAD] max-w-2xl">
-              {campaign.description}
-            </p>
-          )}
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">

@@ -90,6 +90,7 @@ export interface Campaign {
   id: string
   name: string
   description?: string
+  imageUrl?: string
   status: 'Aberta' | 'Fechada'
   options: string[]
   createdAt: string

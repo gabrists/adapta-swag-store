@@ -1,6 +1,15 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Megaphone, CheckCircle, X, Loader2 } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Megaphone,
+  CheckCircle,
+  X,
+  Loader2,
+  Upload,
+  ImageIcon,
+} from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -9,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Table,
   TableBody,
@@ -36,10 +46,12 @@ import {
 } from '@/components/ui/form'
 import useSwagStore from '@/stores/useSwagStore'
 import { useToast } from '@/hooks/use-toast'
+import { uploadToR2 } from '@/lib/storage'
 
 const formSchema = z.object({
   name: z.string().min(2, 'O nome é obrigatório'),
   description: z.string().optional(),
+  imageUrl: z.string().optional(),
 })
 
 export default function CampaignsPage() {
@@ -48,6 +60,8 @@ export default function CampaignsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [options, setOptions] = useState<string[]>([])
   const [optionInput, setOptionInput] = useState('')
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,8 +69,11 @@ export default function CampaignsPage() {
     defaultValues: {
       name: '',
       description: '',
+      imageUrl: '',
     },
   })
+
+  const formImageUrl = form.watch('imageUrl')
 
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -77,6 +94,28 @@ export default function CampaignsPage() {
     setOptions(options.filter((_, idx) => idx !== indexToRemove))
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      setIsUploadingImage(true)
+      const url = await uploadToR2(file)
+      form.setValue('imageUrl', url)
+    } catch (error: any) {
+      toast({
+        title: 'Erro no upload',
+        description: error.message || 'Falha ao processar a imagem.',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsUploadingImage(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (options.length === 0) {
       toast({
@@ -91,6 +130,7 @@ export default function CampaignsPage() {
       await createCampaign({
         name: values.name,
         description: values.description,
+        imageUrl: values.imageUrl,
         options,
       })
       toast({
@@ -195,7 +235,20 @@ export default function CampaignsPage() {
                     className="hover:bg-gray-50 dark:hover:bg-white/5 border-gray-200 dark:border-white/10 transition-colors"
                   >
                     <TableCell className="pl-6 font-semibold text-slate-900 dark:text-white">
-                      {campaign.name}
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 rounded-md border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+                          <AvatarImage
+                            src={campaign.imageUrl}
+                            className="object-cover"
+                          />
+                          <AvatarFallback className="rounded-md bg-primary/10 text-primary">
+                            <Megaphone className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="truncate max-w-[200px]">
+                          {campaign.name}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -287,6 +340,57 @@ export default function CampaignsPage() {
                 )}
               />
 
+              <div className="space-y-2">
+                <FormLabel>Imagem do Produto</FormLabel>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
+                    {formImageUrl ? (
+                      <AvatarImage
+                        src={formImageUrl}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-slate-100 dark:bg-white/5 rounded-xl text-slate-400">
+                        <ImageIcon className="h-6 w-6" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isUploadingImage}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {isUploadingImage ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="h-4 w-4 mr-2" />
+                        )}
+                        Upload
+                      </Button>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+                    <Input
+                      placeholder="Ou cole a URL da imagem"
+                      value={formImageUrl || ''}
+                      onChange={(e) =>
+                        form.setValue('imageUrl', e.target.value)
+                      }
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <FormField
                 control={form.control}
                 name="description"
@@ -296,7 +400,7 @@ export default function CampaignsPage() {
                     <FormControl>
                       <Textarea
                         placeholder="Ex: Escolha o tamanho da sua camiseta..."
-                        className="resize-none"
+                        className="resize-none h-20"
                         {...field}
                       />
                     </FormControl>
@@ -347,7 +451,7 @@ export default function CampaignsPage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={form.formState.isSubmitting}
+                  disabled={form.formState.isSubmitting || isUploadingImage}
                   className="bg-[#0E9C8B] hover:bg-[#0E9C8B]/90 text-white"
                 >
                   {form.formState.isSubmitting ? (

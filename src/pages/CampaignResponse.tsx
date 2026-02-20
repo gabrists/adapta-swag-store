@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { CheckCircle, Loader2 } from 'lucide-react'
+import { CheckCircle, Loader2, ImageIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import useSwagStore from '@/stores/useSwagStore'
@@ -106,12 +107,21 @@ export default function CampaignResponse() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#061412] p-4 sm:p-6">
       <div className="max-w-md w-full glass-panel p-6 sm:p-8 rounded-3xl border-white/10 shadow-2xl animate-fade-in-up">
         <div className="text-center mb-8">
-          <Badge
-            variant="outline"
-            className="mb-4 bg-primary/10 text-primary border-primary/20"
-          >
-            Coleta de Tamanho
-          </Badge>
+          {campaign.imageUrl ? (
+            <Avatar className="mx-auto w-32 h-32 mb-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-lg">
+              <AvatarImage src={campaign.imageUrl} className="object-cover" />
+              <AvatarFallback className="bg-slate-100 dark:bg-white/5 rounded-2xl">
+                <ImageIcon className="w-12 h-12 text-slate-400" />
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <Badge
+              variant="outline"
+              className="mb-4 bg-primary/10 text-primary border-primary/20"
+            >
+              Coleta de Tamanho
+            </Badge>
+          )}
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
             {campaign.name}
           </h1>
