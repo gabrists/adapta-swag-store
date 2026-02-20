@@ -174,36 +174,45 @@ export function ProductCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-5 pt-0 mt-auto flex flex-row items-center gap-3 w-full">
-        {/* Quantity Stepper - Hidden when out of stock */}
+      <CardFooter className="p-5 pt-0 mt-auto flex flex-row items-center w-full">
+        {/* Quantity Stepper - Hidden when out of stock or size not selected */}
         {!isOutOfStock && (
           <div
             className={cn(
-              'flex items-center shrink-0 bg-slate-50 dark:bg-black/20 rounded-xl p-1 border border-slate-200 dark:border-white/5 transition-opacity duration-300',
-              isStepperDisabled && 'opacity-50 pointer-events-none',
+              'transition-all duration-300 ease-in-out overflow-hidden shrink-0 flex items-center',
+              product.hasGrid && !selectedSize
+                ? 'max-w-0 opacity-0 mr-0'
+                : 'max-w-[120px] opacity-100 mr-3',
             )}
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              disabled={quantity <= 1 || isStepperDisabled}
+            <div
+              className={cn(
+                'flex items-center shrink-0 bg-slate-50 dark:bg-black/20 rounded-xl p-1 border border-slate-200 dark:border-white/5 w-[104px] justify-between',
+                isStepperDisabled && 'opacity-50 pointer-events-none',
+              )}
             >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-semibold w-6 text-center tabular-nums text-slate-900 dark:text-white select-none">
-              {quantity}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
-              onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
-              disabled={quantity >= maxQuantity || isStepperDisabled}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                disabled={quantity <= 1 || isStepperDisabled}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-semibold w-6 shrink-0 text-center tabular-nums text-slate-900 dark:text-white select-none">
+                {quantity}
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 shrink-0 rounded-lg text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10"
+                onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+                disabled={quantity >= maxQuantity || isStepperDisabled}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
 
@@ -236,14 +245,14 @@ export function ProductCard({
                 : 'default'
             }
             className={cn(
-              'flex-1 font-medium active:scale-[0.98] transition-all rounded-xl min-w-0 border border-transparent',
+              'flex-1 font-medium active:scale-[0.98] transition-all duration-300 rounded-xl min-w-0 border',
               hasOrdered && product.isSingleQuota
                 ? 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-white cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/10 shadow-none border-slate-200 dark:border-white/5'
                 : isOutOfStock
-                  ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none'
+                  ? 'bg-slate-200 dark:bg-gray-700 text-slate-500 dark:text-gray-300 cursor-not-allowed hover:bg-slate-200 dark:hover:bg-gray-700 shadow-none border-transparent'
                   : product.hasGrid && !selectedSize
-                    ? 'text-slate-600 dark:text-slate-300 shadow-none border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
-                    : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow shadow-md',
+                    ? 'text-slate-600 dark:text-slate-300 shadow-sm border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20 hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-100 cursor-default'
+                    : 'bg-[#0E9C8B] text-white hover:bg-[#09695d] dark:btn-primary-glow shadow-md border-transparent disabled:opacity-50',
             )}
             onClick={handleAddToCartClick}
             disabled={isDisabled}
