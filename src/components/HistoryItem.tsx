@@ -76,7 +76,9 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                   {entry.user.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="truncate max-w-[150px] text-slate-900">{entry.user}</span>
+              <span className="truncate max-w-[150px] text-slate-900">
+                {entry.user}
+              </span>
             </div>
           </div>
 

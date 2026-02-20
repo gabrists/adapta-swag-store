@@ -56,24 +56,24 @@ export function CollaboratorProfile({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="sm:max-w-md flex flex-col h-full p-0 gap-0 border-l shadow-xl">
-          <SheetHeader className="p-6 bg-slate-50 border-b border-slate-100 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
+        <SheetContent className="sm:max-w-md flex flex-col h-full p-0 gap-0 border-l border-slate-200 dark:border-white/10 shadow-xl">
+          <SheetHeader className="p-6 bg-slate-50 dark:bg-slate-950/40 border-b border-slate-100 dark:border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-5 dark:opacity-10 dark:text-white">
               <Package className="w-32 h-32" />
             </div>
             <SheetTitle className="sr-only">Perfil do Colaborador</SheetTitle>
             <div className="flex flex-col items-center relative z-10">
-              <Avatar className="h-24 w-24 border-4 border-white shadow-md mb-4 ring-1 ring-slate-200">
+              <Avatar className="h-24 w-24 border-4 border-white dark:border-[#081a17] shadow-md mb-4 ring-1 ring-slate-200 dark:ring-white/10">
                 <AvatarImage
                   src={collaborator.avatarUrl}
                   alt={collaborator.name}
                   className="object-cover"
                 />
-                <AvatarFallback className="text-2xl font-bold text-[#0E9C8B] bg-[#0E9C8B]/10">
+                <AvatarFallback className="text-2xl font-bold text-[#0E9C8B] bg-[#0E9C8B]/10 dark:bg-[#0E9C8B]/20">
                   {collaborator.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <h2 className="text-xl font-bold text-slate-900 text-center">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white text-center">
                 {collaborator.name}
               </h2>
               <div className="flex items-center gap-2 mt-1 text-sm text-[#ADADAD]">
@@ -91,27 +91,27 @@ export function CollaboratorProfile({
                   </span>
                   <Badge
                     variant="secondary"
-                    className="text-lg px-4 py-1 bg-white border border-slate-200 text-[#0E9C8B] shadow-sm"
+                    className="text-lg px-4 py-1 bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-[#0E9C8B] shadow-sm"
                   >
                     {totalItems}
                   </Badge>
                 </div>
               </div>
             </div>
-            <SheetDescription className="text-center mt-4 text-xs text-[#ADADAD]">
+            <SheetDescription className="text-center mt-4 text-xs text-[#ADADAD] dark:text-slate-400">
               Membro desde {format(new Date(), 'MMMM yyyy', { locale: ptBR })}
             </SheetDescription>
           </SheetHeader>
 
-          <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/30">
-            <div className="p-4 bg-white border-b border-slate-100 flex items-center justify-between shadow-sm z-10">
-              <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+          <div className="flex-1 overflow-hidden flex flex-col bg-slate-50/30 dark:bg-transparent">
+            <div className="p-4 bg-white dark:bg-transparent border-b border-slate-100 dark:border-white/5 flex items-center justify-between shadow-sm z-10">
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <History className="w-4 h-4 text-[#0E9C8B]" />
                 Histórico de Brindes
               </h3>
               <Badge
                 variant="outline"
-                className="text-xs font-normal text-[#ADADAD] bg-slate-50"
+                className="text-xs font-normal text-[#ADADAD] bg-slate-50 dark:bg-white/5 dark:border-white/10 dark:text-slate-300"
               >
                 {employeeOrders.length} entregas
               </Badge>
@@ -126,20 +126,20 @@ export function CollaboratorProfile({
                       <div key={order.id} className="relative pb-8 last:pb-0">
                         {/* Timeline Connector */}
                         {!isLast && (
-                          <div className="absolute left-[11px] top-3 bottom-0 w-px bg-slate-200" />
+                          <div className="absolute left-[11px] top-3 bottom-0 w-px bg-slate-200 dark:bg-white/10" />
                         )}
 
                         {/* Timeline Dot */}
-                        <div className="absolute left-0 top-3 h-[22px] w-[22px] rounded-full border-[3px] border-slate-50 bg-[#0E9C8B] shadow-sm flex items-center justify-center z-10">
+                        <div className="absolute left-0 top-3 h-[22px] w-[22px] rounded-full border-[3px] border-slate-50 dark:border-[#081a17] bg-[#0E9C8B] shadow-sm flex items-center justify-center z-10">
                           <div className="h-1.5 w-1.5 bg-white rounded-full" />
                         </div>
 
                         {/* Card Content */}
                         <div className="ml-10">
-                          <div className="bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group">
+                          <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10 shadow-sm hover:shadow-md dark:shadow-none dark:hover:bg-white/10 transition-shadow transition-colors duration-200 overflow-hidden group">
                             <div className="p-3 flex items-start gap-3">
                               {/* Product Image */}
-                              <Avatar className="h-12 w-12 border border-slate-100 rounded-md bg-slate-50">
+                              <Avatar className="h-12 w-12 border border-slate-100 dark:border-white/10 rounded-md bg-slate-50 dark:bg-black/20">
                                 <AvatarImage
                                   src={getImageSrc(
                                     order.productImage,
@@ -148,7 +148,7 @@ export function CollaboratorProfile({
                                   alt={order.productName}
                                   className="object-cover"
                                 />
-                                <AvatarFallback className="rounded-md text-[#ADADAD] text-xs font-bold bg-slate-100">
+                                <AvatarFallback className="rounded-md text-[#ADADAD] text-xs font-bold bg-slate-100 dark:bg-white/5">
                                   {order.productName
                                     ?.substring(0, 2)
                                     .toUpperCase() || 'IT'}
@@ -158,7 +158,7 @@ export function CollaboratorProfile({
                               {/* Details */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
-                                  <h4 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">
+                                  <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight line-clamp-2">
                                     {order.productName || 'Brinde sem nome'}
                                   </h4>
                                 </div>
@@ -178,7 +178,7 @@ export function CollaboratorProfile({
                                       </span>
                                       <Badge
                                         variant="secondary"
-                                        className="text-[10px] px-1 h-4 bg-slate-100 text-[#ADADAD] border-none"
+                                        className="text-[10px] px-1 h-4 bg-slate-100 dark:bg-white/10 text-[#ADADAD] dark:text-slate-400 border-none"
                                       >
                                         Tam: {order.size}
                                       </Badge>
@@ -188,9 +188,9 @@ export function CollaboratorProfile({
                               </div>
                             </div>
 
-                            <Separator className="bg-slate-50" />
+                            <Separator className="bg-slate-50 dark:bg-white/5" />
 
-                            <div className="bg-slate-50/50 px-3 py-2 flex items-center justify-between text-xs">
+                            <div className="bg-slate-50/50 dark:bg-black/20 px-3 py-2 flex items-center justify-between text-xs">
                               <span className="text-[#ADADAD] flex items-center gap-1.5">
                                 <Box className="w-3 h-3" />
                                 Entregue
@@ -211,13 +211,13 @@ export function CollaboratorProfile({
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center p-8">
-                  <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
                     <Package className="w-8 h-8 text-[#ADADAD]" />
                   </div>
-                  <h3 className="text-slate-900 font-medium mb-1">
+                  <h3 className="text-slate-900 dark:text-slate-300 font-medium mb-1">
                     Nenhum item retirado
                   </h3>
-                  <p className="text-[#ADADAD] text-sm max-w-[200px]">
+                  <p className="text-[#ADADAD] dark:text-slate-500 text-sm max-w-[200px]">
                     Nenhum item retirado até o momento por este colaborador.
                   </p>
                 </div>
@@ -225,7 +225,7 @@ export function CollaboratorProfile({
             </ScrollArea>
           </div>
 
-          <SheetFooter className="p-4 border-t border-slate-100 bg-white">
+          <SheetFooter className="p-4 border-t border-slate-100 dark:border-white/10 bg-white dark:bg-[#081a17]">
             <Button
               className="w-full bg-[#0E9C8B] hover:bg-[#0E9C8B]/90 text-white gap-2 shadow-sm transition-all hover:shadow-md"
               onClick={() => setShowManualDelivery(true)}
