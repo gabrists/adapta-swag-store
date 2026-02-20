@@ -49,9 +49,9 @@ export function CartSheet() {
           <Button
             variant="outline"
             size="icon"
-            className="relative border-white/10 hover:bg-white/10 bg-black/20 text-white"
+            className="relative border-gray-200 dark:border-white/10 bg-white dark:bg-black/20 text-slate-900 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition-all"
           >
-            <ShoppingCart className="h-5 w-5 text-slate-200" />
+            <ShoppingCart className="h-5 w-5" />
             {totalItems > 0 && (
               <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full p-0 text-[10px] bg-primary border-none shadow-[0_0_10px_rgba(20,240,214,0.5)] pointer-events-none text-primary-foreground font-bold">
                 {totalItems}
