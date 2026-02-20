@@ -42,22 +42,22 @@ export function HistoryItem({ entry }: HistoryItemProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="group flex items-center p-4 bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md hover:border-[#0E9C8B]/30 transition-all cursor-pointer relative overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0E9C8B] opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="group flex items-center p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm hover:shadow-md hover:border-[#00CA7E]/30 dark:hover:border-[#00CA7E]/50 transition-all cursor-pointer relative overflow-hidden">
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00CA7E] opacity-0 group-hover:opacity-100 transition-opacity" />
 
           <div className="relative mr-4 shrink-0">
-            <Avatar className="h-12 w-12 border border-slate-200">
+            <Avatar className="h-12 w-12 border border-slate-200 dark:border-slate-700">
               <AvatarImage
                 src={thumbnail}
                 alt={firstItem.productName}
                 className="object-cover"
               />
-              <AvatarFallback>
+              <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                 {firstItem.productName.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             {entry.items.length > 1 && (
-              <div className="absolute -bottom-1 -right-1 bg-slate-900 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border border-white">
+              <div className="absolute -bottom-1 -right-1 bg-slate-900 dark:bg-slate-700 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border border-white dark:border-slate-800">
                 +{entry.items.length - 1}
               </div>
             )}
@@ -65,18 +65,18 @@ export function HistoryItem({ entry }: HistoryItemProps) {
 
           <div className="flex-1 min-w-0 pr-4">
             <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-slate-900 truncate group-hover:text-[#0E9C8B] transition-colors">
+              <h4 className="font-semibold text-slate-900 dark:text-white truncate group-hover:text-[#00CA7E] transition-colors">
                 Pedido #{entry.id.substring(0, 6)}
               </h4>
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-white">
+            <div className="flex items-center gap-1.5 text-sm">
               <Avatar className="h-5 w-5 shrink-0">
                 <AvatarImage src={userAvatarUrl} alt={entry.user} />
-                <AvatarFallback className="text-[8px] bg-slate-100 text-white">
+                <AvatarFallback className="text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {entry.user.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <span className="truncate max-w-[150px] text-slate-900">
+              <span className="truncate max-w-[150px] text-slate-700 dark:text-slate-300">
                 {entry.user}
               </span>
             </div>
@@ -85,18 +85,18 @@ export function HistoryItem({ entry }: HistoryItemProps) {
           <div className="text-right pl-2 flex flex-col items-end gap-1">
             <Badge
               variant="secondary"
-              className="font-mono text-xs bg-slate-100 text-slate-700 group-hover:bg-[#0E9C8B]/10 group-hover:text-[#0E9C8B] transition-colors"
+              className="font-mono text-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 group-hover:bg-[#00CA7E]/10 group-hover:text-[#00CA7E] transition-colors"
             >
               {itemCount} {itemCount === 1 ? 'item' : 'itens'}
             </Badge>
-            <span className="text-xs text-slate-500 whitespace-nowrap">
+            <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
               {format(date, 'd MMM, HH:mm', { locale: ptBR })}
             </span>
           </div>
         </div>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[450px] p-0 gap-0 overflow-hidden border-none shadow-2xl">
+      <DialogContent className="sm:max-w-[450px] p-0 gap-0 overflow-hidden border-none shadow-2xl glass-panel">
         <DialogHeader className="sr-only">
           <DialogTitle>Detalhes do Pedido</DialogTitle>
           <DialogDescription>
@@ -104,7 +104,7 @@ export function HistoryItem({ entry }: HistoryItemProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="bg-[#0E9C8B] p-6 text-white flex flex-col items-center justify-center relative">
+        <div className="bg-[#00CA7E] p-6 text-white flex flex-col items-center justify-center relative">
           <div className="bg-white/20 absolute inset-0 backdrop-blur-[2px]" />
           <div className="relative z-10 flex flex-col items-center w-full">
             <div className="h-16 w-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm mb-3 border border-white/30">
@@ -119,10 +119,10 @@ export function HistoryItem({ entry }: HistoryItemProps) {
           </div>
         </div>
 
-        <div className="flex flex-col max-h-[60vh]">
+        <div className="flex flex-col max-h-[60vh] bg-white dark:bg-[#081a17]/90">
           <div className="p-6 pb-0 space-y-4">
-            <div className="flex items-center p-3 rounded-lg bg-slate-50 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-white mr-3 shrink-0 overflow-hidden">
+            <div className="flex items-center p-3 rounded-lg bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5">
+              <div className="w-10 h-10 rounded-full bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 dark:text-slate-500 mr-3 shrink-0 overflow-hidden">
                 <img
                   src={userAvatarUrl}
                   alt={entry.user}
@@ -130,23 +130,27 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                 />
               </div>
               <div className="flex-1">
-                <div className="text-xs text-slate-500">Retirado por</div>
-                <div className="font-medium text-slate-900">{entry.user}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">
+                  Retirado por
+                </div>
+                <div className="font-medium text-slate-900 dark:text-white">
+                  {entry.user}
+                </div>
               </div>
-              <div className="h-8 w-px bg-slate-200 mx-3" />
+              <div className="h-8 w-px bg-slate-200 dark:bg-white/10 mx-3" />
               <div className="flex-1">
-                <div className="text-xs text-slate-500 flex items-center gap-1">
+                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> Destino
                 </div>
-                <div className="font-medium text-slate-900 truncate">
+                <div className="font-medium text-slate-900 dark:text-white truncate">
                   {entry.destination}
                 </div>
               </div>
             </div>
 
-            <h3 className="text-sm font-medium text-slate-900 flex items-center gap-2 pt-2">
-              <Package className="w-4 h-4 text-slate-500" /> Itens Retirados (
-              {itemCount})
+            <h3 className="text-sm font-medium text-slate-900 dark:text-white flex items-center gap-2 pt-2">
+              <Package className="w-4 h-4 text-slate-500 dark:text-slate-400" />{' '}
+              Itens Retirados ({itemCount})
             </h3>
           </div>
 
@@ -155,9 +159,9 @@ export function HistoryItem({ entry }: HistoryItemProps) {
               {entry.items.map((item, idx) => (
                 <div
                   key={`${item.productId}-${idx}`}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-colors"
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
                 >
-                  <Avatar className="h-12 w-12 border border-slate-100 rounded-md">
+                  <Avatar className="h-12 w-12 border border-slate-100 dark:border-white/10 rounded-md">
                     <AvatarImage
                       src={
                         item.productImageQuery.startsWith('http') ||
@@ -168,24 +172,24 @@ export function HistoryItem({ entry }: HistoryItemProps) {
                       alt={item.productName}
                       className="object-cover"
                     />
-                    <AvatarFallback className="rounded-md">
+                    <AvatarFallback className="rounded-md bg-slate-100 dark:bg-black/20 text-slate-700 dark:text-slate-300">
                       {item.productName.substring(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-900 text-sm truncate">
+                    <p className="font-medium text-slate-900 dark:text-white text-sm truncate">
                       {item.productName}
                     </p>
                     {item.size && (
                       <Badge
                         variant="outline"
-                        className="text-[10px] h-5 px-1.5 border-slate-200 text-slate-500 bg-white mt-1"
+                        className="text-[10px] h-5 px-1.5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 bg-white dark:bg-black/20 mt-1"
                       >
                         Tamanho: {item.size}
                       </Badge>
                     )}
                   </div>
-                  <div className="font-mono text-sm font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">
+                  <div className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-black/20 px-2 py-1 rounded">
                     x{item.quantity}
                   </div>
                 </div>
@@ -194,9 +198,12 @@ export function HistoryItem({ entry }: HistoryItemProps) {
           </ScrollArea>
         </div>
 
-        <div className="bg-slate-50 px-6 py-4 flex justify-end border-t border-slate-100">
+        <div className="bg-slate-50 dark:bg-[#081a17] px-6 py-4 flex justify-end border-t border-slate-100 dark:border-white/5">
           <DialogClose asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10"
+            >
               Fechar
             </Button>
           </DialogClose>
