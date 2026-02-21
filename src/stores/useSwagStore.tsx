@@ -60,6 +60,7 @@ interface SwagContextType {
   updateCollaborator: (collaborator: Collaborator) => Promise<void>
   deleteCollaborator: (id: string) => Promise<void>
   approveOrder: (order: Order) => Promise<void>
+  bulkApproveOrders: (orders: Order[]) => Promise<void>
   rejectOrder: (orderId: string, reason: string) => Promise<void>
   registerManualDelivery: (
     employeeId: string,
@@ -773,7 +774,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       await updateLocalStock(order.itemId, order.quantity, order.size)
 
-      const approvalMsg = `✅ *Boas notícias!* Seu pedido do ${order.productName} foi aprovado. Você já pode retirá-lo com o time de Facilities/RH.`
+      const approvalMsg = `Boas notícias! Seu pedido foi aprovado, no seu pedido tinha:\n\n- ${order.quantity}x ${order.productName}\n\nVocê já pode retirá-lo com o time de RH.`
       if (order.employeeId) {
         notifySlackDM(order.employeeId, approvalMsg)
       }
@@ -791,6 +792,68 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       toast({
         title: 'Erro ao aprovar',
         description: 'Não foi possível processar a aprovação.',
+        variant: 'destructive',
+      })
+    }
+  }
+
+  const bulkApproveOrders = async (ordersToApprove: Order[]) => {
+    if (!checkAdminPermission()) return
+    if (ordersToApprove.length === 0) return
+
+    try {
+      const movements = ordersToApprove.map((order) => ({
+        group_id: crypto.randomUUID(),
+        item_id: order.itemId,
+        employee_id: order.employeeId,
+        type: 'OUT',
+        quantity: order.quantity,
+        size: order.size,
+        destination: 'Solicitação Aprovada',
+      }))
+
+      const { error: moveError } = await supabase
+        .from('inventory_movements')
+        .insert(movements)
+
+      if (moveError) throw moveError
+
+      const orderIds = ordersToApprove.map((o) => o.id)
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ status: 'Entregue' })
+        .in('id', orderIds)
+
+      if (updateError) throw updateError
+
+      for (const order of ordersToApprove) {
+        await updateLocalStock(order.itemId, order.quantity, order.size)
+      }
+
+      const employeeId = ordersToApprove[0].employeeId
+      const itemsList = ordersToApprove
+        .map((item) => `- ${item.quantity}x ${item.productName}`)
+        .join('\n')
+
+      const approvalMsg = `Boas notícias! Seu pedido foi aprovado, no seu pedido tinha:\n\n${itemsList}\n\nVocê já pode retirá-lo com o time de RH.`
+
+      if (employeeId) {
+        notifySlackDM(employeeId, approvalMsg)
+      }
+
+      toast({
+        title: 'Pedidos Aprovados',
+        description: 'Estoque atualizado e pedidos marcados como entregues.',
+        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+      })
+      triggerConfetti()
+
+      await Promise.all([fetchOrders(), fetchHistory()])
+    } catch (error) {
+      console.error('Bulk Approve error:', error)
+      toast({
+        title: 'Erro ao aprovar',
+        description: 'Não foi possível processar a aprovação em lote.',
         variant: 'destructive',
       })
     }
@@ -1219,6 +1282,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         updateCollaborator,
         deleteCollaborator,
         approveOrder,
+        bulkApproveOrders,
         rejectOrder,
         registerManualDelivery,
         saveSlackSettings,

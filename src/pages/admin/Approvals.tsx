@@ -31,7 +31,8 @@ interface OrderGroup {
 }
 
 export default function ApprovalsPage() {
-  const { orders, approveOrder, rejectOrder, isLoading } = useSwagStore()
+  const { orders, approveOrder, bulkApproveOrders, rejectOrder, isLoading } =
+    useSwagStore()
   const [searchQuery, setSearchQuery] = useState('')
 
   const [localResolved, setLocalResolved] = useState<
@@ -164,7 +165,7 @@ export default function ApprovalsPage() {
       return next
     })
 
-    await Promise.all(pendingItems.map((o) => approveOrder(o)))
+    await bulkApproveOrders(pendingItems)
   }
 
   const handleRejectClick = (order: Order) => {
