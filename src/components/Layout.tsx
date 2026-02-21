@@ -330,7 +330,7 @@ export default function Layout() {
               <ThemeToggle />
               {!location.pathname.startsWith('/admin') && <CartSheet />}
 
-              {!isAdmin && (
+              {isAdmin && (
                 <>
                   <Button
                     asChild
