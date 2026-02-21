@@ -710,13 +710,18 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       const currentEmail = currentEmp?.email || user.email
 
-      for (const item of cart) {
-        const channelMessage = `🚨 *Novo Pedido de Swag:* ${user.name} (${currentEmail}) solicitou ${item.quantity}x ${item.productName}. Acesse o painel para aprovar ou rejeitar: ${window.location.origin}/admin/approvals`
-        notifySlackChannel(channelMessage)
+      const totalDistinctItems = cart.length
+      const itemWord = totalDistinctItems === 1 ? 'item' : 'itens'
+      const itemsList = cart
+        .map((item) => `- ${item.quantity}x ${item.productName}`)
+        .join('\n')
+      const adminUrl = `${window.location.origin}/admin/approvals`
 
-        const dmMessage = `⏳ *Recebemos seu pedido!* Sua solicitação para ${item.productName} foi enviada ao RH. Avisaremos aqui quando houver atualização.`
-        notifySlackDM(user.id, dmMessage)
-      }
+      const channelMessage = `:rotating_light: Novo Pedido de Swag: ${user.name} (${currentEmail}) solicitou ${totalDistinctItems} ${itemWord}:\n\n${itemsList}\n\nAcesse o painel para aprovar ou rejeitar: ${adminUrl}`
+      notifySlackChannel(channelMessage)
+
+      const dmMessage = `⏳ *Recebemos seu pedido!* Sua solicitação para os seguintes itens foi enviada ao RH:\n\n${itemsList}\n\nAvisaremos aqui quando houver atualização.`
+      notifySlackDM(user.id, dmMessage)
 
       setCart([])
       toast({
