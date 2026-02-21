@@ -15,7 +15,6 @@ import {
   LogOut,
   User as UserIcon,
   ChevronsUpDown,
-  Plus,
   Users,
   Clock,
   ClipboardCheck,
@@ -329,31 +328,6 @@ export default function Layout() {
             <div className="flex items-center gap-2">
               <ThemeToggle />
               {!location.pathname.startsWith('/admin') && <CartSheet />}
-
-              {isAdmin && (
-                <>
-                  <Button
-                    asChild
-                    size="sm"
-                    className="hidden sm:flex btn-primary-glow shadow-sm"
-                  >
-                    <Link to="/gerenciar">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Cadastrar Brinde
-                    </Link>
-                  </Button>
-                  <Button
-                    asChild
-                    size="icon"
-                    className="flex sm:hidden btn-primary-glow shadow-sm h-8 w-8"
-                  >
-                    <Link to="/gerenciar">
-                      <Plus className="h-4 w-4" />
-                      <span className="sr-only">Cadastrar Brinde</span>
-                    </Link>
-                  </Button>
-                </>
-              )}
             </div>
           </div>
         </header>
