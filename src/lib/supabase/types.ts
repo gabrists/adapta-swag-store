@@ -463,8 +463,84 @@ export const Constants = {
 } as const
 
 // ====== DATABASE EXTENDED CONTEXT (auto-generated) ======
-// This section contains constraints, RLS policies, functions, triggers,
-// indexes and materialized views not present in the type definitions above.
+// This section contains actual PostgreSQL column types, constraints, RLS policies,
+// functions, triggers, indexes and materialized views not present in the type definitions above.
+// IMPORTANT: The TypeScript types above map UUID, TEXT, VARCHAR all to "string".
+// Use the COLUMN TYPES section below to know the real PostgreSQL type for each column.
+// Always use the correct PostgreSQL type when writing SQL migrations.
+
+// --- COLUMN TYPES (actual PostgreSQL types) ---
+// Use this to know the real database type when writing migrations.
+// "string" in TypeScript types above may be uuid, text, varchar, timestamptz, etc.
+// Table: campaign_responses
+//   id: uuid (not null, default: gen_random_uuid())
+//   campaign_id: uuid (not null)
+//   employee_id: uuid (not null)
+//   choice: text (not null)
+//   updated_at: timestamp with time zone (nullable, default: CURRENT_TIMESTAMP)
+// Table: departments
+//   id: uuid (not null, default: gen_random_uuid())
+//   name: text (not null)
+//   created_at: timestamp with time zone (nullable, default: now())
+// Table: employees
+//   id: uuid (not null, default: gen_random_uuid())
+//   name: text (not null)
+//   email: text (not null)
+//   department_id: uuid (nullable)
+//   role: text (nullable, default: 'Colaborador'::text)
+//   avatar_url: text (nullable)
+//   created_at: timestamp with time zone (nullable, default: now())
+//   onboarding_kit_status: text (nullable, default: 'Pendente'::text)
+// Table: inventory_movements
+//   id: uuid (not null, default: gen_random_uuid())
+//   group_id: uuid (not null)
+//   item_id: uuid (not null)
+//   employee_id: uuid (nullable)
+//   type: text (not null)
+//   quantity: integer (not null)
+//   size: text (nullable)
+//   destination: text (nullable)
+//   created_at: timestamp with time zone (nullable, default: now())
+// Table: items
+//   id: uuid (not null, default: gen_random_uuid())
+//   name: text (not null)
+//   description: text (nullable)
+//   image_url: text (nullable)
+//   category: text (not null, default: 'Geral'::text)
+//   price: numeric (nullable, default: 0)
+//   has_grid: boolean (nullable, default: false)
+//   grid: jsonb (nullable)
+//   current_stock: integer (not null, default: 0)
+//   critical_level: integer (not null, default: 5)
+//   created_at: timestamp with time zone (nullable, default: now())
+//   unit_cost: numeric (not null, default: 0)
+//   supplier_url: text (nullable)
+//   is_single_quota: boolean (not null, default: false)
+//   is_active: boolean (not null, default: true)
+// Table: orders
+//   id: uuid (not null, default: gen_random_uuid())
+//   employee_id: uuid (not null)
+//   item_id: uuid (not null)
+//   quantity: integer (not null, default: 1)
+//   size: text (nullable)
+//   status: text (not null, default: 'Pendente'::text)
+//   rejection_reason: text (nullable)
+//   created_at: timestamp with time zone (nullable, default: now())
+// Table: slack_settings
+//   id: uuid (not null, default: gen_random_uuid())
+//   webhook_url: text (not null, default: ''::text)
+//   is_enabled: boolean (not null, default: false)
+//   created_at: timestamp with time zone (nullable, default: now())
+//   updated_at: timestamp with time zone (nullable, default: now())
+//   bot_token: text (nullable, default: ''::text)
+// Table: swag_campaigns
+//   id: uuid (not null, default: gen_random_uuid())
+//   name: text (not null)
+//   description: text (nullable)
+//   status: text (not null, default: 'Aberta'::text)
+//   options: jsonb (not null, default: '[]'::jsonb)
+//   created_at: timestamp with time zone (nullable, default: CURRENT_TIMESTAMP)
+//   image_url: text (nullable)
 
 // --- CONSTRAINTS ---
 // Table: campaign_responses

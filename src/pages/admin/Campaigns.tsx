@@ -13,6 +13,8 @@ import {
   Link as LinkIcon,
   ExternalLink,
   Copy,
+  Check,
+  ChevronsUpDown,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -49,6 +51,22 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '@/components/ui/command'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { cn } from '@/lib/utils'
+
 import useSwagStore from '@/stores/useSwagStore'
 import { useToast } from '@/hooks/use-toast'
 import { uploadToR2 } from '@/lib/storage'
@@ -57,17 +75,27 @@ const formSchema = z.object({
   name: z.string().min(2, 'O nome é obrigatório'),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
+  targetType: z.enum(['all', 'departments', 'employees']).default('all'),
+  targetIds: z.array(z.string()).default([]),
 })
 
 export default function CampaignsPage() {
-  const { campaigns, campaignResponses, team, createCampaign, updateCampaign } =
-    useSwagStore()
+  const {
+    campaigns,
+    campaignResponses,
+    team,
+    departments,
+    createCampaign,
+    updateCampaign,
+  } = useSwagStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null)
   const [options, setOptions] = useState<string[]>([])
   const [optionInput, setOptionInput] = useState('')
   const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [openDepartments, setOpenDepartments] = useState(false)
+  const [openEmployees, setOpenEmployees] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
@@ -77,6 +105,8 @@ export default function CampaignsPage() {
       name: '',
       description: '',
       imageUrl: '',
+      targetType: 'all',
+      targetIds: [],
     },
   })
 
@@ -129,6 +159,8 @@ export default function CampaignsPage() {
       name: campaign.name,
       description: campaign.description || '',
       imageUrl: campaign.imageUrl || '',
+      targetType: campaign.targetType || 'all',
+      targetIds: campaign.targetIds || [],
     })
     setOptions(campaign.options)
     setIsDialogOpen(true)
@@ -154,6 +186,19 @@ export default function CampaignsPage() {
       return
     }
 
+    if (
+      values.targetType !== 'all' &&
+      (!values.targetIds || values.targetIds.length === 0)
+    ) {
+      toast({
+        title: 'Público-alvo vazio',
+        description:
+          'Você precisa selecionar ao menos um departamento ou colaborador.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     try {
       if (editingCampaign) {
         await updateCampaign(editingCampaign.id, {
@@ -161,6 +206,8 @@ export default function CampaignsPage() {
           description: values.description,
           imageUrl: values.imageUrl,
           options,
+          targetType: values.targetType,
+          targetIds: values.targetIds,
         })
         toast({
           title: 'Campanha Atualizada',
@@ -173,6 +220,8 @@ export default function CampaignsPage() {
           description: values.description,
           imageUrl: values.imageUrl,
           options,
+          targetType: values.targetType,
+          targetIds: values.targetIds,
         })
         toast({
           title: 'Campanha Criada',
@@ -193,6 +242,18 @@ export default function CampaignsPage() {
     }
   }
 
+  const getTargetTeam = (campaign: Campaign) => {
+    if (campaign.targetType === 'departments') {
+      return team.filter((e) =>
+        campaign.targetIds?.includes(e.departmentId || ''),
+      )
+    }
+    if (campaign.targetType === 'employees') {
+      return team.filter((e) => campaign.targetIds?.includes(e.id))
+    }
+    return team
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto space-y-6 pb-12 animate-fade-in-up">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -208,7 +269,13 @@ export default function CampaignsPage() {
         <Button
           onClick={() => {
             setEditingCampaign(null)
-            form.reset({ name: '', description: '', imageUrl: '' })
+            form.reset({
+              name: '',
+              description: '',
+              imageUrl: '',
+              targetType: 'all',
+              targetIds: [],
+            })
             setOptions([])
             setIsDialogOpen(true)
           }}
@@ -242,7 +309,7 @@ export default function CampaignsPage() {
                 Status
               </TableHead>
               <TableHead className="text-slate-700 dark:text-[#ADADAD]">
-                Opções
+                Público-Alvo
               </TableHead>
               <TableHead className="text-center text-slate-700 dark:text-[#ADADAD]">
                 Progresso
@@ -268,12 +335,20 @@ export default function CampaignsPage() {
               </TableRow>
             ) : (
               filteredCampaigns.map((campaign) => {
-                const totalTarget = team.length
-                const responsesCount = campaignResponses.filter(
+                const targetTeam = getTargetTeam(campaign)
+                const totalTarget = targetTeam.length
+
+                const campaignResps = campaignResponses.filter(
                   (r) => r.campaignId === campaign.id,
+                )
+                const validResponsesCount = targetTeam.filter((emp) =>
+                  campaignResps.some((r) => r.employeeId === emp.id),
                 ).length
+
                 const progress =
-                  totalTarget > 0 ? (responsesCount / totalTarget) * 100 : 0
+                  totalTarget > 0
+                    ? (validResponsesCount / totalTarget) * 100
+                    : 0
 
                 return (
                   <TableRow
@@ -309,35 +384,25 @@ export default function CampaignsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {campaign.options.slice(0, 3).map((opt) => (
-                          <Badge
-                            key={opt}
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-[#ADADAD] border border-slate-200 dark:border-transparent"
-                          >
-                            {opt}
-                          </Badge>
-                        ))}
-                        {campaign.options.length > 3 && (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-[#ADADAD] border border-slate-200 dark:border-transparent"
-                          >
-                            +{campaign.options.length - 3}
-                          </Badge>
-                        )}
-                      </div>
+                      <Badge
+                        variant="secondary"
+                        className="text-xs px-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-[#ADADAD] border border-slate-200 dark:border-transparent"
+                      >
+                        {campaign.targetType === 'all' && 'Toda a Empresa'}
+                        {campaign.targetType === 'departments' &&
+                          'Por Departamento'}
+                        {campaign.targetType === 'employees' && 'Colaboradores'}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex flex-col items-center justify-center">
                         <span className="text-sm font-semibold text-slate-900 dark:text-white">
-                          {responsesCount} / {totalTarget}
+                          {validResponsesCount} / {totalTarget}
                         </span>
                         <div className="w-full max-w-[80px] h-1.5 bg-gray-200 dark:bg-white/10 rounded-full mt-1 overflow-hidden">
                           <div
                             className="h-full bg-primary rounded-full transition-all"
-                            style={{ width: `${progress}%` }}
+                            style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>
                       </div>
@@ -389,7 +454,7 @@ export default function CampaignsPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>
               {editingCampaign ? 'Editar Campanha' : 'Nova Campanha de Coleta'}
@@ -524,6 +589,273 @@ export default function CampaignsPage() {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="targetType"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Público-Alvo</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={(val) => {
+                          field.onChange(val)
+                          form.setValue('targetIds', [])
+                        }}
+                        defaultValue={field.value}
+                        className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+                      >
+                        <FormItem className="flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-white/10 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors space-y-2 text-center relative group has-[:checked]:border-primary/50 has-[:checked]:bg-primary/5">
+                          <FormControl>
+                            <RadioGroupItem
+                              value="all"
+                              className="absolute top-2 right-2"
+                            />
+                          </FormControl>
+                          <FormLabel className="font-medium cursor-pointer w-full text-sm">
+                            Toda a Empresa
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-white/10 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors space-y-2 text-center relative group has-[:checked]:border-primary/50 has-[:checked]:bg-primary/5">
+                          <FormControl>
+                            <RadioGroupItem
+                              value="departments"
+                              className="absolute top-2 right-2"
+                            />
+                          </FormControl>
+                          <FormLabel className="font-medium cursor-pointer w-full text-sm">
+                            Por Departamento
+                          </FormLabel>
+                        </FormItem>
+                        <FormItem className="flex flex-col items-center justify-center p-3 border border-slate-200 dark:border-white/10 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors space-y-2 text-center relative group has-[:checked]:border-primary/50 has-[:checked]:bg-primary/5">
+                          <FormControl>
+                            <RadioGroupItem
+                              value="employees"
+                              className="absolute top-2 right-2"
+                            />
+                          </FormControl>
+                          <FormLabel className="font-medium cursor-pointer w-full text-sm leading-tight">
+                            Colaboradores Específicos
+                          </FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {form.watch('targetType') === 'departments' && (
+                <FormField
+                  control={form.control}
+                  name="targetIds"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col animate-fade-in-up">
+                      <FormLabel>Departamentos Selecionados</FormLabel>
+                      <Popover
+                        open={openDepartments}
+                        onOpenChange={setOpenDepartments}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'w-full justify-between bg-transparent',
+                                !field.value?.length && 'text-muted-foreground',
+                              )}
+                            >
+                              {field.value?.length > 0
+                                ? `${field.value.length} departamento(s) selecionado(s)`
+                                : 'Selecione departamentos...'}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0"
+                          align="start"
+                        >
+                          <Command>
+                            <CommandInput placeholder="Buscar departamento..." />
+                            <CommandList>
+                              <CommandEmpty>
+                                Nenhum departamento encontrado.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {Object.entries(departments).map(
+                                  ([id, name]) => (
+                                    <CommandItem
+                                      key={id}
+                                      value={name}
+                                      onSelect={() => {
+                                        const current = field.value || []
+                                        const updated = current.includes(id)
+                                          ? current.filter((val) => val !== id)
+                                          : [...current, id]
+                                        field.onChange(updated)
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          'mr-2 h-4 w-4',
+                                          field.value?.includes(id)
+                                            ? 'opacity-100'
+                                            : 'opacity-0',
+                                        )}
+                                      />
+                                      {name}
+                                    </CommandItem>
+                                  ),
+                                )}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {field.value?.map((id) => (
+                          <Badge
+                            key={id}
+                            variant="secondary"
+                            className="flex items-center gap-1.5 px-2 py-1 bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white border border-slate-200 dark:border-white/10"
+                          >
+                            {departments[id] || 'Desconhecido'}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                field.onChange(
+                                  field.value.filter((v) => v !== id),
+                                )
+                              }
+                              className="focus:outline-none ml-1"
+                            >
+                              <X className="h-3.5 w-3.5 cursor-pointer hover:text-red-500 text-slate-500 transition-colors" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {form.watch('targetType') === 'employees' && (
+                <FormField
+                  control={form.control}
+                  name="targetIds"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col animate-fade-in-up">
+                      <FormLabel>Colaboradores Selecionados</FormLabel>
+                      <Popover
+                        open={openEmployees}
+                        onOpenChange={setOpenEmployees}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                'w-full justify-between bg-transparent',
+                                !field.value?.length && 'text-muted-foreground',
+                              )}
+                            >
+                              {field.value?.length > 0
+                                ? `${field.value.length} colaborador(es) selecionado(s)`
+                                : 'Selecione colaboradores...'}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-[var(--radix-popover-trigger-width)] p-0"
+                          align="start"
+                        >
+                          <Command>
+                            <CommandInput placeholder="Buscar colaborador..." />
+                            <CommandList>
+                              <CommandEmpty>
+                                Nenhum colaborador encontrado.
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {team.map((emp) => (
+                                  <CommandItem
+                                    key={emp.id}
+                                    value={`${emp.name} ${emp.email}`}
+                                    onSelect={() => {
+                                      const current = field.value || []
+                                      const updated = current.includes(emp.id)
+                                        ? current.filter(
+                                            (val) => val !== emp.id,
+                                          )
+                                        : [...current, emp.id]
+                                      field.onChange(updated)
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        'mr-2 h-4 w-4 shrink-0',
+                                        field.value?.includes(emp.id)
+                                          ? 'opacity-100'
+                                          : 'opacity-0',
+                                      )}
+                                    />
+                                    <Avatar className="h-6 w-6 mr-2 shrink-0">
+                                      <AvatarImage src={emp.avatarUrl} />
+                                      <AvatarFallback>
+                                        {emp.name.substring(0, 2)}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="truncate">{emp.name}</span>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {field.value?.map((id) => {
+                          const emp = team.find((e) => e.id === id)
+                          if (!emp) return null
+                          return (
+                            <Badge
+                              key={id}
+                              variant="secondary"
+                              className="flex items-center gap-1.5 pl-1.5 pr-2 py-1 bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white border border-slate-200 dark:border-white/10"
+                            >
+                              <Avatar className="h-5 w-5 shrink-0">
+                                <AvatarImage src={emp.avatarUrl} />
+                                <AvatarFallback className="text-[10px]">
+                                  {emp.name.substring(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="truncate max-w-[140px]">
+                                {emp.name}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  field.onChange(
+                                    field.value.filter((v) => v !== id),
+                                  )
+                                }
+                                className="focus:outline-none ml-1"
+                              >
+                                <X className="h-3.5 w-3.5 cursor-pointer hover:text-red-500 text-slate-500 transition-colors" />
+                              </button>
+                            </Badge>
+                          )
+                        })}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className="space-y-3">
                 <FormLabel>Opções de Escolha</FormLabel>

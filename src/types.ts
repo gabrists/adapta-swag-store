@@ -76,6 +76,7 @@ export interface Collaborator {
   name: string
   email: string
   department: string
+  departmentId?: string
   role: string
   avatarUrl?: string
   onboardingKitStatus: 'Pendente' | 'Entregue'
@@ -95,6 +96,8 @@ export interface Campaign {
   imageUrl?: string
   status: 'Aberta' | 'Fechada'
   options: string[]
+  targetType: 'all' | 'departments' | 'employees'
+  targetIds?: string[]
   createdAt: string
 }
 

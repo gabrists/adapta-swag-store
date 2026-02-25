@@ -52,27 +52,29 @@ export default function CampaignDashboard() {
     campaignResponses,
     team,
     updateCampaignStatus,
-    sendSlackNotification,
+    notifySlackChannel,
+    notifySlackDM,
   } = useSwagStore()
   const { toast } = useToast()
 
   const campaign = campaigns.find((c) => c.id === id)
   const responses = campaignResponses.filter((r) => r.campaignId === id)
 
-  const totalEmployees = team.length
-  const responsesCount = responses.length
-  const pendingCount = totalEmployees - responsesCount
-
-  const chartData = useMemo(() => {
-    if (!campaign) return []
-    return campaign.options.map((opt) => ({
-      name: opt,
-      value: responses.filter((r) => r.choice === opt).length,
-    }))
-  }, [campaign, responses])
+  const targetTeam = useMemo(() => {
+    if (!campaign) return team
+    if (campaign.targetType === 'departments') {
+      return team.filter((e) =>
+        campaign.targetIds?.includes(e.departmentId || ''),
+      )
+    }
+    if (campaign.targetType === 'employees') {
+      return team.filter((e) => campaign.targetIds?.includes(e.id))
+    }
+    return team
+  }, [campaign, team])
 
   const tableData = useMemo(() => {
-    return team.map((emp) => {
+    return targetTeam.map((emp) => {
       const resp = responses.find((r) => r.employeeId === emp.id)
       return {
         id: emp.id,
@@ -84,7 +86,25 @@ export default function CampaignDashboard() {
           : null,
       }
     })
-  }, [team, responses])
+  }, [targetTeam, responses])
+
+  const chartData = useMemo(() => {
+    if (!campaign) return []
+    // Only count responses from target team to avoid skewing charts if audience changed
+    const targetResponses = responses.filter((r) =>
+      targetTeam.some((emp) => emp.id === r.employeeId),
+    )
+    return campaign.options.map((opt) => ({
+      name: opt,
+      value: targetResponses.filter((r) => r.choice === opt).length,
+    }))
+  }, [campaign, responses, targetTeam])
+
+  const totalEmployees = targetTeam.length
+  const targetResponsesCount = tableData.filter(
+    (r) => r.choice !== 'Pendente',
+  ).length
+  const pendingCount = totalEmployees - targetResponsesCount
 
   const handleExportCSV = () => {
     let csvContent =
@@ -119,13 +139,26 @@ export default function CampaignDashboard() {
     const link = `${window.location.origin}/coleta/${campaign.id}`
     const msg = `👕 *O RH precisa da sua ajuda!* Escolha seu tamanho para a campanha *${campaign.name}*. Clique aqui para responder: ${link}`
 
-    await sendSlackNotification(msg)
+    try {
+      if (campaign.targetType === 'all') {
+        await notifySlackChannel(msg)
+      } else {
+        const promises = targetTeam.map((emp) => notifySlackDM(emp.id, msg))
+        await Promise.allSettled(promises)
+      }
 
-    toast({
-      title: 'Notificação enviada',
-      description: `Mensagem enviada com sucesso ao Slack!`,
-      className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-    })
+      toast({
+        title: 'Notificação enviada',
+        description: `Mensagem enviada com sucesso ao Slack!`,
+        className: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+      })
+    } catch (error) {
+      toast({
+        title: 'Erro ao notificar',
+        description: 'Não foi possível enviar a notificação para o Slack.',
+        variant: 'destructive',
+      })
+    }
   }
 
   const handleToggleStatus = async () => {
@@ -210,6 +243,16 @@ export default function CampaignDashboard() {
               >
                 {campaign.status}
               </Badge>
+              <Badge
+                variant="secondary"
+                className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-[#ADADAD]"
+              >
+                {campaign.targetType === 'all' && 'Toda a Empresa'}
+                {campaign.targetType === 'departments' &&
+                  'Departamentos Selecionados'}
+                {campaign.targetType === 'employees' &&
+                  'Colaboradores Selecionados'}
+              </Badge>
             </div>
             {campaign.description && (
               <p className="text-slate-600 dark:text-[#ADADAD] max-w-2xl break-words">
@@ -287,7 +330,7 @@ export default function CampaignDashboard() {
         <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
-              Total de Colaboradores
+              Público-Alvo
             </CardTitle>
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
@@ -307,11 +350,13 @@ export default function CampaignDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900 dark:text-white">
-              {responsesCount}
+              {targetResponsesCount}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {((responsesCount / totalEmployees) * 100).toFixed(0)}% de
-              conclusão
+              {totalEmployees > 0
+                ? ((targetResponsesCount / totalEmployees) * 100).toFixed(0)
+                : 0}
+              % de conclusão
             </p>
           </CardContent>
         </Card>
@@ -339,7 +384,7 @@ export default function CampaignDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 min-h-0">
-            {responsesCount > 0 ? (
+            {targetResponsesCount > 0 ? (
               <ChartContainer config={chartConfig} className="h-[300px] w-full">
                 <BarChart
                   data={chartData}
@@ -384,7 +429,7 @@ export default function CampaignDashboard() {
         <Card className="md:col-span-2 bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none h-[420px] flex flex-col">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Lista de Respostas
+              Lista de Respostas do Público-Alvo
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-1 min-h-0 p-0 overflow-auto rounded-b-2xl">

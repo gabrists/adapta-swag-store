@@ -194,6 +194,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         name: emp.name,
         email: emp.email,
         department: emp.departments?.name || 'Geral',
+        departmentId: emp.department_id,
         role: emp.role || 'Colaborador',
         avatarUrl: emp.avatar_url,
         onboardingKitStatus: emp.onboarding_kit_status || 'Pendente',
@@ -340,6 +341,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         imageUrl: d.image_url,
         status: d.status as 'Aberta' | 'Fechada',
         options: d.options as string[],
+        targetType: d.target_type || 'all',
+        targetIds: d.target_ids || [],
         createdAt: d.created_at,
       })) || []
 
@@ -377,6 +380,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       description: data.description,
       image_url: data.imageUrl,
       options: data.options,
+      target_type: data.targetType,
+      target_ids: data.targetIds,
     })
     if (error) throw error
     await fetchCampaigns()
@@ -394,6 +399,8 @@ export function SwagProvider({ children }: { children: ReactNode }) {
     if (data.imageUrl !== undefined) updates.image_url = data.imageUrl
     if (data.options !== undefined) updates.options = data.options
     if (data.status !== undefined) updates.status = data.status
+    if (data.targetType !== undefined) updates.target_type = data.targetType
+    if (data.targetIds !== undefined) updates.target_ids = data.targetIds
 
     const { error } = await supabase
       .from('swag_campaigns' as any)
@@ -477,7 +484,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
   }
 
   const notifySlackDM = async (employeeId: string, text: string) => {
-    // 1. Ensure we always use the latest email from the employees table to avoid stale session data errors
     const { data: employee } = await supabase
       .from('employees')
       .select('email')
@@ -495,11 +501,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
     const payloadInfo = { type: 'dm', email, text }
     console.log('Sending Slack DM:', payloadInfo)
-
-    toast({
-      title: 'Slack DM',
-      description: 'DM enviada para o Slack do colaborador',
-    })
 
     if (!slackSettings?.botToken || !slackSettings?.isEnabled) {
       console.log('Slack Bot Token Missing or Disabled. Payload:', payloadInfo)
@@ -570,6 +571,10 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         user.id,
         '🔔 *Teste de Conexão (DM):* O sistema Adapta Swag Store está conectado ao Slack com sucesso!',
       )
+      toast({
+        title: 'Testes enviados',
+        description: 'Verifique o canal do RH e suas DMs no Slack.',
+      })
     }
   }
 
@@ -702,7 +707,6 @@ export function SwagProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error
 
-      // Get latest employee email to ensure no stale data in channel message
       const { data: currentEmp } = await supabase
         .from('employees')
         .select('email')
