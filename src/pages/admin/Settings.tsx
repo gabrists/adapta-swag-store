@@ -133,6 +133,7 @@ export default function Settings() {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type="password"
                         className="h-12"
                         placeholder="https://hooks.slack.com/services/..."
                         {...field}
@@ -157,6 +158,7 @@ export default function Settings() {
                     </FormLabel>
                     <FormControl>
                       <Input
+                        type="password"
                         className="h-12"
                         placeholder="xoxb-..."
                         {...field}
