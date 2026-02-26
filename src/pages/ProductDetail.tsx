@@ -134,14 +134,21 @@ export default function ProductDetail() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
-        <div className="flex flex-col-reverse md:flex-row gap-4">
-          <div className="flex md:flex-col gap-3 overflow-x-auto md:w-20 shrink-0 scrollbar-none pb-2 md:pb-0">
+        <div className="flex flex-col gap-4 w-full">
+          <div className="w-full aspect-square bg-slate-100 dark:bg-black/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 relative">
+            <img
+              src={images[mainImage]}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-500"
+            />
+          </div>
+          <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2">
             {images.map((img, i) => (
               <button
                 key={i}
                 onClick={() => setMainImage(i)}
                 className={cn(
-                  'relative rounded-xl overflow-hidden aspect-square border-2 shrink-0 w-20 md:w-full transition-all',
+                  'relative rounded-xl overflow-hidden aspect-square border-2 shrink-0 w-20 transition-all',
                   mainImage === i
                     ? 'border-[#00CA7E] shadow-sm'
                     : 'border-transparent opacity-70 hover:opacity-100',
@@ -154,13 +161,6 @@ export default function ProductDetail() {
                 />
               </button>
             ))}
-          </div>
-          <div className="flex-1 aspect-[4/5] sm:aspect-square bg-slate-100 dark:bg-black/40 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 relative">
-            <img
-              src={images[mainImage]}
-              alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-500"
-            />
           </div>
         </div>
 
