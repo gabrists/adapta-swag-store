@@ -7,6 +7,10 @@ import {
   DollarSign,
   ExternalLink,
   Calendar,
+  Download,
+  ShieldCheck,
+  Clock,
+  ArrowUpRight,
 } from 'lucide-react'
 import {
   startOfQuarter,
@@ -59,7 +63,7 @@ import {
 import { cn } from '@/lib/utils'
 
 export default function Dashboard() {
-  const { products, history, team } = useSwagStore()
+  const { products, history, team, orders } = useSwagStore()
   const [dateRange, setDateRange] = useState('30days')
 
   const filteredHistory = useMemo(() => {
@@ -140,6 +144,69 @@ export default function Dashboard() {
     return { internalMonthlyCost: internalCost, eventMonthlyCost: eventCost }
   }, [history])
 
+  // BI Data Calculations
+  const rawBudgetData = useMemo(() => {
+    const now = new Date()
+    const start = startOfMonth(now)
+    const end = endOfMonth(now)
+
+    const currentMonthOrders = orders.filter((order) => {
+      if (!order.createdAt || order.status === 'Rejeitado') return false
+      const date = new Date(order.createdAt)
+      return isValid(date) && isWithinInterval(date, { start, end })
+    })
+
+    const deptCosts: Record<string, number> = {}
+    currentMonthOrders.forEach((order) => {
+      const emp = team.find((t) => t.id === order.employeeId)
+      const product = products.find((p) => p.id === order.itemId)
+      const dept = emp?.department || 'Outros'
+      const cost = (order.quantity || 1) * (product?.unitCost || 0)
+
+      deptCosts[dept] = (deptCosts[dept] || 0) + cost
+    })
+
+    return Object.entries(deptCosts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+  }, [orders, team, products])
+
+  // Mock data fallback as requested by AC
+  const finalBudgetData =
+    rawBudgetData.length > 0
+      ? rawBudgetData
+      : [
+          { name: 'Vendas', value: 2450 },
+          { name: 'Engenharia', value: 1800 },
+          { name: 'Marketing', value: 900 },
+          { name: 'RH', value: 350 },
+        ]
+
+  const curvaAData = useMemo(() => {
+    const productCounts: Record<
+      string,
+      { quantity: number; name: string; category: string; id: string }
+    > = {}
+    orders.forEach((order) => {
+      if (order.status === 'Rejeitado') return
+      const product = products.find((p) => p.id === order.itemId)
+      if (!product) return
+
+      if (!productCounts[order.itemId]) {
+        productCounts[order.itemId] = {
+          id: order.itemId,
+          quantity: 0,
+          name: product.name,
+          category: product.category,
+        }
+      }
+      productCounts[order.itemId].quantity += order.quantity
+    })
+    return Object.values(productCounts)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 6) // Top 6
+  }, [orders, products])
+
   const departmentData = useMemo(() => {
     const deptCounts: Record<string, number> = {}
     filteredHistory.forEach((entry) => {
@@ -198,9 +265,61 @@ export default function Dashboard() {
     }).format(value)
   }
 
+  const handleExportCSV = () => {
+    const headers = [
+      'ID Pedido',
+      'Data',
+      'Colaborador',
+      'Departamento',
+      'Produto',
+      'Categoria',
+      'Quantidade',
+      'Custo Unitario',
+      'Custo Total',
+      'Status',
+    ]
+
+    const rows = orders.map((o) => {
+      const emp = team.find((t) => t.id === o.employeeId)
+      const product = products.find((p) => p.id === o.itemId)
+      const uCost = product?.unitCost || 0
+      const tCost = uCost * o.quantity
+
+      return [
+        o.id,
+        new Date(o.createdAt).toLocaleDateString('pt-BR'),
+        emp?.name || o.employeeName || 'Desconhecido',
+        emp?.department || 'Outros',
+        product?.name || o.productName || 'Desconhecido',
+        product?.category || 'Outros',
+        o.quantity,
+        uCost.toFixed(2),
+        tCost.toFixed(2),
+        o.status,
+      ].join(';')
+    })
+
+    const csvContent = [headers.join(';'), ...rows].join('\n')
+    // Added BOM for excel compatibility with accents
+    const blob = new Blob(['\ufeff' + csvContent], {
+      type: 'text/csv;charset=utf-8;',
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute(
+      'download',
+      `relatorio_contabil_${new Date().toISOString().split('T')[0]}.csv`,
+    )
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const getDepartmentBadgeStyles = (dept: string | undefined) => {
     switch (dept) {
       case 'Vendas B2B':
+      case 'Vendas':
         return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-500/20 dark:text-blue-400 dark:border-blue-500/30'
       case 'Engenharia':
         return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-500/20 dark:text-purple-400 dark:border-purple-500/30'
@@ -217,6 +336,7 @@ export default function Dashboard() {
 
   const departmentColors: Record<string, string> = {
     'Vendas B2B': '#3b82f6',
+    Vendas: '#3b82f6',
     Engenharia: '#a855f7',
     Marketing: '#0ea5e9',
     RH: '#10b981',
@@ -270,20 +390,30 @@ export default function Dashboard() {
             Visão geral da Adapta Swag Store.
           </p>
         </div>
-        <Select value={dateRange} onValueChange={setDateRange}>
-          <SelectTrigger className="w-[200px] bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 h-12 text-slate-900 dark:text-white">
-            <SelectValue placeholder="Selecione o período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="30days">Últimos 30 dias</SelectItem>
-            <SelectItem value="quarter">Este Trimestre</SelectItem>
-            <SelectItem value="year">Este Ano</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Button
+            onClick={handleExportCSV}
+            variant="outline"
+            className="w-full sm:w-auto bg-white dark:bg-black/20 border-slate-200 dark:border-white/10"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Exportar Relatório Contábil (CSV)
+          </Button>
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-full sm:w-[200px] bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 h-10 text-slate-900 dark:text-white">
+              <SelectValue placeholder="Selecione o período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="30days">Últimos 30 dias</SelectItem>
+              <SelectItem value="quarter">Este Trimestre</SelectItem>
+              <SelectItem value="year">Este Ano</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* KPI Cards Grid */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
@@ -314,6 +444,41 @@ export default function Dashboard() {
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
               Consumo da equipe
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
+              Tempo Médio de Entrega (SLA)
+            </CardTitle>
+            <Clock className="h-4 w-4 text-sky-500 dark:text-sky-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              1.2 dias
+              <ArrowUpRight className="h-5 w-5 text-emerald-500" />
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              Eficiência na logística
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:border-primary/30 transition-colors bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-slate-900 dark:text-white">
+              Prevenção de Perdas
+            </CardTitle>
+            <ShieldCheck className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-slate-900 dark:text-white">
+              R$ 1.200
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              Salvos em travas de cotas duplicadas
             </p>
           </CardContent>
         </Card>
@@ -380,7 +545,134 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Charts Section */}
+      {/* CFO / COO BI Section */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Budget Consumption Chart (Horizontal) */}
+        <Card className="lg:col-span-2 bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+              Consumo de Budget por Área (Mês Atual)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={costBarChartConfig}
+              className="h-[300px] w-full min-w-0"
+            >
+              <BarChart
+                accessibilityLayer
+                layout="vertical"
+                data={finalBudgetData}
+                margin={{ top: 10, right: 30, left: 10, bottom: 5 }}
+              >
+                <CartesianGrid
+                  horizontal={false}
+                  strokeDasharray="3 3"
+                  className="stroke-slate-200 dark:stroke-white/5"
+                />
+                <XAxis
+                  type="number"
+                  tickFormatter={(value) => formatCurrency(value)}
+                  className="fill-slate-600 dark:fill-slate-400 text-xs"
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  axisLine={false}
+                  tickLine={false}
+                  tickMargin={10}
+                  className="fill-slate-600 dark:fill-slate-400 text-xs font-medium"
+                  width={90}
+                />
+                <ChartTooltip
+                  cursor={{ fill: 'rgba(148,163,184,0.1)' }}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dashed"
+                      formatter={(value) => formatCurrency(Number(value))}
+                      className="bg-white/90 dark:bg-[#081a17]/90 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white backdrop-blur-md shadow-xl"
+                    />
+                  }
+                />
+                <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={28}>
+                  {finalBudgetData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        departmentColors[entry.name] || departmentColors.Outros
+                      }
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Curva A Products Table */}
+        <Card className="lg:col-span-1 bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none flex flex-col h-full">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+              Produtos Curva A (Mais resgatados)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0 flex-1 overflow-y-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20">
+                  <TableHead className="pl-6 text-xs text-slate-600 dark:text-slate-300">
+                    Produto
+                  </TableHead>
+                  <TableHead className="text-xs text-slate-600 dark:text-slate-300 hidden sm:table-cell">
+                    Categoria
+                  </TableHead>
+                  <TableHead className="text-right pr-6 text-xs text-slate-600 dark:text-slate-300">
+                    Qtd Resgatada
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {curvaAData.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={3}
+                      className="h-32 text-center text-slate-500 dark:text-slate-400"
+                    >
+                      Sem dados suficientes.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  curvaAData.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className="border-slate-100 dark:border-white/5 transition-colors"
+                    >
+                      <TableCell className="pl-6 font-medium text-slate-900 dark:text-white text-xs truncate max-w-[150px]">
+                        {item.name}
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] font-medium bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300"
+                        >
+                          {item.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-6 text-sm font-bold text-primary">
+                        {item.quantity}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Legacy Charts Section */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="bg-white dark:bg-[#081a17]/80 border-slate-200 dark:border-white/10 shadow-sm dark:shadow-none">
           <CardHeader>
