@@ -323,6 +323,48 @@ export type Database = {
           },
         ]
       }
+      product_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          product_id: string | null
+          rating: number | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          product_id?: string | null
+          rating?: number | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          product_id?: string | null
+          rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'product_reviews_employee_id_fkey'
+            columns: ['employee_id']
+            isOneToOne: false
+            referencedRelation: 'employees'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'product_reviews_product_id_fkey'
+            columns: ['product_id']
+            isOneToOne: false
+            referencedRelation: 'items'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       slack_settings: {
         Row: {
           bot_token: string | null
@@ -599,6 +641,13 @@ export const Constants = {
 //   status: text (not null, default: 'Pendente'::text)
 //   rejection_reason: text (nullable)
 //   created_at: timestamp with time zone (nullable, default: now())
+// Table: product_reviews
+//   id: uuid (not null, default: gen_random_uuid())
+//   product_id: uuid (nullable)
+//   employee_id: uuid (nullable)
+//   rating: integer (nullable)
+//   comment: text (nullable)
+//   created_at: timestamp with time zone (nullable, default: now())
 // Table: slack_settings
 //   id: uuid (not null, default: gen_random_uuid())
 //   webhook_url: text (not null, default: ''::text)
@@ -649,6 +698,11 @@ export const Constants = {
 //   FOREIGN KEY orders_item_id_fkey: FOREIGN KEY (item_id) REFERENCES items(id)
 //   PRIMARY KEY orders_pkey: PRIMARY KEY (id)
 //   CHECK orders_status_check: CHECK ((status = ANY (ARRAY['Pendente'::text, 'Entregue'::text, 'Rejeitado'::text])))
+// Table: product_reviews
+//   FOREIGN KEY product_reviews_employee_id_fkey: FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+//   PRIMARY KEY product_reviews_pkey: PRIMARY KEY (id)
+//   FOREIGN KEY product_reviews_product_id_fkey: FOREIGN KEY (product_id) REFERENCES items(id) ON DELETE CASCADE
+//   CHECK product_reviews_rating_check: CHECK (((rating >= 1) AND (rating <= 5)))
 // Table: slack_settings
 //   PRIMARY KEY slack_settings_pkey: PRIMARY KEY (id)
 // Table: swag_campaigns

@@ -9,6 +9,7 @@ import { AuthProvider } from '@/stores/useAuthStore'
 import Layout from '@/components/Layout'
 import RequireAuth from '@/components/RequireAuth'
 import RequireAdmin from '@/components/RequireAdmin'
+import ScrollToTop from '@/components/ScrollToTop'
 import Index from '@/pages/Index'
 import HistoryPage from '@/pages/History'
 import ManageProducts from '@/pages/ManageProducts'
@@ -36,6 +37,7 @@ const App = () => {
     <BrowserRouter
       future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
     >
+      <ScrollToTop />
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
         <TooltipProvider>
           <AuthProvider>
