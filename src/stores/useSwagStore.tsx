@@ -85,6 +85,7 @@ interface SwagContextType {
     id: string,
     status: 'Aberta' | 'Fechada',
   ) => Promise<void>
+  deleteCampaign: (id: string) => Promise<void>
   submitCampaignResponse: (
     campaignId: string,
     employeeId: string,
@@ -424,6 +425,19 @@ export function SwagProvider({ children }: { children: ReactNode }) {
       .eq('id', id)
     if (error) throw error
     await fetchCampaigns()
+  }
+
+  const deleteCampaign = async (id: string) => {
+    if (!checkAdminPermission()) return
+    const { error } = await supabase
+      .from('swag_campaigns' as any)
+      .delete()
+      .eq('id', id)
+    if (error) {
+      console.error(error)
+      throw error
+    }
+    setCampaigns((prev) => prev.filter((c) => c.id !== id))
   }
 
   const submitCampaignResponse = async (
@@ -1300,6 +1314,7 @@ export function SwagProvider({ children }: { children: ReactNode }) {
         createCampaign,
         updateCampaign,
         updateCampaignStatus,
+        deleteCampaign,
         submitCampaignResponse,
         isLoading,
       }}

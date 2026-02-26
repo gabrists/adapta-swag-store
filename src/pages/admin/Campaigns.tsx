@@ -15,6 +15,7 @@ import {
   Copy,
   Check,
   ChevronsUpDown,
+  Trash2,
 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -65,6 +66,15 @@ import {
   CommandItem,
 } from '@/components/ui/command'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 
 import useSwagStore from '@/stores/useSwagStore'
@@ -87,10 +97,15 @@ export default function CampaignsPage() {
     departments,
     createCampaign,
     updateCampaign,
+    deleteCampaign,
   } = useSwagStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null)
+  const [campaignToDelete, setCampaignToDelete] = useState<Campaign | null>(
+    null,
+  )
+  const [isDeleting, setIsDeleting] = useState(false)
   const [options, setOptions] = useState<string[]>([])
   const [optionInput, setOptionInput] = useState('')
   const [isUploadingImage, setIsUploadingImage] = useState(false)
@@ -437,6 +452,15 @@ export default function CampaignsPage() {
                           title="Editar"
                         >
                           <Pencil className="h-4 w-4 text-slate-500 dark:text-[#ADADAD] hover:text-primary dark:hover:text-primary transition-colors" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setCampaignToDelete(campaign)}
+                          className="hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-500/20 dark:hover:text-red-400 text-slate-500 dark:text-[#ADADAD]"
+                          title="Excluir"
+                        >
+                          <Trash2 className="h-4 w-4 transition-colors" />
                         </Button>
                         <Link to={`/admin/campanhas/${campaign.id}`}>
                           <Button variant="outline" size="sm">
@@ -914,6 +938,64 @@ export default function CampaignsPage() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={!!campaignToDelete}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setCampaignToDelete(null)
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-[425px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Campanha</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta campanha? Esta ação não pode
+              ser desfeita e todos os dados de respostas vinculados serão
+              removidos permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancelar
+            </AlertDialogCancel>
+            <Button
+              variant="destructive"
+              onClick={async (e) => {
+                e.preventDefault()
+                if (!campaignToDelete) return
+                setIsDeleting(true)
+                try {
+                  await deleteCampaign(campaignToDelete.id)
+                  toast({
+                    title: 'Sucesso',
+                    description: 'Campanha excluída com sucesso!',
+                    className:
+                      'bg-emerald-50 border-emerald-200 text-emerald-900',
+                  })
+                  setCampaignToDelete(null)
+                } catch (error) {
+                  toast({
+                    title: 'Erro',
+                    description:
+                      'Erro ao excluir campanha. Por favor, tente novamente.',
+                    variant: 'destructive',
+                  })
+                } finally {
+                  setIsDeleting(false)
+                }
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
+              Excluir
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
